@@ -71,7 +71,7 @@ const AppNavigator = () => {
             } else if (route.name === 'Trips') {
               iconName = focused ? 'map' : 'map-outline';
             } else if (route.name === 'Trucks') {
-              iconName = focused ? 'car' : 'car-outline';
+              iconName = focused ? 'car-sport' : 'car-outline';
             } else {
               iconName = 'help-outline';
             }

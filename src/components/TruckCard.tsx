@@ -30,7 +30,7 @@ const TruckCard: React.FC<TruckCardProps> = ({
       <View style={styles.header}>
         <View style={styles.truckInfo}>
           <Text style={styles.truckName}>{truck.name}</Text>
-          <Text style={styles.truckNumber}>{truck.truckNumber}</Text>
+          <Text style={styles.truckNumber}>{truck.truck_number}</Text>
           <Text style={styles.truckModel}>{truck.model}</Text>
         </View>
         <View style={styles.actions}>

@@ -29,14 +29,14 @@ interface AddTripScreenProps {
 
 const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
   const [formData, setFormData] = useState<TripFormData>({
-    truckId: route?.params?.truckId || '',
+    truck_id: route?.params?.truckId || '',
     source: '',
     destination: '',
-    dieselQuantity: 0,
-    dieselPricePerLiter: 0,
-    fastTagCost: 0,
-    mcdCost: 0,
-    greenTaxCost: 0,
+    diesel_quantity: 0,
+    diesel_price_per_liter: 0,
+    fast_tag_cost: 0,
+    mcd_cost: 0,
+    green_tax_cost: 0,
   });
 
   const [errors, setErrors] = useState<TripFormErrors>({});
@@ -63,19 +63,19 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
 
   const calculateTotalCost = () => {
     return tripService.calculateTotalCost({
-      diesel_quantity: formData.dieselQuantity,
-      diesel_price_per_liter: formData.dieselPricePerLiter,
-      fast_tag_cost: formData.fastTagCost,
-      mcd_cost: formData.mcdCost,
-      green_tax_cost: formData.greenTaxCost,
+      diesel_quantity: formData.diesel_quantity,
+      diesel_price_per_liter: formData.diesel_price_per_liter,
+      fast_tag_cost: formData.fast_tag_cost,
+      mcd_cost: formData.mcd_cost,
+      green_tax_cost: formData.green_tax_cost,
     });
   };
 
   const validateForm = (): boolean => {
     const newErrors: TripFormErrors = {};
 
-    if (!formData.truckId) {
-      newErrors.truckId = 'Please select a truck';
+    if (!formData.truck_id) {
+      newErrors.truck_id = 'Please select a truck';
     }
     if (!formData.source.trim()) {
       newErrors.source = 'Source is required';
@@ -83,20 +83,20 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
     if (!formData.destination.trim()) {
       newErrors.destination = 'Destination is required';
     }
-    if (formData.dieselQuantity <= 0) {
-      newErrors.dieselQuantity = 'Diesel quantity must be greater than 0';
+    if (formData.diesel_quantity <= 0) {
+      newErrors.diesel_quantity = 'Diesel quantity must be greater than 0';
     }
-    if (formData.dieselPricePerLiter <= 0) {
-      newErrors.dieselPricePerLiter = 'Diesel price must be greater than 0';
+    if (formData.diesel_price_per_liter <= 0) {
+      newErrors.diesel_price_per_liter = 'Diesel price must be greater than 0';
     }
-    if (formData.fastTagCost < 0) {
-      newErrors.fastTagCost = 'Fast tag cost cannot be negative';
+    if (formData.fast_tag_cost < 0) {
+      newErrors.fast_tag_cost = 'Fast tag cost cannot be negative';
     }
-    if (formData.mcdCost < 0) {
-      newErrors.mcdCost = 'MCD cost cannot be negative';
+    if (formData.mcd_cost < 0) {
+      newErrors.mcd_cost = 'MCD cost cannot be negative';
     }
-    if (formData.greenTaxCost < 0) {
-      newErrors.greenTaxCost = 'Green tax cost cannot be negative';
+    if (formData.green_tax_cost < 0) {
+      newErrors.green_tax_cost = 'Green tax cost cannot be negative';
     }
 
     setErrors(newErrors);
@@ -112,14 +112,14 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
     
     try {
       await tripService.createTrip({
-        truck_id: formData.truckId,
+        truck_id: formData.truck_id,
         source: formData.source.trim(),
         destination: formData.destination.trim(),
-        diesel_quantity: formData.dieselQuantity,
-        diesel_price_per_liter: formData.dieselPricePerLiter,
-        fast_tag_cost: formData.fastTagCost,
-        mcd_cost: formData.mcdCost,
-        green_tax_cost: formData.greenTaxCost,
+        diesel_quantity: formData.diesel_quantity,
+        diesel_price_per_liter: formData.diesel_price_per_liter,
+        fast_tag_cost: formData.fast_tag_cost,
+        mcd_cost: formData.mcd_cost,
+        green_tax_cost: formData.green_tax_cost,
         trip_date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
       });
 
@@ -192,20 +192,20 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                       key={truck.id}
                       style={[
                         styles.truckOption,
-                        formData.truckId === truck.id && styles.truckOptionSelected,
+                        formData.truck_id === truck.id && styles.truckOptionSelected,
                       ]}
-                      onPress={() => updateFormData('truckId', truck.id)}
+                      onPress={() => updateFormData('truck_id', truck.id)}
                       activeOpacity={0.8}
                     >
                       <Text style={[
                         styles.truckOptionText,
-                        formData.truckId === truck.id && styles.truckOptionTextSelected,
+                        formData.truck_id === truck.id && styles.truckOptionTextSelected,
                       ]}>
                         {truck.name}
                       </Text>
                       <Text style={[
                         styles.truckOptionSubtext,
-                        formData.truckId === truck.id && styles.truckOptionSubtextSelected,
+                        formData.truck_id === truck.id && styles.truckOptionSubtextSelected,
                       ]}>
                         {truck.truck_number}
                       </Text>
@@ -223,8 +223,8 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                   />
                 </View>
               )}
-              {errors.truckId && (
-                <Text style={styles.errorText}>{errors.truckId}</Text>
+              {errors.truck_id && (
+                <Text style={styles.errorText}>{errors.truck_id}</Text>
               )}
             </View>
 
@@ -255,19 +255,19 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
               <CustomInput
                 label="Diesel Quantity (Liters)"
                 placeholder="0"
-                value={formData.dieselQuantity.toString()}
-                onChangeText={(text) => updateFormData('dieselQuantity', parseFloat(text) || 0)}
+                value={formData.diesel_quantity.toString()}
+                onChangeText={(text) => updateFormData('diesel_quantity', parseFloat(text) || 0)}
                 keyboardType="numeric"
-                error={errors.dieselQuantity}
+                error={errors.diesel_quantity}
                 required
               />
               <CustomInput
                 label="Diesel Price per Liter (₹)"
                 placeholder="0"
-                value={formData.dieselPricePerLiter.toString()}
-                onChangeText={(text) => updateFormData('dieselPricePerLiter', parseFloat(text) || 0)}
+                value={formData.diesel_price_per_liter.toString()}
+                onChangeText={(text) => updateFormData('diesel_price_per_liter', parseFloat(text) || 0)}
                 keyboardType="numeric"
-                error={errors.dieselPricePerLiter}
+                error={errors.diesel_price_per_liter}
                 required
               />
             </View>
@@ -278,26 +278,26 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
               <CustomInput
                 label="Fast Tag Cost (₹)"
                 placeholder="0"
-                value={formData.fastTagCost.toString()}
-                onChangeText={(text) => updateFormData('fastTagCost', parseFloat(text) || 0)}
+                value={formData.fast_tag_cost.toString()}
+                onChangeText={(text) => updateFormData('fast_tag_cost', parseFloat(text) || 0)}
                 keyboardType="numeric"
-                error={errors.fastTagCost}
+                error={errors.fast_tag_cost}
               />
               <CustomInput
                 label="MCD Cost (₹)"
                 placeholder="0"
-                value={formData.mcdCost.toString()}
-                onChangeText={(text) => updateFormData('mcdCost', parseFloat(text) || 0)}
+                value={formData.mcd_cost.toString()}
+                onChangeText={(text) => updateFormData('mcd_cost', parseFloat(text) || 0)}
                 keyboardType="numeric"
-                error={errors.mcdCost}
+                error={errors.mcd_cost}
               />
               <CustomInput
                 label="Green Tax Cost (₹)"
                 placeholder="0"
-                value={formData.greenTaxCost.toString()}
-                onChangeText={(text) => updateFormData('greenTaxCost', parseFloat(text) || 0)}
+                value={formData.green_tax_cost.toString()}
+                onChangeText={(text) => updateFormData('green_tax_cost', parseFloat(text) || 0)}
                 keyboardType="numeric"
-                error={errors.greenTaxCost}
+                error={errors.green_tax_cost}
               />
             </View>
 
@@ -306,8 +306,8 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
               <Text style={styles.totalCostLabel}>Total Trip Cost</Text>
               <Text style={styles.totalCostValue}>₹{totalCost.toLocaleString('en-IN')}</Text>
               <Text style={styles.totalCostBreakdown}>
-                Diesel: ₹{(formData.dieselQuantity * formData.dieselPricePerLiter).toLocaleString('en-IN')} | 
-                Other: ₹{(formData.fastTagCost + formData.mcdCost + formData.greenTaxCost).toLocaleString('en-IN')}
+                Diesel: ₹{(formData.diesel_quantity * formData.diesel_price_per_liter).toLocaleString('en-IN')} | 
+                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost).toLocaleString('en-IN')}
               </Text>
             </View>
 

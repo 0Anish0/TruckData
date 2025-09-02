@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SIZES } from '../constants/theme';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -42,6 +43,7 @@ const TrucksStack = () => (
 
 const AppNavigator = () => {
   const { user, loading } = useAuth();
+  const insets = useSafeAreaInsets();
 
   if (loading) {
     return null; // Or a loading screen
@@ -83,8 +85,8 @@ const AppNavigator = () => {
             borderTopWidth: 1,
             borderTopColor: COLORS.border,
             paddingTop: SIZES.spacingSm,
-            paddingBottom: SIZES.spacingSm,
-            height: 60,
+            paddingBottom: Math.max(insets.bottom, SIZES.spacingSm),
+            height: 60 + Math.max(insets.bottom - SIZES.spacingSm, 0),
             ...SIZES.shadowStrong,
           },
           tabBarLabelStyle: {

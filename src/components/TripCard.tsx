@@ -19,8 +19,8 @@ const TripCard: React.FC<TripCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -57,35 +57,35 @@ const TripCard: React.FC<TripCardProps> = ({
       <View style={styles.details}>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Date:</Text>
-          <Text style={styles.detailValue}>{formatDate(trip.tripDate)}</Text>
+          <Text style={styles.detailValue}>{formatDate(trip.trip_date)}</Text>
         </View>
         
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Diesel:</Text>
           <Text style={styles.detailValue}>
-            {trip.dieselQuantity}L @ {formatCurrency(trip.dieselPricePerLiter)}
+            {trip.diesel_quantity}L @ {formatCurrency(trip.diesel_price_per_liter)}
           </Text>
         </View>
 
         <View style={styles.costsContainer}>
           <View style={styles.costItem}>
             <Text style={styles.costLabel}>Fast Tag</Text>
-            <Text style={styles.costValue}>{formatCurrency(trip.fastTagCost)}</Text>
+            <Text style={styles.costValue}>{formatCurrency(trip.fast_tag_cost)}</Text>
           </View>
           <View style={styles.costItem}>
             <Text style={styles.costLabel}>MCD</Text>
-            <Text style={styles.costValue}>{formatCurrency(trip.mcdCost)}</Text>
+            <Text style={styles.costValue}>{formatCurrency(trip.mcd_cost)}</Text>
           </View>
           <View style={styles.costItem}>
             <Text style={styles.costLabel}>Green Tax</Text>
-            <Text style={styles.costValue}>{formatCurrency(trip.greenTaxCost)}</Text>
+            <Text style={styles.costValue}>{formatCurrency(trip.green_tax_cost)}</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.totalContainer}>
         <Text style={styles.totalLabel}>Total Cost</Text>
-        <Text style={styles.totalValue}>{formatCurrency(trip.totalCost)}</Text>
+        <Text style={styles.totalValue}>{formatCurrency(trip.total_cost)}</Text>
       </View>
     </TouchableOpacity>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,90 +14,45 @@ import { COLORS, SIZES, FONTS } from '../constants/theme';
 import { Truck, Trip } from '../types';
 import TruckCard from '../components/TruckCard';
 import CustomButton from '../components/CustomButton';
-
-// Mock data
-const mockTrucks: Truck[] = [
-  {
-    id: '1',
-    name: 'Truck 1',
-    truckNumber: 'DL-01-AB-1234',
-    model: 'Tata 407',
-    createdAt: new Date('2023-06-15'),
-  },
-  {
-    id: '2',
-    name: 'Truck 2',
-    truckNumber: 'DL-02-CD-5678',
-    model: 'Ashok Leyland Dost',
-    createdAt: new Date('2023-08-20'),
-  },
-  {
-    id: '3',
-    name: 'Truck 3',
-    truckNumber: 'DL-03-EF-9012',
-    model: 'Mahindra Bolero Pickup',
-    createdAt: new Date('2023-12-10'),
-  },
-];
-
-const mockTrips: Trip[] = [
-  {
-    id: '1',
-    truckId: '1',
-    source: 'Delhi',
-    destination: 'Kolkata',
-    dieselQuantity: 120,
-    dieselPricePerLiter: 95,
-    fastTagCost: 2500,
-    mcdCost: 800,
-    greenTaxCost: 150,
-    totalCost: 14250,
-    tripDate: new Date('2024-01-15'),
-    createdAt: new Date(),
-  },
-  {
-    id: '2',
-    truckId: '2',
-    source: 'Mumbai',
-    destination: 'Pune',
-    dieselQuantity: 80,
-    dieselPricePerLiter: 98,
-    fastTagCost: 1200,
-    mcdCost: 500,
-    greenTaxCost: 100,
-    totalCost: 9640,
-    tripDate: new Date('2024-01-14'),
-    createdAt: new Date(),
-  },
-  {
-    id: '3',
-    truckId: '1',
-    source: 'Kolkata',
-    destination: 'Delhi',
-    dieselQuantity: 125,
-    dieselPricePerLiter: 96,
-    fastTagCost: 2500,
-    mcdCost: 800,
-    greenTaxCost: 150,
-    totalCost: 14850,
-    tripDate: new Date('2024-01-10'),
-    createdAt: new Date(),
-  },
-];
+import { truckService } from '../services/truckService';
+import { tripService } from '../services/tripService';
 
 const TrucksScreen: React.FC = ({ navigation }: any) => {
+  const [trucks, setTrucks] = useState<Truck[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const onRefresh = () => {
+  const loadData = async () => {
+    try {
+      const [trucksData, tripsData] = await Promise.all([
+        truckService.getTrucks(),
+        tripService.getTrips(),
+      ]);
+      setTrucks(trucksData);
+      setTrips(tripsData);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    await loadData();
+    setRefreshing(false);
   };
 
   const getTruckStats = (truckId: string) => {
-    const truckTrips = mockTrips.filter(trip => trip.truckId === truckId);
+    const truckTrips = trips.filter(trip => trip.truck_id === truckId);
     const tripCount = truckTrips.length;
-    const totalCost = truckTrips.reduce((sum, trip) => sum + trip.totalCost, 0);
-    const totalDiesel = truckTrips.reduce((sum, trip) => sum + trip.dieselQuantity, 0);
+    const totalCost = truckTrips.reduce((sum, trip) => sum + trip.total_cost, 0);
+    const totalDiesel = truckTrips.reduce((sum, trip) => sum + trip.diesel_quantity, 0);
     const avgCost = tripCount > 0 ? totalCost / tripCount : 0;
 
     return {
@@ -109,27 +64,23 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
   };
 
   const handleAddTruck = () => {
-    Alert.alert(
-      'Add New Truck',
-      'This feature will be implemented when we integrate with Supabase',
-      [{ text: 'OK' }]
-    );
+    navigation.navigate('AddTruck');
   };
 
   const handleTruckPress = (truck: Truck) => {
-    // Navigate to truck details/trips
-    console.log('Truck pressed:', truck);
+    navigation.navigate('TruckTrips', { truck });
   };
 
   const handleEditTruck = (truck: Truck) => {
+    // TODO: Implement edit truck functionality
     Alert.alert(
       'Edit Truck',
-      `Edit ${truck.name} - This feature will be implemented when we integrate with Supabase`,
+      `Edit ${truck.name} - This feature will be implemented soon`,
       [{ text: 'OK' }]
     );
   };
 
-  const handleDeleteTruck = (truck: Truck) => {
+  const handleDeleteTruck = async (truck: Truck) => {
     Alert.alert(
       'Delete Truck',
       `Are you sure you want to delete ${truck.name}?`,
@@ -138,18 +89,23 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
         { 
           text: 'Delete', 
           style: 'destructive',
-          onPress: () => {
-            console.log('Delete truck:', truck);
-            Alert.alert('Success', 'Truck deleted successfully');
+          onPress: async () => {
+            try {
+              await truckService.deleteTruck(truck.id);
+              await loadData(); // Refresh the data
+              Alert.alert('Success', 'Truck deleted successfully');
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'Failed to delete truck');
+            }
           }
         },
       ]
     );
   };
 
-  const totalTrucks = mockTrucks.length;
-  const totalTrips = mockTrips.length;
-  const totalCost = mockTrips.reduce((sum, trip) => sum + trip.totalCost, 0);
+  const totalTrucks = trucks.length;
+  const totalTrips = trips.length;
+  const totalCost = trips.reduce((sum, trip) => sum + trip.total_cost, 0);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -207,20 +163,32 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
         }
         showsVerticalScrollIndicator={false}
       >
-        {mockTrucks.map(truck => {
-          const stats = getTruckStats(truck.id);
-          return (
-            <TruckCard
-              key={truck.id}
-              truck={truck}
-              tripCount={stats.tripCount}
-              totalCost={stats.totalCost}
-              onPress={() => handleTruckPress(truck)}
-              onEdit={() => handleEditTruck(truck)}
-              onDelete={() => handleDeleteTruck(truck)}
-            />
-          );
-        })}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading trucks...</Text>
+          </View>
+        ) : trucks.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="car-outline" size={64} color={COLORS.textTertiary} />
+            <Text style={styles.emptyTitle}>No trucks yet</Text>
+            <Text style={styles.emptySubtitle}>Add your first truck to get started</Text>
+          </View>
+        ) : (
+          trucks.map(truck => {
+            const stats = getTruckStats(truck.id);
+            return (
+              <TruckCard
+                key={truck.id}
+                truck={truck}
+                tripCount={stats.tripCount}
+                totalCost={stats.totalCost}
+                onPress={() => handleTruckPress(truck)}
+                onEdit={() => handleEditTruck(truck)}
+                onDelete={() => handleDeleteTruck(truck)}
+              />
+            );
+          })
+        )}
         
         <View style={styles.bottomSpacing} />
       </ScrollView>
@@ -308,6 +276,37 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: SIZES.spacingXl,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: SIZES.spacingXxl,
+  },
+  loadingText: {
+    fontSize: SIZES.fontSizeMd,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: SIZES.spacingXxl,
+    paddingHorizontal: SIZES.spacingLg,
+  },
+  emptyTitle: {
+    fontSize: SIZES.fontSizeXl,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    marginTop: SIZES.spacingLg,
+    marginBottom: SIZES.spacingSm,
+  },
+  emptySubtitle: {
+    fontSize: SIZES.fontSizeMd,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
 

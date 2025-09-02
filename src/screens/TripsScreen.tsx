@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,95 +7,57 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, FONTS } from '../constants/theme';
 import { Trip } from '../types';
 import TripCard from '../components/TripCard';
+import { tripService } from '../services/tripService';
+import { truckService } from '../services/truckService';
 
-// Mock trips data
-const mockTrips: Trip[] = [
-  {
-    id: '1',
-    truckId: '1',
-    source: 'Delhi',
-    destination: 'Kolkata',
-    dieselQuantity: 120,
-    dieselPricePerLiter: 95,
-    fastTagCost: 2500,
-    mcdCost: 800,
-    greenTaxCost: 150,
-    totalCost: 14250,
-    tripDate: new Date('2024-01-15'),
-    createdAt: new Date(),
-  },
-  {
-    id: '2',
-    truckId: '2',
-    source: 'Mumbai',
-    destination: 'Pune',
-    dieselQuantity: 80,
-    dieselPricePerLiter: 98,
-    fastTagCost: 1200,
-    mcdCost: 500,
-    greenTaxCost: 100,
-    totalCost: 9640,
-    tripDate: new Date('2024-01-14'),
-    createdAt: new Date(),
-  },
-  {
-    id: '3',
-    truckId: '1',
-    source: 'Kolkata',
-    destination: 'Delhi',
-    dieselQuantity: 125,
-    dieselPricePerLiter: 96,
-    fastTagCost: 2500,
-    mcdCost: 800,
-    greenTaxCost: 150,
-    totalCost: 14850,
-    tripDate: new Date('2024-01-10'),
-    createdAt: new Date(),
-  },
-  {
-    id: '4',
-    truckId: '2',
-    source: 'Pune',
-    destination: 'Mumbai',
-    dieselQuantity: 75,
-    dieselPricePerLiter: 97,
-    fastTagCost: 1200,
-    mcdCost: 500,
-    greenTaxCost: 100,
-    totalCost: 8775,
-    tripDate: new Date('2024-01-08'),
-    createdAt: new Date(),
-  },
-];
 
-const mockTrucks = [
-  { id: '1', name: 'Truck 1' },
-  { id: '2', name: 'Truck 2' },
-];
 
 const TripsScreen: React.FC = ({ navigation }: any) => {
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [trucks, setTrucks] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const onRefresh = () => {
+  const loadData = async () => {
+    try {
+      const [tripsData, trucksData] = await Promise.all([
+        tripService.getTrips(),
+        truckService.getTrucks(),
+      ]);
+      setTrips(tripsData);
+      setTrucks(trucksData);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    await loadData();
+    setRefreshing(false);
   };
 
-  const getTruckName = (truckId: string) => {
-    const truck = mockTrucks.find(t => t.id === truckId);
-    return truck ? truck.name : 'Unknown Truck';
+  const getTruckName = (trip: Trip) => {
+    return trip.trucks?.name || 'Unknown Truck';
   };
 
-  const filteredTrips = mockTrips.filter(trip => {
+  const filteredTrips = trips.filter(trip => {
     // Filter by truck
-    if (selectedFilter !== 'all' && trip.truckId !== selectedFilter) {
+    if (selectedFilter !== 'all' && trip.truck_id !== selectedFilter) {
       return false;
     }
     
@@ -105,7 +67,7 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
       return (
         trip.source.toLowerCase().includes(query) ||
         trip.destination.toLowerCase().includes(query) ||
-        getTruckName(trip.truckId).toLowerCase().includes(query)
+        getTruckName(trip).toLowerCase().includes(query)
       );
     }
     
@@ -113,7 +75,7 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
   });
 
   const totalTrips = filteredTrips.length;
-  const totalCost = filteredTrips.reduce((sum, trip) => sum + trip.totalCost, 0);
+  const totalCost = filteredTrips.reduce((sum, trip) => sum + trip.total_cost, 0);
   const avgCost = totalTrips > 0 ? totalCost / totalTrips : 0;
 
   const handleTripPress = (trip: Trip) => {
@@ -187,7 +149,7 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
             </Text>
           </TouchableOpacity>
           
-          {mockTrucks.map(truck => (
+          {trucks.map(truck => (
             <TouchableOpacity
               key={truck.id}
               style={[
@@ -222,7 +184,7 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
             <TripCard
               key={trip.id}
               trip={trip}
-              truckName={getTruckName(trip.truckId)}
+              truckName={getTruckName(trip)}
               onPress={() => handleTripPress(trip)}
               onEdit={() => handleEditTrip(trip)}
               onDelete={() => handleDeleteTrip(trip)}

@@ -1,24 +1,34 @@
 export interface Truck {
   id: string;
   name: string;
-  truckNumber: string;
+  truck_number: string;
   model: string;
-  createdAt: Date;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
 }
 
 export interface Trip {
   id: string;
-  truckId: string;
+  truck_id: string;
   source: string;
   destination: string;
-  dieselQuantity: number;
-  dieselPricePerLiter: number;
-  fastTagCost: number;
-  mcdCost: number;
-  greenTaxCost: number;
-  totalCost: number;
-  tripDate: Date;
-  createdAt: Date;
+  diesel_quantity: number;
+  diesel_price_per_liter: number;
+  fast_tag_cost: number;
+  mcd_cost: number;
+  green_tax_cost: number;
+  total_cost: number;
+  trip_date: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  trucks?: {
+    id: string;
+    name: string;
+    truck_number: string;
+    model: string;
+  };
 }
 
 export interface User {
@@ -29,23 +39,23 @@ export interface User {
 }
 
 export interface TripFormData {
-  truckId: string;
+  truck_id: string;
   source: string;
   destination: string;
-  dieselQuantity: number;
-  dieselPricePerLiter: number;
-  fastTagCost: number;
-  mcdCost: number;
-  greenTaxCost: number;
+  diesel_quantity: number;
+  diesel_price_per_liter: number;
+  fast_tag_cost: number;
+  mcd_cost: number;
+  green_tax_cost: number;
 }
 
 export interface TripFormErrors {
-  truckId?: string;
+  truck_id?: string;
   source?: string;
   destination?: string;
-  dieselQuantity?: string;
-  dieselPricePerLiter?: string;
-  fastTagCost?: string;
-  mcdCost?: string;
-  greenTaxCost?: string;
+  diesel_quantity?: string;
+  diesel_price_per_liter?: string;
+  fast_tag_cost?: string;
+  mcd_cost?: string;
+  green_tax_cost?: string;
 }

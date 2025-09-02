@@ -27,7 +27,10 @@ const TripCard: React.FC<TripCardProps> = ({
     });
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | undefined | null) => {
+    if (amount === undefined || amount === null || isNaN(amount)) {
+      return '₹0';
+    }
     return `₹${amount.toLocaleString('en-IN')}`;
   };
 
@@ -63,7 +66,7 @@ const TripCard: React.FC<TripCardProps> = ({
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Diesel:</Text>
           <Text style={styles.detailValue}>
-            {trip.diesel_quantity}L @ {formatCurrency(trip.diesel_price_per_liter)}
+            {trip.diesel_quantity || 0}L @ {formatCurrency(trip.diesel_price_per_liter)}
           </Text>
         </View>
 

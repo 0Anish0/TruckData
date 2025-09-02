@@ -51,8 +51,8 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
   const getTruckStats = (truckId: string) => {
     const truckTrips = trips.filter(trip => trip.truck_id === truckId);
     const tripCount = truckTrips.length;
-    const totalCost = truckTrips.reduce((sum, trip) => sum + trip.total_cost, 0);
-    const totalDiesel = truckTrips.reduce((sum, trip) => sum + trip.diesel_quantity, 0);
+    const totalCost = truckTrips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
+    const totalDiesel = truckTrips.reduce((sum, trip) => sum + (trip.diesel_quantity || 0), 0);
     const avgCost = tripCount > 0 ? totalCost / tripCount : 0;
 
     return {
@@ -105,7 +105,7 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
 
   const totalTrucks = trucks.length;
   const totalTrips = trips.length;
-  const totalCost = trips.reduce((sum, trip) => sum + trip.total_cost, 0);
+  const totalCost = trips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -139,7 +139,7 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
           <View style={styles.statIconContainer}>
             <Ionicons name="wallet" size={20} color={COLORS.fuel} />
           </View>
-          <Text style={styles.statValue}>₹{(totalCost / 1000).toFixed(1)}K</Text>
+          <Text style={styles.statValue}>₹{((totalCost || 0) / 1000).toFixed(1)}K</Text>
           <Text style={styles.statLabel}>Total Cost</Text>
         </View>
       </View>

@@ -10,13 +10,11 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIZES, FONTS } from '../constants/theme';
+import { COLORS, SIZES } from '../constants/theme';
 import { Trip } from '../types';
 import TripCard from '../components/TripCard';
 import { tripService } from '../services/tripService';
 import { truckService } from '../services/truckService';
-
-
 
 const TripsScreen: React.FC = ({ navigation }: any) => {
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -75,7 +73,7 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
   });
 
   const totalTrips = filteredTrips.length;
-  const totalCost = filteredTrips.reduce((sum, trip) => sum + trip.total_cost, 0);
+  const totalCost = filteredTrips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
   const avgCost = totalTrips > 0 ? totalCost / totalTrips : 0;
 
   const handleTripPress = (trip: Trip) => {
@@ -117,7 +115,7 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
           <View style={styles.statIconContainer}>
             <Ionicons name="wallet" size={18} color={COLORS.fuel} />
           </View>
-          <Text style={styles.statValue}>₹{(totalCost / 1000).toFixed(1)}K</Text>
+          <Text style={styles.statValue}>₹{((totalCost || 0) / 1000).toFixed(1)}K</Text>
           <Text style={styles.statLabel}>Total Cost</Text>
         </View>
         
@@ -125,7 +123,7 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
           <View style={styles.statIconContainer}>
             <Ionicons name="trending-up" size={18} color={COLORS.primary} />
           </View>
-          <Text style={styles.statValue}>₹{avgCost.toFixed(0)}</Text>
+          <Text style={styles.statValue}>₹{(avgCost || 0).toFixed(0)}</Text>
           <Text style={styles.statLabel}>Avg Cost</Text>
         </View>
       </View>

@@ -11,7 +11,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
     storage: AsyncStorage,
-    storageKey: 'truckfleet-auth-token',
+    storageKey: 'triptracker-auth-token',
   },
 });
 

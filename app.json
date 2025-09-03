@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "TruckFleetApp",
-    "slug": "TruckFleetApp",
+    "name": "TripTracker",
+    "slug": "TripTracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.saurabhkhatri2015.TruckFleetApp"
+      "bundleIdentifier": "com.triptracker.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +22,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.saurabhkhatri2015.TruckFleetApp"
+      "package": "com.triptracker.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"

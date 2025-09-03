@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'truckfleetapp://reset-password',
+              redirectTo: 'triptracker://reset-password',
     });
     return { error };
   };

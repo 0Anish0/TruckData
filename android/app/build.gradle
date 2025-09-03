@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.saurabhkhatri2015.TruckFleetApp'
+    namespace 'com.triptracker.app'
     defaultConfig {
-        applicationId 'com.saurabhkhatri2015.TruckFleetApp'
+        applicationId 'com.triptracker.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

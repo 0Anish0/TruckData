@@ -1,4 +1,4 @@
-package com.saurabhkhatri2015.TruckFleetApp
+package com.triptracker.app
 
 import android.os.Build
 import android.os.Bundle

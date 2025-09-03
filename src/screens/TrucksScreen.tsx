@@ -108,7 +108,7 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
       <View style={styles.header}>
         <Text style={styles.title}>Your Trucks</Text>
         <TouchableOpacity style={styles.addButton} onPress={handleAddTruck} activeOpacity={0.7}>
-          <Ionicons name="add" size={28} color={COLORS.primary} />
+          <Ionicons name="add" size={28} color={COLORS.surface} />
         </TouchableOpacity>
       </View>
 
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   addButton: {
     width: 44,
     height: 44,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.primary,
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',

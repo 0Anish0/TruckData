@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
 import { Trip } from '../types';
 import TripCard from '../components/TripCard';
+import CustomButton from '../components/CustomButton';
 import { tripService } from '../services/tripService';
 import { truckService } from '../services/truckService';
 
@@ -116,7 +117,7 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
       <View style={styles.header}>
         <Text style={styles.title}>All Trips</Text>
         <TouchableOpacity style={styles.addButton} activeOpacity={0.7}>
-          <Ionicons name="add" size={28} color={COLORS.primary} />
+          <Ionicons name="add" size={28} color={COLORS.surface} />
         </TouchableOpacity>
       </View>
 
@@ -145,6 +146,16 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
           <Text style={styles.statValue}>₹{(avgCost || 0).toFixed(0)}</Text>
           <Text style={styles.statLabel}>Avg Cost</Text>
         </View>
+      </View>
+
+      {/* Add Trip Button */}
+      <View style={styles.addTripContainer}>
+        <CustomButton
+          title="Add New Trip"
+          onPress={() => navigation.navigate('AddTrip')}
+          variant="outline"
+          size="large"
+        />
       </View>
 
       {/* Filters */}
@@ -246,7 +257,7 @@ const styles = StyleSheet.create({
   addButton: {
     width: 44,
     height: 44,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.primary,
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
@@ -290,6 +301,10 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: 'center',
     fontWeight: '600',
+  },
+  addTripContainer: {
+    paddingHorizontal: SIZES.spacingLg,
+    marginBottom: SIZES.spacingLg,
   },
   filtersContainer: {
     paddingHorizontal: SIZES.spacingLg,

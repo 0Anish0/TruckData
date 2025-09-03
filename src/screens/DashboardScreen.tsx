@@ -36,6 +36,16 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
     totalCost: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
+  // Debug: Log user object to see what's available
+  useEffect(() => {
+    if (user) {
+      console.log('User object in DashboardScreen:', user);
+      console.log('User email:', user.email);
+      console.log('User metadata:', user.user_metadata);
+    }
+  }, [user]);
 
   const loadDashboardData = async () => {
     try {
@@ -192,6 +202,7 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
   };
 
   const handleSignOut = async () => {
+    setShowProfileDropdown(false);
     Alert.alert(
       'Sign Out',
       'Are you sure you want to sign out?',
@@ -210,6 +221,35 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
         },
       ]
     );
+  };
+
+  const toggleProfileDropdown = () => {
+    setShowProfileDropdown(!showProfileDropdown);
+  };
+
+  const formatEmailDisplay = (email: string | undefined) => {
+    if (!email) return 'No email available';
+    
+    // If email is already masked (contains asterisks), show it as is
+    if (email.includes('*')) return email;
+    
+    // Otherwise, show the full email
+    return email;
+  };
+
+  const getDisplayName = (user: any) => {
+    // Try to get name from user metadata first
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name;
+    }
+    
+    // Try to get from email if not masked
+    if (user?.email && !user.email.includes('*')) {
+      return user.email.split('@')[0];
+    }
+    
+    // Fallback to a generic name
+    return 'User';
   };
 
   if (loading) {
@@ -235,10 +275,36 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Truck Fleet Manager</Text>
-          <TouchableOpacity style={styles.profileButton} onPress={handleSignOut} activeOpacity={0.7}>
-            <Ionicons name="log-out-outline" size={32} color={COLORS.primary} />
-          </TouchableOpacity>
+          <View style={styles.profileContainer}>
+            <TouchableOpacity style={styles.profileButton} onPress={toggleProfileDropdown} activeOpacity={0.7}>
+              <Ionicons name="person-circle" size={32} color={COLORS.primary} />
+            </TouchableOpacity>
+            
+
+          </View>
         </View>
+
+        {/* Profile Dropdown - Positioned outside header to avoid clipping */}
+        {showProfileDropdown && (
+          <>
+            <TouchableOpacity 
+              style={styles.backdrop} 
+              onPress={() => setShowProfileDropdown(false)} 
+              activeOpacity={1}
+            />
+            <View style={styles.profileDropdown}>
+              <View style={styles.profileInfo}>
+                <Ionicons name="person-circle" size={48} color={COLORS.primary} />
+                <Text style={styles.profileName}>{getDisplayName(user)}</Text>
+                <Text style={styles.profileEmail}>{formatEmailDisplay(user?.email)}</Text>
+              </View>
+              <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} activeOpacity={0.7}>
+                <Ionicons name="log-out-outline" size={20} color={COLORS.error} />
+                <Text style={styles.logoutText}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
 
         {/* Quick Stats */}
         <View style={styles.statsContainer}>
@@ -390,9 +456,68 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     letterSpacing: -0.5,
   },
+  profileContainer: {
+    position: 'relative',
+    zIndex: 10001,
+  },
+  backdrop: {
+    position: 'absolute',
+    top: -1000,
+    left: -1000,
+    right: -1000,
+    bottom: -1000,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    zIndex: 9999,
+  },
   profileButton: {
     padding: SIZES.spacingXs,
     borderRadius: SIZES.radius,
+  },
+  profileDropdown: {
+    position: 'absolute',
+    top: 100,
+    right: SIZES.spacingLg,
+    backgroundColor: COLORS.surface,
+    borderRadius: SIZES.radiusLg,
+    padding: SIZES.spacingLg,
+    minWidth: 200,
+    maxHeight: 300,
+    ...SIZES.shadowStrong,
+    zIndex: 10000,
+  },
+  profileInfo: {
+    alignItems: 'center',
+    marginBottom: SIZES.spacingLg,
+    paddingBottom: SIZES.spacingLg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  profileName: {
+    fontSize: SIZES.fontSizeLg,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    marginTop: SIZES.spacingSm,
+    marginBottom: SIZES.spacingXs,
+  },
+  profileEmail: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SIZES.spacingMd,
+    paddingHorizontal: SIZES.spacingLg,
+    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.background,
+  },
+  logoutText: {
+    fontSize: SIZES.fontSizeMd,
+    fontWeight: '600',
+    color: COLORS.error,
+    marginLeft: SIZES.spacingSm,
   },
   statsContainer: {
     flexDirection: 'row',

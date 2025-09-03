@@ -36,6 +36,7 @@ const DashboardStack = () => (
 const TripsStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TripsMain" component={TripsScreen} />
+    <Stack.Screen name="AddTrip" component={AddTripScreen} />
     <Stack.Screen name="EditTrip" component={EditTripScreen as any} />
   </Stack.Navigator>
 );
@@ -83,7 +84,7 @@ const AppNavigator = () => {
             } else if (route.name === 'Trips') {
               iconName = focused ? 'map' : 'map-outline';
             } else if (route.name === 'Trucks') {
-              iconName = focused ? 'car-sport' : 'car-outline';
+              iconName = focused ? 'car-sport' : 'car-sport-outline';
             } else {
               iconName = 'help-outline';
             }

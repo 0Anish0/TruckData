@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SIZES } from '../constants/theme';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -15,6 +16,8 @@ import AddTruckScreen from '../screens/AddTruckScreen';
 import TripsScreen from '../screens/TripsScreen';
 import TrucksScreen from '../screens/TrucksScreen';
 import TruckTripsScreen from '../screens/TruckTripsScreen';
+import EditTripScreen from '../screens/EditTripScreen';
+import EditTruckScreen from '../screens/EditTruckScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -25,12 +28,15 @@ const DashboardStack = () => (
     <Stack.Screen name="AddTrip" component={AddTripScreen} />
     <Stack.Screen name="AddTruck" component={AddTruckScreen} />
     <Stack.Screen name="TruckTrips" component={TruckTripsScreen} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen as any} />
+    <Stack.Screen name="EditTruck" component={EditTruckScreen as any} />
   </Stack.Navigator>
 );
 
 const TripsStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TripsMain" component={TripsScreen} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen as any} />
   </Stack.Navigator>
 );
 
@@ -38,6 +44,8 @@ const TrucksStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TrucksMain" component={TrucksScreen} />
     <Stack.Screen name="AddTruck" component={AddTruckScreen} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen as any} />
+    <Stack.Screen name="EditTruck" component={EditTruckScreen as any} />
   </Stack.Navigator>
 );
 
@@ -46,7 +54,11 @@ const AppNavigator = () => {
   const insets = useSafeAreaInsets();
 
   if (loading) {
-    return null; // Or a loading screen
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
   }
 
   if (!user) {
@@ -104,5 +116,18 @@ const AppNavigator = () => {
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+  },
+  loadingText: {
+    fontSize: SIZES.fontSizeLg,
+    color: COLORS.textSecondary,
+  },
+});
 
 export default AppNavigator;

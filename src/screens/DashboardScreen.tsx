@@ -66,6 +66,44 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
     }
   }, [user]);
 
+  // Add session refresh check
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          // Session is null, user should be redirected to auth
+          return;
+        }
+        
+        // Check if session is about to expire (within 5 minutes)
+        if (session.expires_at) {
+          const expiresAt = new Date(session.expires_at * 1000);
+          const now = new Date();
+          const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+          
+          if (expiresAt <= fiveMinutesFromNow) {
+            console.log('Session expiring soon, refreshing...');
+            const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
+            if (error) {
+              console.error('Failed to refresh session:', error);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      }
+    };
+
+    // Check session every 2 minutes
+    const interval = setInterval(checkSession, 2 * 60 * 1000);
+    
+    // Initial check
+    checkSession();
+
+    return () => clearInterval(interval);
+  }, []);
+
   const onRefresh = async () => {
     setRefreshing(true);
     await loadDashboardData();
@@ -93,6 +131,64 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
   const handleTripPress = (trip: any) => {
     // Navigate to trip details (you can implement this later)
     console.log('Trip pressed:', trip);
+  };
+
+  const handleEditTrip = (trip: any) => {
+    navigation.navigate('EditTrip', { trip });
+  };
+
+  const handleDeleteTrip = (trip: any) => {
+    Alert.alert(
+      'Delete Trip',
+      'Are you sure you want to delete this trip? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await tripService.deleteTrip(trip.id);
+              // Refresh the dashboard data after deletion
+              loadDashboardData();
+              Alert.alert('Success', 'Trip deleted successfully');
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'Failed to delete trip');
+              console.error('Delete trip error:', error);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleEditTruck = (truck: any) => {
+    navigation.navigate('EditTruck', { truck });
+  };
+
+  const handleDeleteTruck = (truck: any) => {
+    Alert.alert(
+      'Delete Truck',
+      `Are you sure you want to delete ${truck.name}? This will also delete all associated trips.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await truckService.deleteTruck(truck.id);
+              // Refresh the dashboard data after deletion
+              loadDashboardData();
+              Alert.alert('Success', 'Truck deleted successfully');
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'Failed to delete truck');
+              console.error('Delete truck error:', error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleSignOut = async () => {
@@ -197,15 +293,17 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
                 truck={{
                   id: truck.id,
                   name: truck.name,
-                  truckNumber: truck.truck_number,
+                  truck_number: truck.truck_number,
                   model: truck.model,
-                  createdAt: new Date(truck.created_at),
+                  created_at: truck.created_at,
+                  updated_at: truck.updated_at,
+                  user_id: truck.user_id,
                 }}
                 tripCount={getTruckTripCount(truck.id)}
                 totalCost={getTruckTotalCost(truck.id)}
                 onPress={() => handleTruckPress(truck)}
-                onEdit={() => {}}
-                onDelete={() => {}}
+                onEdit={() => handleEditTruck(truck)}
+                onDelete={() => handleDeleteTruck(truck)}
               />
             ))
           ) : (
@@ -246,8 +344,8 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
                 }}
                 truckName={trip.trucks?.name || 'Unknown Truck'}
                 onPress={() => handleTripPress(trip)}
-                onEdit={() => {}}
-                onDelete={() => {}}
+                onEdit={() => handleEditTrip(trip)}
+                onDelete={() => handleDeleteTrip(trip)}
               />
             ))
           ) : (

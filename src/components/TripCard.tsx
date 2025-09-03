@@ -5,7 +5,7 @@ import { COLORS, SIZES, FONTS } from '../constants/theme';
 import { Trip } from '../types';
 
 interface TripCardProps {
-  trip: Trip;
+  trip: Trip | any; // Allow both Trip type and transformed data
   truckName: string;
   onPress: () => void;
   onEdit?: () => void;
@@ -19,12 +19,20 @@ const TripCard: React.FC<TripCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+  const formatDate = (date: string | Date) => {
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      if (isNaN(dateObj.getTime())) {
+        return 'Invalid Date';
+      }
+      return dateObj.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
+    } catch (error) {
+      return 'Invalid Date';
+    }
   };
 
   const formatCurrency = (amount: number | undefined | null) => {
@@ -34,63 +42,118 @@ const TripCard: React.FC<TripCardProps> = ({
     return `₹${amount.toLocaleString('en-IN')}`;
   };
 
+  // Handle both data formats (raw database and transformed)
+  const getTripDate = () => {
+    return trip.tripDate || trip.trip_date;
+  };
+
+  const getDieselQuantity = () => {
+    return trip.dieselQuantity || trip.diesel_quantity || 0;
+  };
+
+  const getDieselPricePerLiter = () => {
+    return trip.dieselPricePerLiter || trip.diesel_price_per_liter || 0;
+  };
+
+  const getFastTagCost = () => {
+    return trip.fastTagCost || trip.fast_tag_cost || 0;
+  };
+
+  const getMcdCost = () => {
+    return trip.mcdCost || trip.mcd_cost || 0;
+  };
+
+  const getGreenTaxCost = () => {
+    return trip.greenTaxCost || trip.green_tax_cost || 0;
+  };
+
+  const getTotalCost = () => {
+    return trip.totalCost || trip.total_cost || 0;
+  };
+
+  const handleEditPress = () => {
+    console.log('Edit button pressed for trip:', trip.id);
+    if (onEdit) {
+      onEdit();
+    }
+  };
+
+  const handleDeletePress = () => {
+    console.log('Delete button pressed for trip:', trip.id);
+    if (onDelete) {
+      onDelete();
+    }
+  };
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
-      <View style={styles.header}>
-        <View style={styles.routeInfo}>
-          <Text style={styles.route}>
-            {trip.source} → {trip.destination}
-          </Text>
-          <Text style={styles.truckName}>{truckName}</Text>
-        </View>
-        <View style={styles.actions}>
-          {onEdit && (
-            <TouchableOpacity style={styles.actionButton} onPress={onEdit} activeOpacity={0.7}>
-              <Ionicons name="pencil" size={18} color={COLORS.primary} />
-            </TouchableOpacity>
-          )}
-          {onDelete && (
-            <TouchableOpacity style={styles.actionButton} onPress={onDelete} activeOpacity={0.7}>
-              <Ionicons name="trash" size={18} color={COLORS.error} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-
-      <View style={styles.details}>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Date:</Text>
-          <Text style={styles.detailValue}>{formatDate(trip.trip_date)}</Text>
-        </View>
-        
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Diesel:</Text>
-          <Text style={styles.detailValue}>
-            {trip.diesel_quantity || 0}L @ {formatCurrency(trip.diesel_price_per_liter)}
-          </Text>
-        </View>
-
-        <View style={styles.costsContainer}>
-          <View style={styles.costItem}>
-            <Text style={styles.costLabel}>Fast Tag</Text>
-            <Text style={styles.costValue}>{formatCurrency(trip.fast_tag_cost)}</Text>
-          </View>
-          <View style={styles.costItem}>
-            <Text style={styles.costLabel}>MCD</Text>
-            <Text style={styles.costValue}>{formatCurrency(trip.mcd_cost)}</Text>
-          </View>
-          <View style={styles.costItem}>
-            <Text style={styles.costLabel}>Green Tax</Text>
-            <Text style={styles.costValue}>{formatCurrency(trip.green_tax_cost)}</Text>
+    <View style={styles.card}>
+      <TouchableOpacity style={styles.cardContent} onPress={onPress} activeOpacity={0.8}>
+        <View style={styles.header}>
+          <View style={styles.routeInfo}>
+            <Text style={styles.route}>
+              {trip.source} → {trip.destination}
+            </Text>
+            <Text style={styles.truckName}>{truckName}</Text>
           </View>
         </View>
-      </View>
 
-      <View style={styles.totalContainer}>
-        <Text style={styles.totalLabel}>Total Cost</Text>
-        <Text style={styles.totalValue}>{formatCurrency(trip.total_cost)}</Text>
+        <View style={styles.details}>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Date:</Text>
+            <Text style={styles.detailValue}>{formatDate(getTripDate())}</Text>
+          </View>
+          
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Diesel:</Text>
+            <Text style={styles.detailValue}>
+              {getDieselQuantity()}L @ {formatCurrency(getDieselPricePerLiter())}
+            </Text>
+          </View>
+
+          <View style={styles.costsContainer}>
+            <View style={styles.costItem}>
+              <Text style={styles.costLabel}>Fast Tag</Text>
+              <Text style={styles.costValue}>{formatCurrency(getFastTagCost())}</Text>
+            </View>
+            <View style={styles.costItem}>
+              <Text style={styles.costLabel}>MCD</Text>
+              <Text style={styles.costValue}>{formatCurrency(getMcdCost())}</Text>
+            </View>
+            <View style={styles.costItem}>
+              <Text style={styles.costLabel}>Green Tax</Text>
+              <Text style={styles.costValue}>{formatCurrency(getGreenTaxCost())}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalLabel}>Total Cost</Text>
+          <Text style={styles.totalValue}>{formatCurrency(getTotalCost())}</Text>
+        </View>
+      </TouchableOpacity>
+
+      {/* Action buttons outside the main touchable area */}
+      <View style={styles.actions}>
+        {onEdit && (
+          <TouchableOpacity 
+            style={styles.actionButton} 
+            onPress={handleEditPress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="pencil" size={18} color={COLORS.primary} />
+          </TouchableOpacity>
+        )}
+        {onDelete && (
+          <TouchableOpacity 
+            style={styles.actionButton} 
+            onPress={handleDeletePress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="trash" size={18} color={COLORS.error} />
+          </TouchableOpacity>
+        )}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -98,15 +161,15 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radiusLg,
-    padding: SIZES.spacingLg,
     marginHorizontal: SIZES.spacingLg,
     marginBottom: SIZES.spacingMd,
     ...SIZES.shadow,
+    position: 'relative',
+  },
+  cardContent: {
+    padding: SIZES.spacingLg,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
     marginBottom: SIZES.spacingLg,
   },
   routeInfo: {
@@ -124,6 +187,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   actions: {
+    position: 'absolute',
+    top: SIZES.spacingLg,
+    right: SIZES.spacingLg,
     flexDirection: 'row',
     gap: SIZES.spacingSm,
   },
@@ -134,6 +200,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.borderLight,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 10,
   },
   details: {
     marginBottom: SIZES.spacingLg,

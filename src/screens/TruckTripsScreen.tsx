@@ -60,14 +60,13 @@ const TruckTripsScreen: React.FC<any> = ({ route, navigation }) => {
   };
 
   const handleEditTrip = (trip: any) => {
-    // Navigate to edit trip
-    console.log('Edit trip:', trip);
+    navigation.navigate('EditTrip', { trip });
   };
 
   const handleDeleteTrip = (trip: any) => {
     Alert.alert(
       'Delete Trip',
-      'Are you sure you want to delete this trip?',
+      'Are you sure you want to delete this trip? This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -76,10 +75,12 @@ const TruckTripsScreen: React.FC<any> = ({ route, navigation }) => {
           onPress: async () => {
             try {
               await tripService.deleteTrip(trip.id);
-              await loadTruckTrips(); // Reload data
+              // Refresh the data after deletion
+              loadTruckTrips();
               Alert.alert('Success', 'Trip deleted successfully');
             } catch (error: any) {
-              Alert.alert('Error', 'Failed to delete trip');
+              Alert.alert('Error', error.message || 'Failed to delete trip');
+              console.error('Delete trip error:', error);
             }
           },
         },

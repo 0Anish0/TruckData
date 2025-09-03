@@ -72,12 +72,7 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
   };
 
   const handleEditTruck = (truck: Truck) => {
-    // TODO: Implement edit truck functionality
-    Alert.alert(
-      'Edit Truck',
-      `Edit ${truck.name} - This feature will be implemented soon`,
-      [{ text: 'OK' }]
-    );
+    navigation.navigate('EditTruck', { truck });
   };
 
   const handleDeleteTruck = async (truck: Truck) => {

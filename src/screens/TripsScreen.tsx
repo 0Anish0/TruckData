@@ -82,13 +82,32 @@ const TripsScreen: React.FC = ({ navigation }: any) => {
   };
 
   const handleEditTrip = (trip: Trip) => {
-    // Navigate to edit trip
-    console.log('Edit trip:', trip);
+    navigation.navigate('EditTrip', { trip });
   };
 
   const handleDeleteTrip = (trip: Trip) => {
-    // Show delete confirmation
-    console.log('Delete trip:', trip);
+    Alert.alert(
+      'Delete Trip',
+      'Are you sure you want to delete this trip? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await tripService.deleteTrip(trip.id);
+              // Refresh the data after deletion
+              loadData();
+              Alert.alert('Success', 'Trip deleted successfully');
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'Failed to delete trip');
+              console.error('Delete trip error:', error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (

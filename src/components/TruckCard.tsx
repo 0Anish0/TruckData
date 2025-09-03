@@ -35,12 +35,28 @@ const TruckCard: React.FC<TruckCardProps> = ({
         </View>
         <View style={styles.actions}>
           {onEdit && (
-            <TouchableOpacity style={styles.actionButton} onPress={onEdit} activeOpacity={0.7}>
+            <TouchableOpacity 
+              style={styles.actionButton} 
+              onPress={(e) => {
+                e.stopPropagation();
+                console.log('Edit button pressed for truck:', truck.id);
+                onEdit();
+              }}
+              activeOpacity={0.7}
+            >
               <Ionicons name="pencil" size={18} color={COLORS.primary} />
             </TouchableOpacity>
           )}
           {onDelete && (
-            <TouchableOpacity style={styles.actionButton} onPress={onDelete} activeOpacity={0.7}>
+            <TouchableOpacity 
+              style={styles.actionButton} 
+              onPress={(e) => {
+                e.stopPropagation();
+                console.log('Delete button pressed for truck:', truck.id);
+                onDelete();
+              }}
+              activeOpacity={0.7}
+            >
               <Ionicons name="trash" size={18} color={COLORS.error} />
             </TouchableOpacity>
           )}

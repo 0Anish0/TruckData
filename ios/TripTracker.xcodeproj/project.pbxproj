@@ -7,26 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		12D3776863B9E61A23B06D30 /* libPods-TripTracker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 73D94C06233E87463FDA26D2 /* libPods-TripTracker.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		91F563FD4468024BD9CA8595 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D481FB8A758C6F58B416F409 /* ExpoModulesProvider.swift */; };
-		A0BC1EAAB8174F394E78B8DF /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8391E8595FF0DB3BA5B35FAA /* PrivacyInfo.xcprivacy */; };
+		9458084282DDB6673B3B79C6 /* libPods-TripTracker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34CD761577FFCBD85CFACBD2 /* libPods-TripTracker.a */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		BCFDA3FA675AAA8DE384A529 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDBDFD17AB98302EE678E35E /* ExpoModulesProvider.swift */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F386CDB9E621BBEC98129E10 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 182593E2233AA99D8047004D /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		13B07F961A680F5B00A75B9A /* TripTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TripTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = TripTracker/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = TripTracker/Info.plist; sourceTree = "<group>"; };
-		3ABEAF70C82C7FE3A5D6DF48 /* Pods-TripTracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TripTracker.release.xcconfig"; path = "Target Support Files/Pods-TripTracker/Pods-TripTracker.release.xcconfig"; sourceTree = "<group>"; };
-		73D94C06233E87463FDA26D2 /* libPods-TripTracker.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TripTracker.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8391E8595FF0DB3BA5B35FAA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = TripTracker/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		8FBBF1C453D758C5FCB6DC47 /* Pods-TripTracker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TripTracker.debug.xcconfig"; path = "Target Support Files/Pods-TripTracker/Pods-TripTracker.debug.xcconfig"; sourceTree = "<group>"; };
+		182593E2233AA99D8047004D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = TripTracker/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1C18B0BD547FABA50D11D2D3 /* Pods-TripTracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TripTracker.release.xcconfig"; path = "Target Support Files/Pods-TripTracker/Pods-TripTracker.release.xcconfig"; sourceTree = "<group>"; };
+		34CD761577FFCBD85CFACBD2 /* libPods-TripTracker.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TripTracker.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		748F0FBAAEB9E5228BEE6316 /* Pods-TripTracker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TripTracker.debug.xcconfig"; path = "Target Support Files/Pods-TripTracker/Pods-TripTracker.debug.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = TripTracker/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		D481FB8A758C6F58B416F409 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-TripTracker/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		CDBDFD17AB98302EE678E35E /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-TripTracker/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = TripTracker/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* TripTracker-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "TripTracker-Bridging-Header.h"; path = "TripTracker/TripTracker-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				12D3776863B9E61A23B06D30 /* libPods-TripTracker.a in Frameworks */,
+				9458084282DDB6673B3B79C6 /* libPods-TripTracker.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,7 +53,15 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				8391E8595FF0DB3BA5B35FAA /* PrivacyInfo.xcprivacy */,
+				182593E2233AA99D8047004D /* PrivacyInfo.xcprivacy */,
+			);
+			name = TripTracker;
+			sourceTree = "<group>";
+		};
+		278A2FC44D816867E193862A /* TripTracker */ = {
+			isa = PBXGroup;
+			children = (
+				CDBDFD17AB98302EE678E35E /* ExpoModulesProvider.swift */,
 			);
 			name = TripTracker;
 			sourceTree = "<group>";
@@ -62,27 +70,19 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				73D94C06233E87463FDA26D2 /* libPods-TripTracker.a */,
+				34CD761577FFCBD85CFACBD2 /* libPods-TripTracker.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4B3E4045575729FA29E84D84 /* Pods */ = {
+		30EFE8252249CF5813E5204F /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				8FBBF1C453D758C5FCB6DC47 /* Pods-TripTracker.debug.xcconfig */,
-				3ABEAF70C82C7FE3A5D6DF48 /* Pods-TripTracker.release.xcconfig */,
+				748F0FBAAEB9E5228BEE6316 /* Pods-TripTracker.debug.xcconfig */,
+				1C18B0BD547FABA50D11D2D3 /* Pods-TripTracker.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		7D402E4CACB5281113EF70F8 /* TripTracker */ = {
-			isa = PBXGroup;
-			children = (
-				D481FB8A758C6F58B416F409 /* ExpoModulesProvider.swift */,
-			);
-			name = TripTracker;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -99,8 +99,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				4B3E4045575729FA29E84D84 /* Pods */,
-				BF13BE1BCC1D2CB5A83823E3 /* ExpoModulesProviders */,
+				30EFE8252249CF5813E5204F /* Pods */,
+				92317F1BCB6646C81AC0EDD5 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -115,6 +115,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		92317F1BCB6646C81AC0EDD5 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				278A2FC44D816867E193862A /* TripTracker */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
 			isa = PBXGroup;
 			children = (
@@ -122,14 +130,6 @@
 			);
 			name = Supporting;
 			path = TripTracker/Supporting;
-			sourceTree = "<group>";
-		};
-		BF13BE1BCC1D2CB5A83823E3 /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				7D402E4CACB5281113EF70F8 /* TripTracker */,
-			);
-			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "TripTracker" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				EC18402C37C9524DDB94FEB4 /* [Expo] Configure project */,
+				B86E6375C26999E6AC4A9628 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				62335F67F7442FCE9CCBD252 /* [CP] Embed Pods Frameworks */,
+				7E4C3209A596A4121B3D9DBA /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				A0BC1EAAB8174F394E78B8DF /* PrivacyInfo.xcprivacy in Resources */,
+				F386CDB9E621BBEC98129E10 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,7 +240,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		62335F67F7442FCE9CCBD252 /* [CP] Embed Pods Frameworks */ = {
+		7E4C3209A596A4121B3D9DBA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -330,7 +330,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TripTracker/Pods-TripTracker-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EC18402C37C9524DDB94FEB4 /* [Expo] Configure project */ = {
+		B86E6375C26999E6AC4A9628 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -357,7 +357,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				91F563FD4468024BD9CA8595 /* ExpoModulesProvider.swift in Sources */,
+				BCFDA3FA675AAA8DE384A529 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,7 +366,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8FBBF1C453D758C5FCB6DC47 /* Pods-TripTracker.debug.xcconfig */;
+			baseConfigurationReference = 748F0FBAAEB9E5228BEE6316 /* Pods-TripTracker.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -402,7 +402,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3ABEAF70C82C7FE3A5D6DF48 /* Pods-TripTracker.release.xcconfig */;
+			baseConfigurationReference = 1C18B0BD547FABA50D11D2D3 /* Pods-TripTracker.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

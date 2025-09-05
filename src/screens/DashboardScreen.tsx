@@ -50,11 +50,25 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      
+      // Debug: Check current user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      console.log('Dashboard - Current user ID:', currentUser?.id);
+      console.log('Dashboard - Current user email:', currentUser?.email);
+      console.log('Dashboard - Auth context user ID:', user?.id);
+      
+      // Debug database state first
+      await tripService.debugDatabaseState();
+
       const [trucks, trips, tripStats] = await Promise.all([
         truckService.getTrucks(),
         tripService.getTrips(),
         tripService.getTripStats(),
       ]);
+
+      console.log('Dashboard - Loaded trucks:', trucks.length);
+      console.log('Dashboard - Loaded trips:', trips.length);
+      console.log('Dashboard - Trip stats:', tripStats);
 
       setData({
         trucks,
@@ -264,6 +278,38 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header - Fixed/Sticky */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Truck Fleet Manager</Text>
+        <View style={styles.profileContainer}>
+          <TouchableOpacity style={styles.profileButton} onPress={toggleProfileDropdown} activeOpacity={0.7}>
+            <Ionicons name="person-circle" size={32} color={COLORS.primary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Profile Dropdown - Positioned outside header to avoid clipping */}
+      {showProfileDropdown && (
+        <>
+          <TouchableOpacity 
+            style={styles.backdrop} 
+            onPress={() => setShowProfileDropdown(false)} 
+            activeOpacity={1}
+          />
+          <View style={styles.profileDropdown}>
+            <View style={styles.profileInfo}>
+              <Ionicons name="person-circle" size={48} color={COLORS.primary} />
+              <Text style={styles.profileName}>{getDisplayName(user)}</Text>
+              <Text style={styles.profileEmail}>{formatEmailDisplay(user?.email)}</Text>
+            </View>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} activeOpacity={0.7}>
+              <Ionicons name="log-out-outline" size={20} color={COLORS.error} />
+              <Text style={styles.logoutText}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -272,39 +318,6 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Truck Fleet Manager</Text>
-          <View style={styles.profileContainer}>
-            <TouchableOpacity style={styles.profileButton} onPress={toggleProfileDropdown} activeOpacity={0.7}>
-              <Ionicons name="person-circle" size={32} color={COLORS.primary} />
-            </TouchableOpacity>
-            
-
-          </View>
-        </View>
-
-        {/* Profile Dropdown - Positioned outside header to avoid clipping */}
-        {showProfileDropdown && (
-          <>
-            <TouchableOpacity 
-              style={styles.backdrop} 
-              onPress={() => setShowProfileDropdown(false)} 
-              activeOpacity={1}
-            />
-            <View style={styles.profileDropdown}>
-              <View style={styles.profileInfo}>
-                <Ionicons name="person-circle" size={48} color={COLORS.primary} />
-                <Text style={styles.profileName}>{getDisplayName(user)}</Text>
-                <Text style={styles.profileEmail}>{formatEmailDisplay(user?.email)}</Text>
-              </View>
-              <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} activeOpacity={0.7}>
-                <Ionicons name="log-out-outline" size={20} color={COLORS.error} />
-                <Text style={styles.logoutText}>Sign Out</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
 
         {/* Quick Stats */}
         <View style={styles.statsContainer}>
@@ -449,6 +462,7 @@ const styles = StyleSheet.create({
     paddingBottom: SIZES.spacingLg,
     backgroundColor: COLORS.surface,
     ...SIZES.shadowSubtle,
+    zIndex: 1000,
   },
   title: {
     fontSize: SIZES.fontSizeXxl,
@@ -475,7 +489,7 @@ const styles = StyleSheet.create({
   },
   profileDropdown: {
     position: 'absolute',
-    top: 100,
+    top: 120,
     right: SIZES.spacingLg,
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radiusLg,

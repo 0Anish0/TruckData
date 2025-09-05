@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SIZES } from '../constants/theme';
 import { useAuth } from '../contexts/AuthContext';
@@ -73,52 +73,60 @@ const AppNavigator = () => {
   }
 
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName: keyof typeof Ionicons.glyphMap;
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <SafeAreaView style={styles.container} edges={['top']}>
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ focused, color, size }) => {
+                let iconName: keyof typeof Ionicons.glyphMap;
 
-            if (route.name === 'Dashboard') {
-              iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Trips') {
-              iconName = focused ? 'map' : 'map-outline';
-            } else if (route.name === 'Trucks') {
-              iconName = focused ? 'car-sport' : 'car-sport-outline';
-            } else {
-              iconName = 'help-outline';
-            }
+                if (route.name === 'Dashboard') {
+                  iconName = focused ? 'home' : 'home-outline';
+                } else if (route.name === 'Trips') {
+                  iconName = focused ? 'map' : 'map-outline';
+                } else if (route.name === 'Trucks') {
+                  iconName = focused ? 'car-sport' : 'car-sport-outline';
+                } else {
+                  iconName = 'help-outline';
+                }
 
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: COLORS.primary,
-          tabBarInactiveTintColor: COLORS.textTertiary,
-          tabBarStyle: {
-            backgroundColor: COLORS.surface,
-            borderTopWidth: 1,
-            borderTopColor: COLORS.border,
-            paddingTop: SIZES.spacingSm,
-            paddingBottom: Math.max(insets.bottom, SIZES.spacingSm),
-            height: 60 + Math.max(insets.bottom - SIZES.spacingSm, 0),
-            ...SIZES.shadowStrong,
-          },
-          tabBarLabelStyle: {
-            fontSize: SIZES.fontSizeXs,
-            fontWeight: '600',
-            marginTop: SIZES.spacingXs,
-          },
-          headerShown: false,
-        })}
-      >
-        <Tab.Screen name="Dashboard" component={DashboardStack} />
-        <Tab.Screen name="Trips" component={TripsStack} />
-        <Tab.Screen name="Trucks" component={TrucksStack} />
-      </Tab.Navigator>
-    </NavigationContainer>
+                return <Ionicons name={iconName} size={size} color={color} />;
+              },
+              tabBarActiveTintColor: COLORS.primary,
+              tabBarInactiveTintColor: COLORS.textTertiary,
+              tabBarStyle: {
+                backgroundColor: COLORS.surface,
+                borderTopWidth: 1,
+                borderTopColor: COLORS.border,
+                paddingTop: SIZES.spacingSm,
+                paddingBottom: insets.bottom,
+                height: 60 + insets.bottom,
+                ...SIZES.shadowStrong,
+              },
+              tabBarLabelStyle: {
+                fontSize: SIZES.fontSizeXs,
+                fontWeight: '600',
+                marginTop: SIZES.spacingXs,
+              },
+              headerShown: false,
+            })}
+          >
+            <Tab.Screen name="Dashboard" component={DashboardStack} />
+            <Tab.Screen name="Trips" component={TripsStack} />
+            <Tab.Screen name="Trucks" component={TrucksStack} />
+          </Tab.Navigator>
+        </SafeAreaView>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

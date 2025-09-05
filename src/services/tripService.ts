@@ -14,6 +14,35 @@ const handleAuthError = (error: any) => {
 };
 
 export const tripService = {
+  // Debug function to check database state
+  async debugDatabaseState() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Debug - Current user ID:', user?.id);
+      
+      // Check all trips in database
+      const { data: allTrips, error: allTripsError } = await supabase
+        .from('trips')
+        .select('id, user_id, total_cost, source, destination');
+      
+      console.log('Debug - All trips in database:', allTrips);
+      console.log('Debug - All trips error:', allTripsError);
+      
+      // Check trips for current user
+      if (user) {
+        const { data: userTrips, error: userTripsError } = await supabase
+          .from('trips')
+          .select('id, user_id, total_cost, source, destination')
+          .eq('user_id', user.id);
+        
+        console.log('Debug - User trips:', userTrips);
+        console.log('Debug - User trips error:', userTripsError);
+      }
+    } catch (error) {
+      console.error('Debug error:', error);
+    }
+  },
+
   // Calculate total cost for a trip
   calculateTotalCost(trip: {
     diesel_quantity: number;
@@ -30,6 +59,12 @@ export const tripService = {
   // Get all trips for the current user
   async getTrips(): Promise<Trip[]> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       const { data, error } = await supabase
         .from('trips')
         .select(`
@@ -38,9 +73,11 @@ export const tripService = {
             id,
             name,
             truck_number,
-            model
+            model,
+            user_id
           )
         `)
+        .eq('user_id', user.id)
         .order('trip_date', { ascending: false });
 
       if (error) {
@@ -58,6 +95,12 @@ export const tripService = {
   // Get trips for a specific truck
   async getTripsByTruck(truckId: string): Promise<Trip[]> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       const { data, error } = await supabase
         .from('trips')
         .select(`
@@ -66,10 +109,12 @@ export const tripService = {
             id,
             name,
             truck_number,
-            model
+            model,
+            user_id
           )
         `)
         .eq('truck_id', truckId)
+        .eq('user_id', user.id)
         .order('trip_date', { ascending: false });
 
       if (error) {
@@ -87,6 +132,12 @@ export const tripService = {
   // Get a single trip by ID
   async getTrip(id: string): Promise<Trip | null> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       const { data, error } = await supabase
         .from('trips')
         .select(`
@@ -95,10 +146,12 @@ export const tripService = {
             id,
             name,
             truck_number,
-            model
+            model,
+            user_id
           )
         `)
         .eq('id', id)
+        .eq('user_id', user.id)
         .single();
 
       if (error) {
@@ -186,6 +239,7 @@ export const tripService = {
         .from('trips')
         .update(updates)
         .eq('id', id)
+        .eq('user_id', user.id)
         .select()
         .single();
 
@@ -204,10 +258,17 @@ export const tripService = {
   // Delete a trip
   async deleteTrip(id: string): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       const { error } = await supabase
         .from('trips')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) {
         handleAuthError(error);
@@ -222,9 +283,16 @@ export const tripService = {
   // Get trip statistics for the current user
   async getTripStats() {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       const { data, error } = await supabase
         .from('trips')
-        .select('total_cost, diesel_quantity, diesel_price_per_liter');
+        .select('total_cost, diesel_quantity, diesel_price_per_liter')
+        .eq('user_id', user.id);
 
       if (error) {
         handleAuthError(error);
@@ -252,10 +320,17 @@ export const tripService = {
   // Get trip statistics for a specific truck
   async getTruckTripStats(truckId: string) {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       const { data, error } = await supabase
         .from('trips')
         .select('total_cost, diesel_quantity, diesel_price_per_liter')
-        .eq('truck_id', truckId);
+        .eq('truck_id', truckId)
+        .eq('user_id', user.id);
 
       if (error) {
         handleAuthError(error);

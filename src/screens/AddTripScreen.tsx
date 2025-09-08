@@ -18,6 +18,8 @@ import { tripService } from '../services/tripService';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
+import CommissionCategoryList from '../components/CommissionCategoryList';
+import AmountList from '../components/AmountList';
 
 interface AddTripScreenProps {
   navigation: any;
@@ -44,6 +46,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
     mcd_cost: 0,
     green_tax_cost: 0,
     commission_cost: 0,
+    commission_items: [],
     rto_cost: 0,
     dto_cost: 0,
     municipalities_cost: 0,
@@ -89,18 +92,57 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
   };
 
   const calculateTotalCost = () => {
+    const rtoExtras = (formData.commission_items || []).filter(i => i.authority_type === 'RTO').reduce((s, i) => s + (i.amount || 0), 0);
+    const dtoExtras = (formData.commission_items || []).filter(i => i.authority_type === 'DTO').reduce((s, i) => s + (i.amount || 0), 0);
+    const municipalitiesExtras = (formData.commission_items || []).filter(i => i.authority_type === 'Municipalities').reduce((s, i) => s + (i.amount || 0), 0);
+    const borderExtras = (formData.commission_items || []).filter(i => i.authority_type === 'State Border').reduce((s, i) => s + (i.amount || 0), 0);
+
     return tripService.calculateTotalCost({
       diesel_purchases: formData.diesel_purchases,
-      fast_tag_cost: formData.fast_tag_cost,
-      mcd_cost: formData.mcd_cost,
-      green_tax_cost: formData.green_tax_cost,
+      fast_tag_cost: formData.fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
+      mcd_cost: formData.mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
+      green_tax_cost: formData.green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
       commission_cost: formData.commission_cost || 0,
-      rto_cost: formData.rto_cost || 0,
-      dto_cost: formData.dto_cost || 0,
-      municipalities_cost: formData.municipalities_cost || 0,
-      border_cost: formData.border_cost || 0,
+      rto_cost: (formData.rto_cost || 0) + rtoExtras,
+      dto_cost: (formData.dto_cost || 0) + dtoExtras,
+      municipalities_cost: (formData.municipalities_cost || 0) + municipalitiesExtras,
+      border_cost: (formData.border_cost || 0) + borderExtras,
       repair_cost: formData.repair_cost || 0,
     });
+  };
+
+  const addCategoryItem = (type: 'RTO' | 'DTO' | 'Municipalities' | 'State Border') => {
+    setFormData(prev => ({
+      ...prev,
+      commission_items: [
+        ...(prev.commission_items || []),
+        { state: '', authority_type: type, amount: 0, checkpoint: '', notes: '' }
+      ],
+    }));
+  };
+
+  const updateCategoryItem = (type: 'RTO' | 'DTO' | 'Municipalities' | 'State Border', index: number, updated: any) => {
+    const indices = (formData.commission_items || []).reduce<number[]>((acc, item, i) => {
+      if (item.authority_type === type) acc.push(i);
+      return acc;
+    }, []);
+    const globalIndex = indices[index];
+    setFormData(prev => ({
+      ...prev,
+      commission_items: (prev.commission_items || []).map((it, i) => i === globalIndex ? updated : it),
+    }));
+  };
+
+  const removeCategoryItem = (type: 'RTO' | 'DTO' | 'Municipalities' | 'State Border', index: number) => {
+    const indices = (formData.commission_items || []).reduce<number[]>((acc, item, i) => {
+      if (item.authority_type === type) acc.push(i);
+      return acc;
+    }, []);
+    const globalIndex = indices[index];
+    setFormData(prev => ({
+      ...prev,
+      commission_items: (prev.commission_items || []).filter((_, i) => i !== globalIndex),
+    }));
   };
 
   const validateForm = (): boolean => {
@@ -165,22 +207,39 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
     setLoading(true);
     
     try {
-      await tripService.createTrip({
+      const rtoExtras = (formData.commission_items || []).filter(i => i.authority_type === 'RTO').reduce((s, i) => s + (i.amount || 0), 0);
+      const dtoExtras = (formData.commission_items || []).filter(i => i.authority_type === 'DTO').reduce((s, i) => s + (i.amount || 0), 0);
+      const municipalitiesExtras = (formData.commission_items || []).filter(i => i.authority_type === 'Municipalities').reduce((s, i) => s + (i.amount || 0), 0);
+      const borderExtras = (formData.commission_items || []).filter(i => i.authority_type === 'State Border').reduce((s, i) => s + (i.amount || 0), 0);
+
+      const created = await tripService.createTrip({
         truck_id: formData.truck_id,
         source: formData.source.trim(),
         destination: formData.destination.trim(),
         diesel_purchases: formData.diesel_purchases,
-        fast_tag_cost: formData.fast_tag_cost,
-        mcd_cost: formData.mcd_cost,
-        green_tax_cost: formData.green_tax_cost,
+        fast_tag_cost: formData.fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
+        mcd_cost: formData.mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
+        green_tax_cost: formData.green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
         commission_cost: formData.commission_cost || 0,
-        rto_cost: formData.rto_cost || 0,
-        dto_cost: formData.dto_cost || 0,
-        municipalities_cost: formData.municipalities_cost || 0,
-        border_cost: formData.border_cost || 0,
-        repair_cost: formData.repair_cost || 0,
+        rto_cost: (formData.rto_cost || 0) + rtoExtras,
+        dto_cost: (formData.dto_cost || 0) + dtoExtras,
+        municipalities_cost: (formData.municipalities_cost || 0) + municipalitiesExtras,
+        border_cost: (formData.border_cost || 0) + borderExtras,
+        repair_cost: (formData.repair_cost || 0) + ((formData as any).repair_extras || []).reduce((s:number,n:number)=>s+n,0),
         trip_date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
       });
+
+      if ((formData.commission_items || []).length > 0) {
+        for (const item of (formData.commission_items || [])) {
+          await tripService.addCommissionEvent((created as any).id, {
+            state: item.state,
+            authority_type: item.authority_type,
+            checkpoint: item.checkpoint,
+            amount: item.amount,
+            notes: item.notes,
+          });
+        }
+      }
 
       Alert.alert(
         'Success!',
@@ -266,6 +325,8 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
             <Text style={styles.title}>Add New Trip</Text>
             <View style={styles.placeholder} />
           </View>
+
+          
 
           {/* Form */}
           <View style={styles.formContainer}>
@@ -403,68 +464,124 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
             <View style={styles.inputGroup}>
               <Text style={styles.groupLabel}>Additional Costs</Text>
               <CustomInput
-                label="Fast Tag Cost (₹)"
+                label="#1 Fast Tag Cost (₹)"
                 placeholder="0"
                 value={formData.fast_tag_cost.toString()}
                 onChangeText={(text) => updateFormData('fast_tag_cost', parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.fast_tag_cost}
               />
+              <AmountList
+                title="Fast Tag Cost (₹)"
+                items={((formData as any).fast_tag_extras || []) as any}
+                onAdd={() => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || [], 0]) as any}))}
+                onUpdate={(i, val) => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
+                onRemove={(i) => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+              />
               <CustomInput
-                label="MCD Cost (₹)"
+                label="#1 MCD Cost (₹)"
                 placeholder="0"
                 value={formData.mcd_cost.toString()}
                 onChangeText={(text) => updateFormData('mcd_cost', parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.mcd_cost}
               />
+              <AmountList
+                title="MCD Cost (₹)"
+                items={((formData as any).mcd_extras || []) as any}
+                onAdd={() => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || [], 0]) as any}))}
+                onUpdate={(i, val) => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
+                onRemove={(i) => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+              />
               <CustomInput
-                label="Green Tax Cost (₹)"
+                label="#1 Green Tax Cost (₹)"
                 placeholder="0"
                 value={formData.green_tax_cost.toString()}
                 onChangeText={(text) => updateFormData('green_tax_cost', parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.green_tax_cost}
               />
+              <AmountList
+                title="Green Tax Cost (₹)"
+                items={((formData as any).green_tax_extras || []) as any}
+                onAdd={() => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || [], 0]) as any}))}
+                onUpdate={(i, val) => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
+                onRemove={(i) => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+              />
               <CustomInput
-                label="RTO Cost (₹)"
+                label="#1 RTO Cost (₹)"
                 placeholder="0"
                 value={(formData.rto_cost || 0).toString()}
                 onChangeText={(text) => updateFormData('rto_cost' as any, parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.rto_cost}
               />
+              <CommissionCategoryList
+                authorityType="RTO"
+                items={(formData.commission_items || []).filter(i => i.authority_type === 'RTO') as any}
+                onAdd={() => addCategoryItem('RTO')}
+                onUpdate={(i, updated) => updateCategoryItem('RTO', i, updated)}
+                onRemove={(i) => removeCategoryItem('RTO', i)}
+              />
               <CustomInput
-                label="DTO Cost (₹)"
+                label="#1 DTO Cost (₹)"
                 placeholder="0"
                 value={(formData.dto_cost || 0).toString()}
                 onChangeText={(text) => updateFormData('dto_cost' as any, parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.dto_cost}
               />
+              <CommissionCategoryList
+                authorityType="DTO"
+                items={(formData.commission_items || []).filter(i => i.authority_type === 'DTO') as any}
+                onAdd={() => addCategoryItem('DTO')}
+                onUpdate={(i, updated) => updateCategoryItem('DTO', i, updated)}
+                onRemove={(i) => removeCategoryItem('DTO', i)}
+              />
               <CustomInput
-                label="Municipalities Cost (₹)"
+                label="#1 Municipalities Cost (₹)"
                 placeholder="0"
                 value={(formData.municipalities_cost || 0).toString()}
                 onChangeText={(text) => updateFormData('municipalities_cost' as any, parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.municipalities_cost}
               />
+              <CommissionCategoryList
+                authorityType="Municipalities"
+                items={(formData.commission_items || []).filter(i => i.authority_type === 'Municipalities') as any}
+                onAdd={() => addCategoryItem('Municipalities')}
+                onUpdate={(i, updated) => updateCategoryItem('Municipalities', i, updated)}
+                onRemove={(i) => removeCategoryItem('Municipalities', i)}
+              />
               <CustomInput
-                label="Border Cost (₹)"
+                label="#1 Border Cost (₹)"
                 placeholder="0"
                 value={(formData.border_cost || 0).toString()}
                 onChangeText={(text) => updateFormData('border_cost' as any, parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.border_cost}
               />
+              <CommissionCategoryList
+                authorityType="State Border"
+                items={(formData.commission_items || []).filter(i => i.authority_type === 'State Border') as any}
+                onAdd={() => addCategoryItem('State Border')}
+                onUpdate={(i, updated) => updateCategoryItem('State Border', i, updated)}
+                onRemove={(i) => removeCategoryItem('State Border', i)}
+              />
               <CustomInput
-                label="Repair/Defect Cost (₹)"
+                label="#1 Repair/Defect Cost (₹)"
                 placeholder="0"
                 value={(formData.repair_cost || 0).toString()}
                 onChangeText={(text) => updateFormData('repair_cost' as any, parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.repair_cost}
+              />
+              <AmountList
+                title="Repair/Defect Cost (₹)"
+                items={((formData as any).repair_extras || []) as any}
+                onAdd={() => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || [], 0]) as any}))}
+                onUpdate={(i, val) => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
+                onRemove={(i) => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
               />
             </View>
 

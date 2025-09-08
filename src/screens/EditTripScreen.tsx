@@ -18,6 +18,8 @@ import { tripService } from '../services/tripService';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
+import CommissionCategoryList from '../components/CommissionCategoryList';
+import AmountList from '../components/AmountList';
 
 interface EditTripScreenProps {
   navigation: any;
@@ -57,6 +59,13 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     municipalities_cost: Number((trip as any).municipalities_cost || 0),
     border_cost: Number((trip as any).border_cost || 0),
     repair_cost: Number((trip as any).repair_cost || 0),
+    commission_items: (trip as any).commission_events?.map((e: any) => ({
+      state: e.state,
+      authority_type: e.authority_type,
+      amount: Number(e.amount),
+      checkpoint: e.checkpoint || '',
+      notes: e.notes || '',
+    })) || [],
   });
 
   const [errors, setErrors] = useState<TripFormErrors>({});
@@ -82,16 +91,21 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
   };
 
   const calculateTotalCost = () => {
+    const rtoExtras = (formData.commission_items || []).filter(i => i.authority_type === 'RTO').reduce((s, i) => s + (i.amount || 0), 0);
+    const dtoExtras = (formData.commission_items || []).filter(i => i.authority_type === 'DTO').reduce((s, i) => s + (i.amount || 0), 0);
+    const municipalitiesExtras = (formData.commission_items || []).filter(i => i.authority_type === 'Municipalities').reduce((s, i) => s + (i.amount || 0), 0);
+    const borderExtras = (formData.commission_items || []).filter(i => i.authority_type === 'State Border').reduce((s, i) => s + (i.amount || 0), 0);
+
     return tripService.calculateTotalCost({
       diesel_purchases: formData.diesel_purchases,
-      fast_tag_cost: formData.fast_tag_cost,
-      mcd_cost: formData.mcd_cost,
-      green_tax_cost: formData.green_tax_cost,
+      fast_tag_cost: (formData as any).fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
+      mcd_cost: (formData as any).mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
+      green_tax_cost: (formData as any).green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
       commission_cost: (formData as any).commission_cost || 0,
-      rto_cost: (formData as any).rto_cost || 0,
-      dto_cost: (formData as any).dto_cost || 0,
-      municipalities_cost: (formData as any).municipalities_cost || 0,
-      border_cost: (formData as any).border_cost || 0,
+      rto_cost: (formData as any).rto_cost + rtoExtras,
+      dto_cost: (formData as any).dto_cost + dtoExtras,
+      municipalities_cost: (formData as any).municipalities_cost + municipalitiesExtras,
+      border_cost: (formData as any).border_cost + borderExtras,
       repair_cost: (formData as any).repair_cost || 0,
     });
   };
@@ -162,10 +176,38 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       
       const totalCost = calculateTotalCost();
       
+      const rtoSum = (formData.commission_items || []).filter(i => i.authority_type === 'RTO').reduce((s, i) => s + (i.amount || 0), 0);
+      const dtoSum = (formData.commission_items || []).filter(i => i.authority_type === 'DTO').reduce((s, i) => s + (i.amount || 0), 0);
+      const municipalitiesSum = (formData.commission_items || []).filter(i => i.authority_type === 'Municipalities').reduce((s, i) => s + (i.amount || 0), 0);
+      const borderSum = (formData.commission_items || []).filter(i => i.authority_type === 'State Border').reduce((s, i) => s + (i.amount || 0), 0);
+
       await tripService.updateTrip(trip.id, {
         ...formData,
+        rto_cost: rtoSum,
+        dto_cost: dtoSum,
+        municipalities_cost: municipalitiesSum,
+        border_cost: borderSum,
+        fast_tag_cost: (formData as any).fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
+        mcd_cost: (formData as any).mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
+        green_tax_cost: (formData as any).green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
+        repair_cost: (formData as any).repair_cost + ((formData as any).repair_extras || []).reduce((s:number,n:number)=>s+n,0),
         total_cost: totalCost,
       });
+
+      // Replace commission events
+      const existing = (trip as any).commission_events || [];
+      for (const e of existing) {
+        try { await tripService.deleteCommissionEvent(e.id); } catch {}
+      }
+      for (const item of (formData.commission_items || [])) {
+        await tripService.addCommissionEvent(trip.id, {
+          state: item.state,
+          authority_type: item.authority_type,
+          checkpoint: item.checkpoint,
+          amount: item.amount,
+          notes: item.notes,
+        });
+      }
 
       Alert.alert(
         'Success',
@@ -308,6 +350,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
               {errors.truck_id && <Text style={styles.errorText}>{errors.truck_id}</Text>}
             </View>
 
+            
+
             {/* Source and Destination */}
             <View style={styles.row}>
               <View style={[styles.inputGroup, styles.halfWidth]}>
@@ -362,7 +406,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
             {/* Additional Costs */}
             <View style={styles.row}>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Fast Tag Cost (₹)</Text>
+                <Text style={styles.label}>#1 Fast Tag Cost (₹)</Text>
                 <CustomInput
                   value={formData.fast_tag_cost.toString()}
                   onChangeText={(text) => setFormData({ ...formData, fast_tag_cost: Number(text) || 0 })}
@@ -370,9 +414,16 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                   keyboardType="numeric"
                   error={errors.fast_tag_cost}
                 />
+                <AmountList
+                  title="Fast Tag Cost (₹)"
+                  items={((formData as any).fast_tag_extras || []) as any}
+                  onAdd={() => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || [], 0]) as any}))}
+                  onUpdate={(i, val) => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
+                  onRemove={(i) => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+                />
               </View>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>MCD Cost (₹)</Text>
+                <Text style={styles.label}>#1 MCD Cost (₹)</Text>
                 <CustomInput
                   value={formData.mcd_cost.toString()}
                   onChangeText={(text) => setFormData({ ...formData, mcd_cost: Number(text) || 0 })}
@@ -380,12 +431,19 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                   keyboardType="numeric"
                   error={errors.mcd_cost}
                 />
+                <AmountList
+                  title="MCD Cost (₹)"
+                  items={((formData as any).mcd_extras || []) as any}
+                  onAdd={() => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || [], 0]) as any}))}
+                  onUpdate={(i, val) => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
+                  onRemove={(i) => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+                />
               </View>
             </View>
 
             {/* Other Costs */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Green Tax Cost (₹)</Text>
+              <Text style={styles.label}>#1 Green Tax Cost (₹)</Text>
               <CustomInput
                 value={formData.green_tax_cost.toString()}
                 onChangeText={(text) => setFormData({ ...formData, green_tax_cost: Number(text) || 0 })}
@@ -393,37 +451,12 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 keyboardType="numeric"
                 error={errors.green_tax_cost}
               />
-              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>RTO Cost (₹)</Text>
-              <CustomInput
-                value={((formData as any).rto_cost || 0).toString()}
-                onChangeText={(text) => setFormData({ ...formData, rto_cost: Number(text) || 0 } as any)}
-                placeholder="0"
-                keyboardType="numeric"
-                error={(errors as any).rto_cost}
-              />
-              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>DTO Cost (₹)</Text>
-              <CustomInput
-                value={((formData as any).dto_cost || 0).toString()}
-                onChangeText={(text) => setFormData({ ...formData, dto_cost: Number(text) || 0 } as any)}
-                placeholder="0"
-                keyboardType="numeric"
-                error={(errors as any).dto_cost}
-              />
-              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>Municipalities Cost (₹)</Text>
-              <CustomInput
-                value={((formData as any).municipalities_cost || 0).toString()}
-                onChangeText={(text) => setFormData({ ...formData, municipalities_cost: Number(text) || 0 } as any)}
-                placeholder="0"
-                keyboardType="numeric"
-                error={(errors as any).municipalities_cost}
-              />
-              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>Border Cost (₹)</Text>
-              <CustomInput
-                value={((formData as any).border_cost || 0).toString()}
-                onChangeText={(text) => setFormData({ ...formData, border_cost: Number(text) || 0 } as any)}
-                placeholder="0"
-                keyboardType="numeric"
-                error={(errors as any).border_cost}
+              <AmountList
+                title="Green Tax Cost (₹)"
+                items={((formData as any).green_tax_extras || []) as any}
+                onAdd={() => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || [], 0]) as any}))}
+                onUpdate={(i, val) => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
+                onRemove={(i) => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
               />
               <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>Repair/Defect Cost (₹)</Text>
               <CustomInput
@@ -432,6 +465,90 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 placeholder="0"
                 keyboardType="numeric"
                 error={(errors as any).repair_cost}
+              />
+              <AmountList
+                title="Repair/Defect Cost (₹)"
+                items={((formData as any).repair_extras || []) as any}
+                onAdd={() => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || [], 0]) as any}))}
+                onUpdate={(i, val) => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
+                onRemove={(i) => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+              />
+            </View>
+
+            {/* Commission Payments - Per Category */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Commission Payments</Text>
+              <CommissionCategoryList
+                title="#1 RTO Cost (₹)"
+                authorityType="RTO"
+                items={(formData.commission_items || []).filter(i => i.authority_type === 'RTO') as any}
+                onAdd={() => setFormData(prev => ({ ...prev, commission_items: [ ...(prev.commission_items || []), { state: '', authority_type: 'RTO', amount: 0, checkpoint: '', notes: '' } ] }))}
+                onUpdate={(i, updated) => {
+                  const list = (formData.commission_items || []).slice();
+                  const indices = list.reduce<number[]>((acc, it, idx) => { if (it.authority_type === 'RTO') acc.push(idx); return acc; }, []);
+                  list[indices[i]] = updated as any;
+                  setFormData(prev => ({ ...prev, commission_items: list }));
+                }}
+                onRemove={(i) => {
+                  const list = (formData.commission_items || []).slice();
+                  const indices = list.reduce<number[]>((acc, it, idx) => { if (it.authority_type === 'RTO') acc.push(idx); return acc; }, []);
+                  list.splice(indices[i], 1);
+                  setFormData(prev => ({ ...prev, commission_items: list }));
+                }}
+              />
+              <CommissionCategoryList
+                title="#1 DTO Cost (₹)"
+                authorityType="DTO"
+                items={(formData.commission_items || []).filter(i => i.authority_type === 'DTO') as any}
+                onAdd={() => setFormData(prev => ({ ...prev, commission_items: [ ...(prev.commission_items || []), { state: '', authority_type: 'DTO', amount: 0, checkpoint: '', notes: '' } ] }))}
+                onUpdate={(i, updated) => {
+                  const list = (formData.commission_items || []).slice();
+                  const indices = list.reduce<number[]>((acc, it, idx) => { if (it.authority_type === 'DTO') acc.push(idx); return acc; }, []);
+                  list[indices[i]] = updated as any;
+                  setFormData(prev => ({ ...prev, commission_items: list }));
+                }}
+                onRemove={(i) => {
+                  const list = (formData.commission_items || []).slice();
+                  const indices = list.reduce<number[]>((acc, it, idx) => { if (it.authority_type === 'DTO') acc.push(idx); return acc; }, []);
+                  list.splice(indices[i], 1);
+                  setFormData(prev => ({ ...prev, commission_items: list }));
+                }}
+              />
+              <CommissionCategoryList
+                title="#1 Municipalities Cost (₹)"
+                authorityType="Municipalities"
+                items={(formData.commission_items || []).filter(i => i.authority_type === 'Municipalities') as any}
+                onAdd={() => setFormData(prev => ({ ...prev, commission_items: [ ...(prev.commission_items || []), { state: '', authority_type: 'Municipalities', amount: 0, checkpoint: '', notes: '' } ] }))}
+                onUpdate={(i, updated) => {
+                  const list = (formData.commission_items || []).slice();
+                  const indices = list.reduce<number[]>((acc, it, idx) => { if (it.authority_type === 'Municipalities') acc.push(idx); return acc; }, []);
+                  list[indices[i]] = updated as any;
+                  setFormData(prev => ({ ...prev, commission_items: list }));
+                }}
+                onRemove={(i) => {
+                  const list = (formData.commission_items || []).slice();
+                  const indices = list.reduce<number[]>((acc, it, idx) => { if (it.authority_type === 'Municipalities') acc.push(idx); return acc; }, []);
+                  list.splice(indices[i], 1);
+                  setFormData(prev => ({ ...prev, commission_items: list }));
+                }}
+              />
+              <CommissionCategoryList
+                title="#1 Border Cost (₹)"
+                authorityType="State Border"
+                items={(formData.commission_items || []).filter(i => i.authority_type === 'State Border') as any}
+                onAdd={() => setFormData(prev => ({ ...prev, commission_items: [ ...(prev.commission_items || []), { state: '', authority_type: 'State Border', amount: 0, checkpoint: '', notes: '' } ] }))}
+                onUpdate={(i, updated) => {
+                  const list = (formData.commission_items || []).slice();
+                  const indices = list.reduce<number[]>((acc, it, idx) => { if (it.authority_type === 'State Border') acc.push(idx); return acc; }, []);
+                  list[indices[i]] = updated as any;
+                  setFormData(prev => ({ ...prev, commission_items: list }));
+                }}
+                onRemove={(i) => {
+                  const list = (formData.commission_items || []).slice();
+                  const indices = list.reduce<number[]>((acc, it, idx) => { if (it.authority_type === 'State Border') acc.push(idx); return acc; }, []);
+                  list.splice(indices[i], 1);
+                  setFormData(prev => ({ ...prev, commission_items: list }));
+                }}
               />
             </View>
 

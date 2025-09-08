@@ -105,6 +105,17 @@ export const tripService = {
             purchase_date,
             created_at,
             updated_at
+          ),
+          commission_events (
+            id,
+            state,
+            authority_type,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
           )
         `)
         .eq('user_id', user.id)
@@ -153,6 +164,17 @@ export const tripService = {
             diesel_quantity,
             diesel_price_per_liter,
             purchase_date,
+            created_at,
+            updated_at
+          ),
+          commission_events (
+            id,
+            state,
+            authority_type,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
             created_at,
             updated_at
           )
@@ -204,6 +226,17 @@ export const tripService = {
             diesel_quantity,
             diesel_price_per_liter,
             purchase_date,
+            created_at,
+            updated_at
+          ),
+          commission_events (
+            id,
+            state,
+            authority_type,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
             created_at,
             updated_at
           )
@@ -557,6 +590,73 @@ export const tripService = {
       }
 
       return data;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  // Commission events CRUD
+  async addCommissionEvent(tripId: string, event: { state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      // Ensure trip belongs to user
+      const trip = await this.getTrip(tripId);
+      if (!trip) throw new Error('Trip not found');
+
+      const { data, error } = await supabase
+        .from('commission_events')
+        .insert([{ ...event, trip_id: tripId }])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  async updateCommissionEvent(eventId: string, updates: Partial<{ state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }>): Promise<any> {
+    try {
+      const { data, error } = await supabase
+        .from('commission_events')
+        .update(updates)
+        .eq('id', eventId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  async deleteCommissionEvent(eventId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('commission_events')
+        .delete()
+        .eq('id', eventId);
+      if (error) throw error;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  async getCommissionEvents(tripId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('commission_events')
+        .select('*')
+        .eq('trip_id', tripId)
+        .order('event_time', { ascending: true });
+      if (error) throw error;
+      return data || [];
     } catch (error) {
       handleAuthError(error);
       throw error;

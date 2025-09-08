@@ -18,6 +18,8 @@ import TrucksScreen from '../screens/TrucksScreen';
 import TruckTripsScreen from '../screens/TruckTripsScreen';
 import EditTripScreen from '../screens/EditTripScreen';
 import EditTruckScreen from '../screens/EditTruckScreen';
+import DriversScreen from '../screens/DriversScreen';
+import AddDriverScreen from '../screens/AddDriverScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -47,6 +49,13 @@ const TrucksStack = () => (
     <Stack.Screen name="AddTruck" component={AddTruckScreen} />
     <Stack.Screen name="EditTrip" component={EditTripScreen as any} />
     <Stack.Screen name="EditTruck" component={EditTruckScreen as any} />
+  </Stack.Navigator>
+);
+
+const DriversStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="DriversMain" component={DriversScreen} />
+    <Stack.Screen name="AddDriver" component={AddDriverScreen} />
   </Stack.Navigator>
 );
 
@@ -87,6 +96,8 @@ const AppNavigator = () => {
                   iconName = focused ? 'map' : 'map-outline';
                 } else if (route.name === 'Trucks') {
                   iconName = focused ? 'car-sport' : 'car-sport-outline';
+                } else if (route.name === 'Drivers') {
+                  iconName = focused ? 'person' : 'person-outline';
                 } else {
                   iconName = 'help-outline';
                 }
@@ -115,6 +126,7 @@ const AppNavigator = () => {
             <Tab.Screen name="Dashboard" component={DashboardStack} />
             <Tab.Screen name="Trips" component={TripsStack} />
             <Tab.Screen name="Trucks" component={TrucksStack} />
+            <Tab.Screen name="Drivers" component={DriversStack} />
           </Tab.Navigator>
         </SafeAreaView>
       </NavigationContainer>

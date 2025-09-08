@@ -12,11 +12,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, FONTS } from '../constants/theme';
-import { TripFormData, TripFormErrors } from '../types';
+import { TripFormData, TripFormErrors, DieselPurchaseFormData } from '../types';
 import { truckService } from '../services/truckService';
 import { tripService } from '../services/tripService';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
+import DieselPurchaseForm from '../components/DieselPurchaseForm';
 
 interface EditTripScreenProps {
   navigation: any;
@@ -34,8 +35,19 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     truck_id: trip.truck_id,
     source: trip.source,
     destination: trip.destination,
-    diesel_quantity: Number(trip.diesel_quantity),
-    diesel_price_per_liter: Number(trip.diesel_price_per_liter),
+    diesel_purchases: trip.diesel_purchases?.map(p => ({
+      state: p.state,
+      city: p.city || '',
+      diesel_quantity: p.diesel_quantity,
+      diesel_price_per_liter: p.diesel_price_per_liter,
+      purchase_date: p.purchase_date,
+    })) || [{
+      state: '',
+      city: '',
+      diesel_quantity: 0,
+      diesel_price_per_liter: 0,
+      purchase_date: new Date().toISOString().split('T')[0],
+    }],
     fast_tag_cost: Number(trip.fast_tag_cost),
     mcd_cost: Number(trip.mcd_cost),
     green_tax_cost: Number(trip.green_tax_cost),
@@ -65,8 +77,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
 
   const calculateTotalCost = () => {
     return tripService.calculateTotalCost({
-      diesel_quantity: formData.diesel_quantity,
-      diesel_price_per_liter: formData.diesel_price_per_liter,
+      diesel_purchases: formData.diesel_purchases,
       fast_tag_cost: formData.fast_tag_cost,
       mcd_cost: formData.mcd_cost,
       green_tax_cost: formData.green_tax_cost,
@@ -88,12 +99,29 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       newErrors.destination = 'Destination is required';
     }
 
-    if (formData.diesel_quantity <= 0) {
-      newErrors.diesel_quantity = 'Diesel quantity must be greater than 0';
-    }
-
-    if (formData.diesel_price_per_liter <= 0) {
-      newErrors.diesel_price_per_liter = 'Diesel price must be greater than 0';
+    if (formData.diesel_purchases.length === 0) {
+      newErrors.diesel_purchases = 'At least one diesel purchase is required';
+    } else {
+      // Validate each diesel purchase
+      for (let i = 0; i < formData.diesel_purchases.length; i++) {
+        const purchase = formData.diesel_purchases[i];
+        if (!purchase.state.trim()) {
+          newErrors.diesel_purchases = `State is required for purchase #${i + 1}`;
+          break;
+        }
+        if (purchase.diesel_quantity <= 0) {
+          newErrors.diesel_purchases = `Diesel quantity must be greater than 0 for purchase #${i + 1}`;
+          break;
+        }
+        if (purchase.diesel_price_per_liter <= 0) {
+          newErrors.diesel_purchases = `Diesel price must be greater than 0 for purchase #${i + 1}`;
+          break;
+        }
+        if (!purchase.purchase_date.trim()) {
+          newErrors.diesel_purchases = `Purchase date is required for purchase #${i + 1}`;
+          break;
+        }
+      }
     }
 
     if (formData.fast_tag_cost < 0) {
@@ -180,6 +208,34 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     );
   };
 
+  const addDieselPurchase = () => {
+    const newPurchase: DieselPurchaseFormData = {
+      state: '',
+      city: '',
+      diesel_quantity: 0,
+      diesel_price_per_liter: 0,
+      purchase_date: new Date().toISOString().split('T')[0],
+    };
+    setFormData(prev => ({
+      ...prev,
+      diesel_purchases: [...prev.diesel_purchases, newPurchase],
+    }));
+  };
+
+  const updateDieselPurchase = (index: number, purchase: DieselPurchaseFormData) => {
+    setFormData(prev => ({
+      ...prev,
+      diesel_purchases: prev.diesel_purchases.map((p, i) => i === index ? purchase : p),
+    }));
+  };
+
+  const removeDieselPurchase = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      diesel_purchases: prev.diesel_purchases.filter((_, i) => i !== index),
+    }));
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -262,28 +318,33 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
               </View>
             </View>
 
-            {/* Diesel Details */}
-            <View style={styles.row}>
-              <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Diesel Quantity (L)</Text>
-                <CustomInput
-                  value={formData.diesel_quantity.toString()}
-                  onChangeText={(text) => setFormData({ ...formData, diesel_quantity: Number(text) || 0 })}
-                  placeholder="0"
-                  keyboardType="numeric"
-                  error={errors.diesel_quantity}
+            {/* Diesel Purchases */}
+            <View style={styles.inputGroup}>
+              <View style={styles.dieselHeader}>
+                <Text style={styles.label}>Diesel Purchases</Text>
+                <CustomButton
+                  title="Add Purchase"
+                  onPress={addDieselPurchase}
+                  variant="outline"
+                  size="small"
                 />
               </View>
-              <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Price per Liter (₹)</Text>
-                <CustomInput
-                  value={formData.diesel_price_per_liter.toString()}
-                  onChangeText={(text) => setFormData({ ...formData, diesel_price_per_liter: Number(text) || 0 })}
-                  placeholder="0"
-                  keyboardType="numeric"
-                  error={errors.diesel_price_per_liter}
+              
+              {formData.diesel_purchases.map((purchase, index) => (
+                <DieselPurchaseForm
+                  key={index}
+                  purchase={purchase}
+                  errors={{}}
+                  onUpdate={(updatedPurchase) => updateDieselPurchase(index, updatedPurchase)}
+                  onRemove={() => removeDieselPurchase(index)}
+                  index={index}
+                  canRemove={formData.diesel_purchases.length > 1}
                 />
-              </View>
+              ))}
+              
+              {errors.diesel_purchases && (
+                <Text style={styles.errorText}>{errors.diesel_purchases}</Text>
+              )}
             </View>
 
             {/* Additional Costs */}
@@ -326,6 +387,12 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
             <View style={styles.totalCostContainer}>
               <Text style={styles.totalCostLabel}>Total Cost:</Text>
               <Text style={styles.totalCostValue}>₹{calculateTotalCost().toLocaleString('en-IN')}</Text>
+              <Text style={styles.totalCostBreakdown}>
+                Diesel: ₹{formData.diesel_purchases.reduce((total, purchase) => 
+                  total + (purchase.diesel_quantity * purchase.diesel_price_per_liter), 0
+                ).toLocaleString('en-IN')} | 
+                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost).toLocaleString('en-IN')}
+              </Text>
             </View>
 
             {/* Submit Button */}
@@ -447,6 +514,19 @@ const styles = StyleSheet.create({
     color: COLORS.error,
     fontSize: SIZES.fontSizeSm,
     marginTop: SIZES.spacingXs,
+  },
+  dieselHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.spacingLg,
+  },
+  totalCostBreakdown: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textTertiary,
+    textAlign: 'center',
+    fontWeight: '500',
+    marginTop: SIZES.spacingSm,
   },
 });
 

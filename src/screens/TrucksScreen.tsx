@@ -52,7 +52,13 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
     const truckTrips = trips.filter(trip => trip.truck_id === truckId);
     const tripCount = truckTrips.length;
     const totalCost = truckTrips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
-    const totalDiesel = truckTrips.reduce((sum, trip) => sum + (trip.diesel_quantity || 0), 0);
+    const totalDiesel = truckTrips.reduce((sum, trip: any) => {
+      const qty = (trip.diesel_purchases || []).reduce(
+        (s: number, p: any) => s + Number(p.diesel_quantity || 0),
+        0
+      );
+      return sum + qty;
+    }, 0);
     const avgCost = tripCount > 0 ? totalCost / tripCount : 0;
 
     return {

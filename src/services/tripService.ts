@@ -1,9 +1,12 @@
 import { supabase } from '../lib/supabase';
 import { Database } from '../lib/supabase';
+import { DieselPurchase, DieselPurchaseFormData } from '../types';
 
 type Trip = Database['public']['Tables']['trips']['Row'];
 type TripInsert = Database['public']['Tables']['trips']['Insert'];
 type TripUpdate = Database['public']['Tables']['trips']['Update'];
+type DieselPurchaseInsert = Database['public']['Tables']['diesel_purchases']['Insert'];
+type DieselPurchaseUpdate = Database['public']['Tables']['diesel_purchases']['Update'];
 
 // Helper function to handle auth errors
 const handleAuthError = (error: any) => {
@@ -45,15 +48,21 @@ export const tripService = {
 
   // Calculate total cost for a trip
   calculateTotalCost(trip: {
-    diesel_quantity: number;
-    diesel_price_per_liter: number;
+    diesel_purchases: DieselPurchaseFormData[];
     fast_tag_cost: number;
     mcd_cost: number;
     green_tax_cost: number;
   }): number {
-    const dieselCost = trip.diesel_quantity * trip.diesel_price_per_liter;
+    const dieselCost = trip.diesel_purchases.reduce((total, purchase) => {
+      return total + (purchase.diesel_quantity * purchase.diesel_price_per_liter);
+    }, 0);
     const totalCost = dieselCost + trip.fast_tag_cost + trip.mcd_cost + trip.green_tax_cost;
     return Math.round(totalCost * 100) / 100; // Round to 2 decimal places
+  },
+
+  // Calculate diesel cost for a single purchase
+  calculateDieselCost(purchase: DieselPurchaseFormData): number {
+    return Math.round((purchase.diesel_quantity * purchase.diesel_price_per_liter) * 100) / 100;
   },
 
   // Get all trips for the current user
@@ -75,6 +84,20 @@ export const tripService = {
             truck_number,
             model,
             user_id
+          ),
+          drivers (
+            id,
+            name
+          ),
+          diesel_purchases (
+            id,
+            state,
+            city,
+            diesel_quantity,
+            diesel_price_per_liter,
+            purchase_date,
+            created_at,
+            updated_at
           )
         `)
         .eq('user_id', user.id)
@@ -111,6 +134,20 @@ export const tripService = {
             truck_number,
             model,
             user_id
+          ),
+          drivers (
+            id,
+            name
+          ),
+          diesel_purchases (
+            id,
+            state,
+            city,
+            diesel_quantity,
+            diesel_price_per_liter,
+            purchase_date,
+            created_at,
+            updated_at
           )
         `)
         .eq('truck_id', truckId)
@@ -148,6 +185,20 @@ export const tripService = {
             truck_number,
             model,
             user_id
+          ),
+          drivers (
+            id,
+            name
+          ),
+          diesel_purchases (
+            id,
+            state,
+            city,
+            diesel_quantity,
+            diesel_price_per_liter,
+            purchase_date,
+            created_at,
+            updated_at
           )
         `)
         .eq('id', id)
@@ -167,7 +218,7 @@ export const tripService = {
   },
 
   // Create a new trip
-  async createTrip(trip: Omit<TripInsert, 'user_id' | 'total_cost'>): Promise<Trip> {
+  async createTrip(trip: Omit<TripInsert, 'user_id' | 'total_cost'> & { diesel_purchases: DieselPurchaseFormData[] }): Promise<Trip> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -176,24 +227,61 @@ export const tripService = {
       }
 
       // Calculate total cost in JavaScript
-      const totalCost = this.calculateTotalCost(trip);
+      const totalCost = this.calculateTotalCost({
+        diesel_purchases: trip.diesel_purchases,
+        fast_tag_cost: trip.fast_tag_cost || 0,
+        mcd_cost: trip.mcd_cost || 0,
+        green_tax_cost: trip.green_tax_cost || 0,
+      });
 
-      const { data, error } = await supabase
+      // Create the trip first
+      const { data: tripData, error: tripError } = await supabase
         .from('trips')
         .insert([{ 
-          ...trip, 
-          user_id: user.id,
-          total_cost: totalCost
+          truck_id: trip.truck_id,
+          source: trip.source,
+          destination: trip.destination,
+          driver_id: (trip as any).driver_id ?? null,
+          fast_tag_cost: trip.fast_tag_cost || 0,
+          mcd_cost: trip.mcd_cost || 0,
+          green_tax_cost: trip.green_tax_cost || 0,
+          total_cost: totalCost,
+          trip_date: trip.trip_date,
+          user_id: user.id
         }])
         .select()
         .single();
 
-      if (error) {
-        handleAuthError(error);
-        throw new Error(`Error creating trip: ${error.message}`);
+      if (tripError) {
+        handleAuthError(tripError);
+        throw new Error(`Error creating trip: ${tripError.message}`);
       }
 
-      return data;
+      // Create diesel purchases
+      if (trip.diesel_purchases && trip.diesel_purchases.length > 0) {
+        const dieselPurchases = trip.diesel_purchases.map(purchase => ({
+          trip_id: tripData.id,
+          state: purchase.state,
+          city: purchase.city,
+          diesel_quantity: purchase.diesel_quantity,
+          diesel_price_per_liter: purchase.diesel_price_per_liter,
+          purchase_date: purchase.purchase_date,
+        }));
+
+        const { error: dieselError } = await supabase
+          .from('diesel_purchases')
+          .insert(dieselPurchases);
+
+        if (dieselError) {
+          // If diesel purchases fail, delete the trip
+          await supabase.from('trips').delete().eq('id', tripData.id);
+          handleAuthError(dieselError);
+          throw new Error(`Error creating diesel purchases: ${dieselError.message}`);
+        }
+      }
+
+      // Fetch the complete trip with diesel purchases
+      return await this.getTrip(tripData.id);
     } catch (error) {
       handleAuthError(error);
       throw error;
@@ -209,9 +297,8 @@ export const tripService = {
         throw new Error('User not authenticated');
       }
 
-      // If cost-related fields are being updated, recalculate total cost
-      if (updates.diesel_quantity || updates.diesel_price_per_liter || 
-          updates.fast_tag_cost || updates.mcd_cost || updates.green_tax_cost) {
+      // If cost-related fields on trip are being updated, recalculate total cost
+      if (updates.fast_tag_cost || updates.mcd_cost || updates.green_tax_cost) {
         
         // Get current trip data
         const currentTrip = await this.getTrip(id);
@@ -220,16 +307,20 @@ export const tripService = {
         }
 
         // Merge current data with updates
-        const updatedTrip = {
-          diesel_quantity: updates.diesel_quantity ?? currentTrip.diesel_quantity,
-          diesel_price_per_liter: updates.diesel_price_per_liter ?? currentTrip.diesel_price_per_liter,
+        // Calculate new total cost using existing diesel purchases
+        const dieselPurchases = (currentTrip as any).diesel_purchases || [];
+        updates.total_cost = this.calculateTotalCost({
+          diesel_purchases: dieselPurchases.map((p: any) => ({
+            state: p.state,
+            city: p.city || '',
+            diesel_quantity: Number(p.diesel_quantity) || 0,
+            diesel_price_per_liter: Number(p.diesel_price_per_liter) || 0,
+            purchase_date: p.purchase_date,
+          })),
           fast_tag_cost: updates.fast_tag_cost ?? currentTrip.fast_tag_cost,
           mcd_cost: updates.mcd_cost ?? currentTrip.mcd_cost,
           green_tax_cost: updates.green_tax_cost ?? currentTrip.green_tax_cost,
-        };
-
-        // Calculate new total cost
-        updates.total_cost = this.calculateTotalCost(updatedTrip);
+        });
       }
 
       // Add updated_at timestamp
@@ -291,7 +382,16 @@ export const tripService = {
 
       const { data, error } = await supabase
         .from('trips')
-        .select('total_cost, diesel_quantity, diesel_price_per_liter')
+        .select(`
+          total_cost,
+          fast_tag_cost,
+          mcd_cost,
+          green_tax_cost,
+          diesel_purchases (
+            diesel_quantity,
+            diesel_price_per_liter
+          )
+        `)
         .eq('user_id', user.id);
 
       if (error) {
@@ -302,7 +402,13 @@ export const tripService = {
       const trips = data || [];
       const totalTrips = trips.length;
       const totalCost = trips.reduce((sum, trip) => sum + Number(trip.total_cost), 0);
-      const totalDiesel = trips.reduce((sum, trip) => sum + Number(trip.diesel_quantity), 0);
+      const totalDiesel = trips.reduce((sum, trip: any) => {
+        const qty = (trip.diesel_purchases || []).reduce(
+          (s: number, p: any) => s + Number(p.diesel_quantity || 0),
+          0
+        );
+        return sum + qty;
+      }, 0);
       const avgCost = totalTrips > 0 ? totalCost / totalTrips : 0;
 
       return {
@@ -328,7 +434,13 @@ export const tripService = {
 
       const { data, error } = await supabase
         .from('trips')
-        .select('total_cost, diesel_quantity, diesel_price_per_liter')
+        .select(`
+          total_cost,
+          diesel_purchases (
+            diesel_quantity,
+            diesel_price_per_liter
+          )
+        `)
         .eq('truck_id', truckId)
         .eq('user_id', user.id);
 
@@ -340,7 +452,15 @@ export const tripService = {
       const trips = data || [];
       const totalTrips = trips.length;
       const totalCost = trips.reduce((sum, trip) => sum + Number(trip.total_cost), 0);
-      const totalDiesel = trips.reduce((sum, trip) => sum + Number(trip.diesel_quantity), 0);
+      
+      // Calculate total diesel from all purchases
+      const totalDiesel = trips.reduce((sum, trip) => {
+        const dieselFromPurchases = trip.diesel_purchases?.reduce((dieselSum, purchase) => {
+          return dieselSum + Number(purchase.diesel_quantity);
+        }, 0) || 0;
+        return sum + dieselFromPurchases;
+      }, 0);
+      
       const avgCost = totalTrips > 0 ? totalCost / totalTrips : 0;
 
       return {
@@ -349,6 +469,194 @@ export const tripService = {
         totalDiesel,
         avgCost,
       };
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  // Add a diesel purchase to an existing trip
+  async addDieselPurchase(tripId: string, purchase: Omit<DieselPurchaseInsert, 'trip_id'>): Promise<DieselPurchase> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Verify the trip belongs to the user
+      const trip = await this.getTrip(tripId);
+      if (!trip) {
+        throw new Error('Trip not found');
+      }
+
+      const { data, error } = await supabase
+        .from('diesel_purchases')
+        .insert([{ 
+          ...purchase, 
+          trip_id: tripId
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        handleAuthError(error);
+        throw new Error(`Error adding diesel purchase: ${error.message}`);
+      }
+
+      // Recalculate and update trip total cost
+      const updatedTrip = await this.getTrip(tripId);
+      if (updatedTrip && updatedTrip.diesel_purchases) {
+        const newTotalCost = this.calculateTotalCost({
+          diesel_purchases: updatedTrip.diesel_purchases.map(p => ({
+            state: p.state,
+            city: p.city || '',
+            diesel_quantity: p.diesel_quantity,
+            diesel_price_per_liter: p.diesel_price_per_liter,
+            purchase_date: p.purchase_date,
+          })),
+          fast_tag_cost: updatedTrip.fast_tag_cost,
+          mcd_cost: updatedTrip.mcd_cost,
+          green_tax_cost: updatedTrip.green_tax_cost,
+        });
+
+        await supabase
+          .from('trips')
+          .update({ total_cost: newTotalCost })
+          .eq('id', tripId);
+      }
+
+      return data;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  // Update a diesel purchase
+  async updateDieselPurchase(purchaseId: string, updates: DieselPurchaseUpdate): Promise<DieselPurchase> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Get the purchase to find the trip_id
+      const { data: purchase, error: purchaseError } = await supabase
+        .from('diesel_purchases')
+        .select('trip_id')
+        .eq('id', purchaseId)
+        .single();
+
+      if (purchaseError || !purchase) {
+        throw new Error('Diesel purchase not found');
+      }
+
+      // Verify the trip belongs to the user
+      const trip = await this.getTrip(purchase.trip_id);
+      if (!trip) {
+        throw new Error('Trip not found');
+      }
+
+      const { data, error } = await supabase
+        .from('diesel_purchases')
+        .update(updates)
+        .eq('id', purchaseId)
+        .select()
+        .single();
+
+      if (error) {
+        handleAuthError(error);
+        throw new Error(`Error updating diesel purchase: ${error.message}`);
+      }
+
+      // Recalculate and update trip total cost
+      const updatedTrip = await this.getTrip(purchase.trip_id);
+      if (updatedTrip && updatedTrip.diesel_purchases) {
+        const newTotalCost = this.calculateTotalCost({
+          diesel_purchases: updatedTrip.diesel_purchases.map(p => ({
+            state: p.state,
+            city: p.city || '',
+            diesel_quantity: p.diesel_quantity,
+            diesel_price_per_liter: p.diesel_price_per_liter,
+            purchase_date: p.purchase_date,
+          })),
+          fast_tag_cost: updatedTrip.fast_tag_cost,
+          mcd_cost: updatedTrip.mcd_cost,
+          green_tax_cost: updatedTrip.green_tax_cost,
+        });
+
+        await supabase
+          .from('trips')
+          .update({ total_cost: newTotalCost })
+          .eq('id', purchase.trip_id);
+      }
+
+      return data;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  // Delete a diesel purchase
+  async deleteDieselPurchase(purchaseId: string): Promise<void> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Get the purchase to find the trip_id
+      const { data: purchase, error: purchaseError } = await supabase
+        .from('diesel_purchases')
+        .select('trip_id')
+        .eq('id', purchaseId)
+        .single();
+
+      if (purchaseError || !purchase) {
+        throw new Error('Diesel purchase not found');
+      }
+
+      // Verify the trip belongs to the user
+      const trip = await this.getTrip(purchase.trip_id);
+      if (!trip) {
+        throw new Error('Trip not found');
+      }
+
+      const { error } = await supabase
+        .from('diesel_purchases')
+        .delete()
+        .eq('id', purchaseId);
+
+      if (error) {
+        handleAuthError(error);
+        throw new Error(`Error deleting diesel purchase: ${error.message}`);
+      }
+
+      // Recalculate and update trip total cost
+      const updatedTrip = await this.getTrip(purchase.trip_id);
+      if (updatedTrip && updatedTrip.diesel_purchases) {
+        const newTotalCost = this.calculateTotalCost({
+          diesel_purchases: updatedTrip.diesel_purchases.map(p => ({
+            state: p.state,
+            city: p.city || '',
+            diesel_quantity: p.diesel_quantity,
+            diesel_price_per_liter: p.diesel_price_per_liter,
+            purchase_date: p.purchase_date,
+          })),
+          fast_tag_cost: updatedTrip.fast_tag_cost,
+          mcd_cost: updatedTrip.mcd_cost,
+          green_tax_cost: updatedTrip.green_tax_cost,
+        });
+
+        await supabase
+          .from('trips')
+          .update({ total_cost: newTotalCost })
+          .eq('id', purchase.trip_id);
+      }
     } catch (error) {
       handleAuthError(error);
       throw error;

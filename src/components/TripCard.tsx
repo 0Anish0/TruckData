@@ -47,12 +47,20 @@ const TripCard: React.FC<TripCardProps> = ({
     return trip.tripDate || trip.trip_date;
   };
 
-  const getDieselQuantity = () => {
-    return trip.dieselQuantity || trip.diesel_quantity || 0;
+  const getDieselPurchases = () => {
+    return trip.diesel_purchases || [];
   };
 
-  const getDieselPricePerLiter = () => {
-    return trip.dieselPricePerLiter || trip.diesel_price_per_liter || 0;
+  const getTotalDieselQuantity = () => {
+    const purchases = getDieselPurchases();
+    return purchases.reduce((total, purchase) => total + (purchase.diesel_quantity || 0), 0);
+  };
+
+  const getTotalDieselCost = () => {
+    const purchases = getDieselPurchases();
+    return purchases.reduce((total, purchase) => 
+      total + ((purchase.diesel_quantity || 0) * (purchase.diesel_price_per_liter || 0)), 0
+    );
   };
 
   const getFastTagCost = () => {
@@ -106,9 +114,23 @@ const TripCard: React.FC<TripCardProps> = ({
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Diesel:</Text>
             <Text style={styles.detailValue}>
-              {getDieselQuantity()}L @ {formatCurrency(getDieselPricePerLiter())}
+              {getTotalDieselQuantity()}L - {formatCurrency(getTotalDieselCost())}
             </Text>
           </View>
+
+          {/* Diesel Purchases Breakdown */}
+          {getDieselPurchases().length > 0 && (
+            <View style={styles.dieselPurchasesContainer}>
+              <Text style={styles.dieselPurchasesTitle}>Diesel Purchases:</Text>
+              {getDieselPurchases().map((purchase, index) => (
+                <View key={index} style={styles.dieselPurchaseItem}>
+                  <Text style={styles.dieselPurchaseText}>
+                    {purchase.state}{purchase.city ? `, ${purchase.city}` : ''}: {purchase.diesel_quantity}L @ {formatCurrency(purchase.diesel_price_per_liter)}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           <View style={styles.costsContainer}>
             <View style={styles.costItem}>
@@ -260,6 +282,26 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeLg,
     color: COLORS.primary,
     fontWeight: '700',
+  },
+  dieselPurchasesContainer: {
+    marginTop: SIZES.spacingMd,
+    paddingTop: SIZES.spacingMd,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.borderLight,
+  },
+  dieselPurchasesTitle: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+    marginBottom: SIZES.spacingSm,
+  },
+  dieselPurchaseItem: {
+    marginBottom: SIZES.spacingXs,
+  },
+  dieselPurchaseText: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textPrimary,
+    fontWeight: '500',
   },
 });
 

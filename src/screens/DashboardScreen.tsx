@@ -412,8 +412,6 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
                   truckId: trip.truck_id,
                   source: trip.source,
                   destination: trip.destination,
-                  dieselQuantity: Number(trip.diesel_quantity),
-                  dieselPricePerLiter: Number(trip.diesel_price_per_liter),
                   fastTagCost: Number(trip.fast_tag_cost),
                   mcdCost: Number(trip.mcd_cost),
                   greenTaxCost: Number(trip.green_tax_cost),

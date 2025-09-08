@@ -51,6 +51,12 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     fast_tag_cost: Number(trip.fast_tag_cost),
     mcd_cost: Number(trip.mcd_cost),
     green_tax_cost: Number(trip.green_tax_cost),
+    commission_cost: Number((trip as any).commission_cost || 0),
+    rto_cost: Number((trip as any).rto_cost || 0),
+    dto_cost: Number((trip as any).dto_cost || 0),
+    municipalities_cost: Number((trip as any).municipalities_cost || 0),
+    border_cost: Number((trip as any).border_cost || 0),
+    repair_cost: Number((trip as any).repair_cost || 0),
   });
 
   const [errors, setErrors] = useState<TripFormErrors>({});
@@ -81,6 +87,12 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       fast_tag_cost: formData.fast_tag_cost,
       mcd_cost: formData.mcd_cost,
       green_tax_cost: formData.green_tax_cost,
+      commission_cost: (formData as any).commission_cost || 0,
+      rto_cost: (formData as any).rto_cost || 0,
+      dto_cost: (formData as any).dto_cost || 0,
+      municipalities_cost: (formData as any).municipalities_cost || 0,
+      border_cost: (formData as any).border_cost || 0,
+      repair_cost: (formData as any).repair_cost || 0,
     });
   };
 
@@ -371,7 +383,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
               </View>
             </View>
 
-            {/* Green Tax */}
+            {/* Other Costs */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Green Tax Cost (₹)</Text>
               <CustomInput
@@ -380,6 +392,46 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 placeholder="0"
                 keyboardType="numeric"
                 error={errors.green_tax_cost}
+              />
+              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>RTO Cost (₹)</Text>
+              <CustomInput
+                value={((formData as any).rto_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, rto_cost: Number(text) || 0 } as any)}
+                placeholder="0"
+                keyboardType="numeric"
+                error={(errors as any).rto_cost}
+              />
+              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>DTO Cost (₹)</Text>
+              <CustomInput
+                value={((formData as any).dto_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, dto_cost: Number(text) || 0 } as any)}
+                placeholder="0"
+                keyboardType="numeric"
+                error={(errors as any).dto_cost}
+              />
+              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>Municipalities Cost (₹)</Text>
+              <CustomInput
+                value={((formData as any).municipalities_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, municipalities_cost: Number(text) || 0 } as any)}
+                placeholder="0"
+                keyboardType="numeric"
+                error={(errors as any).municipalities_cost}
+              />
+              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>Border Cost (₹)</Text>
+              <CustomInput
+                value={((formData as any).border_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, border_cost: Number(text) || 0 } as any)}
+                placeholder="0"
+                keyboardType="numeric"
+                error={(errors as any).border_cost}
+              />
+              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>Repair/Defect Cost (₹)</Text>
+              <CustomInput
+                value={((formData as any).repair_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, repair_cost: Number(text) || 0 } as any)}
+                placeholder="0"
+                keyboardType="numeric"
+                error={(errors as any).repair_cost}
               />
             </View>
 
@@ -391,7 +443,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 Diesel: ₹{formData.diesel_purchases.reduce((total, purchase) => 
                   total + (purchase.diesel_quantity * purchase.diesel_price_per_liter), 0
                 ).toLocaleString('en-IN')} | 
-                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost).toLocaleString('en-IN')}
+                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost + ((formData as any).commission_cost || 0) + ((formData as any).rto_cost || 0) + ((formData as any).dto_cost || 0) + ((formData as any).municipalities_cost || 0) + ((formData as any).border_cost || 0) + ((formData as any).repair_cost || 0)).toLocaleString('en-IN')}
               </Text>
             </View>
 

@@ -43,6 +43,12 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
     fast_tag_cost: 0,
     mcd_cost: 0,
     green_tax_cost: 0,
+    commission_cost: 0,
+    rto_cost: 0,
+    dto_cost: 0,
+    municipalities_cost: 0,
+    border_cost: 0,
+    repair_cost: 0,
   });
 
   const [errors, setErrors] = useState<TripFormErrors>({});
@@ -88,6 +94,12 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
       fast_tag_cost: formData.fast_tag_cost,
       mcd_cost: formData.mcd_cost,
       green_tax_cost: formData.green_tax_cost,
+      commission_cost: formData.commission_cost || 0,
+      rto_cost: formData.rto_cost || 0,
+      dto_cost: formData.dto_cost || 0,
+      municipalities_cost: formData.municipalities_cost || 0,
+      border_cost: formData.border_cost || 0,
+      repair_cost: formData.repair_cost || 0,
     });
   };
 
@@ -136,6 +148,10 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
     if (formData.green_tax_cost < 0) {
       newErrors.green_tax_cost = 'Green tax cost cannot be negative';
     }
+    if ((formData.rto_cost || 0) < 0) newErrors.rto_cost = 'RTO cost cannot be negative';
+    if ((formData.dto_cost || 0) < 0) newErrors.dto_cost = 'DTO cost cannot be negative';
+    if ((formData.municipalities_cost || 0) < 0) newErrors.municipalities_cost = 'Municipalities cost cannot be negative';
+    if ((formData.border_cost || 0) < 0) newErrors.border_cost = 'Border cost cannot be negative';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -157,6 +173,12 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
         fast_tag_cost: formData.fast_tag_cost,
         mcd_cost: formData.mcd_cost,
         green_tax_cost: formData.green_tax_cost,
+        commission_cost: formData.commission_cost || 0,
+        rto_cost: formData.rto_cost || 0,
+        dto_cost: formData.dto_cost || 0,
+        municipalities_cost: formData.municipalities_cost || 0,
+        border_cost: formData.border_cost || 0,
+        repair_cost: formData.repair_cost || 0,
         trip_date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
       });
 
@@ -404,6 +426,46 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                 keyboardType="numeric"
                 error={errors.green_tax_cost}
               />
+              <CustomInput
+                label="RTO Cost (₹)"
+                placeholder="0"
+                value={(formData.rto_cost || 0).toString()}
+                onChangeText={(text) => updateFormData('rto_cost' as any, parseFloat(text) || 0)}
+                keyboardType="numeric"
+                error={errors.rto_cost}
+              />
+              <CustomInput
+                label="DTO Cost (₹)"
+                placeholder="0"
+                value={(formData.dto_cost || 0).toString()}
+                onChangeText={(text) => updateFormData('dto_cost' as any, parseFloat(text) || 0)}
+                keyboardType="numeric"
+                error={errors.dto_cost}
+              />
+              <CustomInput
+                label="Municipalities Cost (₹)"
+                placeholder="0"
+                value={(formData.municipalities_cost || 0).toString()}
+                onChangeText={(text) => updateFormData('municipalities_cost' as any, parseFloat(text) || 0)}
+                keyboardType="numeric"
+                error={errors.municipalities_cost}
+              />
+              <CustomInput
+                label="Border Cost (₹)"
+                placeholder="0"
+                value={(formData.border_cost || 0).toString()}
+                onChangeText={(text) => updateFormData('border_cost' as any, parseFloat(text) || 0)}
+                keyboardType="numeric"
+                error={errors.border_cost}
+              />
+              <CustomInput
+                label="Repair/Defect Cost (₹)"
+                placeholder="0"
+                value={(formData.repair_cost || 0).toString()}
+                onChangeText={(text) => updateFormData('repair_cost' as any, parseFloat(text) || 0)}
+                keyboardType="numeric"
+                error={errors.repair_cost}
+              />
             </View>
 
             {/* Total Cost Display */}
@@ -414,7 +476,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                 Diesel: ₹{formData.diesel_purchases.reduce((total, purchase) => 
                   total + (purchase.diesel_quantity * purchase.diesel_price_per_liter), 0
                 ).toLocaleString('en-IN')} | 
-                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost).toLocaleString('en-IN')}
+                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost + (formData.commission_cost || 0) + (formData.rto_cost || 0) + (formData.dto_cost || 0) + (formData.municipalities_cost || 0) + (formData.border_cost || 0) + (formData.repair_cost || 0)).toLocaleString('en-IN')}
               </Text>
             </View>
 

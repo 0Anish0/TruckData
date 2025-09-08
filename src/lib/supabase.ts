@@ -62,6 +62,12 @@ export interface Database {
           fast_tag_cost: number;
           mcd_cost: number;
           green_tax_cost: number;
+          commission_cost: number;
+          rto_cost: number;
+          dto_cost: number;
+          municipalities_cost: number;
+          border_cost: number;
+          repair_cost: number;
           total_cost: number;
           trip_date: string;
           created_at: string;
@@ -77,6 +83,12 @@ export interface Database {
           fast_tag_cost: number;
           mcd_cost: number;
           green_tax_cost: number;
+          commission_cost: number;
+          rto_cost?: number;
+          dto_cost?: number;
+          municipalities_cost?: number;
+          border_cost?: number;
+          repair_cost: number;
           total_cost: number;
           trip_date: string;
           created_at?: string;
@@ -92,6 +104,12 @@ export interface Database {
           fast_tag_cost?: number;
           mcd_cost?: number;
           green_tax_cost?: number;
+          commission_cost?: number;
+          rto_cost?: number;
+          dto_cost?: number;
+          municipalities_cost?: number;
+          border_cost?: number;
+          repair_cost?: number;
           total_cost?: number;
           trip_date?: string;
           created_at?: string;
@@ -130,6 +148,82 @@ export interface Database {
           diesel_quantity?: number;
           diesel_price_per_liter?: number;
           purchase_date?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      commission_events: {
+        Row: {
+          id: string;
+          trip_id: string;
+          state: string;
+          authority_type: string;
+          checkpoint: string | null;
+          amount: number;
+          currency: string | null;
+          event_time: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id: string;
+          state: string;
+          authority_type: string;
+          checkpoint?: string | null;
+          amount: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string;
+          state?: string;
+          authority_type?: string;
+          checkpoint?: string | null;
+          amount?: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      repair_events: {
+        Row: {
+          id: string;
+          trip_id: string;
+          part_or_defect: string;
+          amount: number;
+          currency: string | null;
+          event_time: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id: string;
+          part_or_defect: string;
+          amount: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string;
+          part_or_defect?: string;
+          amount?: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -30,6 +30,12 @@ CREATE TABLE IF NOT EXISTS public.trips (
     fast_tag_cost DECIMAL(10,2) DEFAULT 0,
     mcd_cost DECIMAL(10,2) DEFAULT 0,
     green_tax_cost DECIMAL(10,2) DEFAULT 0,
+    commission_cost DECIMAL(10,2) DEFAULT 0,
+    rto_cost DECIMAL(10,2) DEFAULT 0,
+    dto_cost DECIMAL(10,2) DEFAULT 0,
+    municipalities_cost DECIMAL(10,2) DEFAULT 0,
+    border_cost DECIMAL(10,2) DEFAULT 0,
+    repair_cost DECIMAL(10,2) DEFAULT 0, -- tyre puncture or other defects
     total_cost DECIMAL(10,2) NOT NULL,
     trip_date DATE NOT NULL,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -63,6 +69,34 @@ CREATE TABLE IF NOT EXISTS public.diesel_purchases (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Commission events per trip (RTO/DTO/State Border/Municipalities/Other)
+CREATE TABLE IF NOT EXISTS public.commission_events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE NOT NULL,
+    state TEXT NOT NULL,
+    authority_type TEXT NOT NULL, -- RTO | DTO | State Border | Municipalities | Other
+    checkpoint TEXT,
+    amount DECIMAL(10,2) NOT NULL,
+    currency TEXT DEFAULT 'INR',
+    event_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Repair/defect events per trip
+CREATE TABLE IF NOT EXISTS public.repair_events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE NOT NULL,
+    part_or_defect TEXT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency TEXT DEFAULT 'INR',
+    event_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_trucks_user_id ON public.trucks(user_id);
 CREATE INDEX IF NOT EXISTS idx_trips_user_id ON public.trips(user_id);
@@ -72,6 +106,9 @@ CREATE INDEX IF NOT EXISTS idx_trips_driver_id ON public.trips(driver_id);
 CREATE INDEX IF NOT EXISTS idx_diesel_purchases_trip_id ON public.diesel_purchases(trip_id);
 CREATE INDEX IF NOT EXISTS idx_diesel_purchases_state ON public.diesel_purchases(state);
 CREATE INDEX IF NOT EXISTS idx_diesel_purchases_purchase_date ON public.diesel_purchases(purchase_date);
+CREATE INDEX IF NOT EXISTS idx_commission_events_trip_id ON public.commission_events(trip_id);
+CREATE INDEX IF NOT EXISTS idx_commission_events_state ON public.commission_events(state);
+CREATE INDEX IF NOT EXISTS idx_repair_events_trip_id ON public.repair_events(trip_id);
 
 -- Create function to handle new user signup
 CREATE OR REPLACE FUNCTION handle_new_user()

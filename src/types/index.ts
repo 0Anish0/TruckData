@@ -41,6 +41,12 @@ export interface Trip {
   fast_tag_cost: number;
   mcd_cost: number;
   green_tax_cost: number;
+  commission_cost?: number; // deprecated aggregate
+  rto_cost?: number;
+  dto_cost?: number;
+  municipalities_cost?: number;
+  border_cost?: number;
+  repair_cost?: number;
   total_cost: number;
   trip_date: string;
   created_at: string;
@@ -88,9 +94,17 @@ export interface TripFormData {
   source: string;
   destination: string;
   diesel_purchases: DieselPurchaseFormData[];
+  commission_items?: CommissionItemFormData[];
+  repair_items?: RepairItemFormData[];
   fast_tag_cost: number;
   mcd_cost: number;
   green_tax_cost: number;
+  commission_cost?: number; // deprecated aggregate
+  rto_cost?: number;
+  dto_cost?: number;
+  municipalities_cost?: number;
+  border_cost?: number;
+  repair_cost?: number;
 }
 
 export interface TripFormErrors {
@@ -102,6 +116,30 @@ export interface TripFormErrors {
   fast_tag_cost?: string;
   mcd_cost?: string;
   green_tax_cost?: string;
+  commission_cost?: string;
+  rto_cost?: string;
+  dto_cost?: string;
+  municipalities_cost?: string;
+  border_cost?: string;
+  repair_cost?: string;
+}
+
+export type AuthorityType = 'RTO' | 'DTO' | 'State Border' | 'Municipalities' | 'Other';
+
+export interface CommissionItemFormData {
+  state: string;
+  authority_type: AuthorityType;
+  amount: number;
+  checkpoint?: string;
+  notes?: string;
+  event_time?: string; // ISO
+}
+
+export interface RepairItemFormData {
+  part_or_defect: string;
+  amount: number;
+  notes?: string;
+  event_time?: string; // ISO
 }
 
 export const INDIAN_STATES = [

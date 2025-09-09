@@ -63,7 +63,7 @@ export const tripService = {
       return total + (purchase.diesel_quantity * purchase.diesel_price_per_liter);
     }, 0);
     const splitCommissionSum = (trip.rto_cost || 0) + (trip.dto_cost || 0) + (trip.municipalities_cost || 0) + (trip.border_cost || 0);
-    const totalCost = dieselCost + trip.fast_tag_cost + trip.mcd_cost + trip.green_tax_cost + (trip.commission_cost || 0) + splitCommissionSum + (trip.repair_cost || 0);
+    const totalCost = dieselCost + trip.fast_tag_cost + trip.mcd_cost + trip.green_tax_cost + splitCommissionSum + (trip.repair_cost || 0);
     return Math.round(totalCost * 100) / 100; // Round to 2 decimal places
   },
 
@@ -272,7 +272,6 @@ export const tripService = {
         fast_tag_cost: trip.fast_tag_cost || 0,
         mcd_cost: trip.mcd_cost || 0,
         green_tax_cost: trip.green_tax_cost || 0,
-        commission_cost: (trip as any).commission_cost || 0,
         rto_cost: (trip as any).rto_cost || 0,
         dto_cost: (trip as any).dto_cost || 0,
         municipalities_cost: (trip as any).municipalities_cost || 0,
@@ -291,7 +290,6 @@ export const tripService = {
           fast_tag_cost: trip.fast_tag_cost || 0,
           mcd_cost: trip.mcd_cost || 0,
           green_tax_cost: trip.green_tax_cost || 0,
-          commission_cost: (trip as any).commission_cost || 0,
           rto_cost: (trip as any).rto_cost || 0,
           dto_cost: (trip as any).dto_cost || 0,
           municipalities_cost: (trip as any).municipalities_cost || 0,
@@ -355,7 +353,7 @@ export const tripService = {
       }
 
       // If cost-related fields on trip are being updated, recalculate total cost
-      if (updates.fast_tag_cost || updates.mcd_cost || updates.green_tax_cost || (updates as any).commission_cost || (updates as any).rto_cost || (updates as any).dto_cost || (updates as any).municipalities_cost || (updates as any).border_cost || (updates as any).repair_cost) {
+      if (updates.fast_tag_cost || updates.mcd_cost || updates.green_tax_cost || (updates as any).rto_cost || (updates as any).dto_cost || (updates as any).municipalities_cost || (updates as any).border_cost || (updates as any).repair_cost) {
         
         // Get current trip data
         const currentTrip = await this.getTrip(id);
@@ -377,7 +375,6 @@ export const tripService = {
           fast_tag_cost: updates.fast_tag_cost ?? currentTrip.fast_tag_cost,
           mcd_cost: updates.mcd_cost ?? currentTrip.mcd_cost,
           green_tax_cost: updates.green_tax_cost ?? currentTrip.green_tax_cost,
-          commission_cost: (updates as any).commission_cost ?? (currentTrip as any).commission_cost ?? 0,
           rto_cost: (updates as any).rto_cost ?? (currentTrip as any).rto_cost ?? 0,
           dto_cost: (updates as any).dto_cost ?? (currentTrip as any).dto_cost ?? 0,
           municipalities_cost: (updates as any).municipalities_cost ?? (currentTrip as any).municipalities_cost ?? 0,

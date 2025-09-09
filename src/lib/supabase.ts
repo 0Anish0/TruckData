@@ -62,7 +62,6 @@ export interface Database {
           fast_tag_cost: number;
           mcd_cost: number;
           green_tax_cost: number;
-          commission_cost: number;
           rto_cost: number;
           dto_cost: number;
           municipalities_cost: number;
@@ -83,7 +82,7 @@ export interface Database {
           fast_tag_cost: number;
           mcd_cost: number;
           green_tax_cost: number;
-          commission_cost: number;
+          // commission_cost removed from DB; kept here previously. Do not expect it.
           rto_cost?: number;
           dto_cost?: number;
           municipalities_cost?: number;
@@ -104,7 +103,7 @@ export interface Database {
           fast_tag_cost?: number;
           mcd_cost?: number;
           green_tax_cost?: number;
-          commission_cost?: number;
+          // commission_cost removed from DB; kept here previously. Do not expect it.
           rto_cost?: number;
           dto_cost?: number;
           municipalities_cost?: number;

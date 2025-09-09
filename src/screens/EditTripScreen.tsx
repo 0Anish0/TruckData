@@ -33,15 +33,15 @@ interface EditTripScreenProps {
 const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) => {
   const { trip } = route.params;
   
-  const [formData, setFormData] = useState<TripFormData>({
-    truck_id: trip.truck_id,
-    source: trip.source,
-    destination: trip.destination,
-    diesel_purchases: trip.diesel_purchases?.map(p => ({
+  const buildFormDataFromTrip = (t: any): TripFormData => ({
+    truck_id: t.truck_id,
+    source: t.source,
+    destination: t.destination,
+    diesel_purchases: (t.diesel_purchases || []).map((p: any) => ({
       state: p.state,
       city: p.city || '',
-      diesel_quantity: p.diesel_quantity,
-      diesel_price_per_liter: p.diesel_price_per_liter,
+      diesel_quantity: Number(p.diesel_quantity) || 0,
+      diesel_price_per_liter: Number(p.diesel_price_per_liter) || 0,
       purchase_date: p.purchase_date,
     })) || [{
       state: '',
@@ -50,16 +50,16 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       diesel_price_per_liter: 0,
       purchase_date: new Date().toISOString().split('T')[0],
     }],
-    fast_tag_cost: Number(trip.fast_tag_cost),
-    mcd_cost: Number(trip.mcd_cost),
-    green_tax_cost: Number(trip.green_tax_cost),
-    commission_cost: Number((trip as any).commission_cost || 0),
-    rto_cost: Number((trip as any).rto_cost || 0),
-    dto_cost: Number((trip as any).dto_cost || 0),
-    municipalities_cost: Number((trip as any).municipalities_cost || 0),
-    border_cost: Number((trip as any).border_cost || 0),
-    repair_cost: Number((trip as any).repair_cost || 0),
-    commission_items: (trip as any).commission_events?.map((e: any) => ({
+    fast_tag_cost: Number(t.fast_tag_cost || 0),
+    mcd_cost: Number(t.mcd_cost || 0),
+    green_tax_cost: Number(t.green_tax_cost || 0),
+    commission_cost: Number((t as any).commission_cost || 0),
+    rto_cost: Number((t as any).rto_cost || 0),
+    dto_cost: Number((t as any).dto_cost || 0),
+    municipalities_cost: Number((t as any).municipalities_cost || 0),
+    border_cost: Number((t as any).border_cost || 0),
+    repair_cost: Number((t as any).repair_cost || 0),
+    commission_items: (t as any).commission_events?.map((e: any) => ({
       state: e.state,
       authority_type: e.authority_type,
       amount: Number(e.amount),
@@ -68,6 +68,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     })) || [],
   });
 
+  const [formData, setFormData] = useState<TripFormData>(buildFormDataFromTrip(trip));
+
   const [errors, setErrors] = useState<TripFormErrors>({});
   const [loading, setLoading] = useState(false);
   const [trucks, setTrucks] = useState<any[]>([]);
@@ -75,6 +77,17 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
 
   useEffect(() => {
     loadTrucks();
+    // Ensure fresh trip data (with diesel purchases and relations)
+    (async () => {
+      try {
+        const fullTrip = await tripService.getTrip(trip.id);
+        if (fullTrip) {
+          setFormData(buildFormDataFromTrip(fullTrip));
+        }
+      } catch (e) {
+        console.warn('Failed to refresh trip, using route data');
+      }
+    })();
   }, []);
 
   const loadTrucks = async () => {
@@ -355,8 +368,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
             {/* Source and Destination */}
             <View style={styles.row}>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Source</Text>
                 <CustomInput
+                  label="Source"
                   value={formData.source}
                   onChangeText={(text) => setFormData({ ...formData, source: text })}
                   placeholder="Enter source city"
@@ -364,8 +377,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 />
               </View>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Destination</Text>
                 <CustomInput
+                  label="Destination"
                   value={formData.destination}
                   onChangeText={(text) => setFormData({ ...formData, destination: text })}
                   placeholder="Enter destination city"
@@ -406,8 +419,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
             {/* Additional Costs */}
             <View style={styles.row}>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>#1 Fast Tag Cost (₹)</Text>
                 <CustomInput
+                  label="#1 Fast Tag Cost (₹)"
                   value={formData.fast_tag_cost.toString()}
                   onChangeText={(text) => setFormData({ ...formData, fast_tag_cost: Number(text) || 0 })}
                   placeholder="0"
@@ -423,8 +436,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 />
               </View>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>#1 MCD Cost (₹)</Text>
                 <CustomInput
+                  label="#1 MCD Cost (₹)"
                   value={formData.mcd_cost.toString()}
                   onChangeText={(text) => setFormData({ ...formData, mcd_cost: Number(text) || 0 })}
                   placeholder="0"
@@ -443,8 +456,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
 
             {/* Other Costs */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>#1 Green Tax Cost (₹)</Text>
               <CustomInput
+                label="#1 Green Tax Cost (₹)"
                 value={formData.green_tax_cost.toString()}
                 onChangeText={(text) => setFormData({ ...formData, green_tax_cost: Number(text) || 0 })}
                 placeholder="0"
@@ -458,8 +471,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 onUpdate={(i, val) => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
                 onRemove={(i) => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
               />
-              <Text style={[styles.label, { marginTop: SIZES.spacingMd }]}>Repair/Defect Cost (₹)</Text>
               <CustomInput
+                label="Repair/Defect Cost (₹)"
                 value={((formData as any).repair_cost || 0).toString()}
                 onChangeText={(text) => setFormData({ ...formData, repair_cost: Number(text) || 0 } as any)}
                 placeholder="0"
@@ -597,7 +610,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 Diesel: ₹{formData.diesel_purchases.reduce((total, purchase) => 
                   total + (purchase.diesel_quantity * purchase.diesel_price_per_liter), 0
                 ).toLocaleString('en-IN')} | 
-                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost + ((formData as any).commission_cost || 0) + ((formData as any).rto_cost || 0) + ((formData as any).dto_cost || 0) + ((formData as any).municipalities_cost || 0) + ((formData as any).border_cost || 0) + ((formData as any).repair_cost || 0)).toLocaleString('en-IN')}
+                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost + ((formData as any).rto_cost || 0) + ((formData as any).dto_cost || 0) + ((formData as any).municipalities_cost || 0) + ((formData as any).border_cost || 0) + ((formData as any).repair_cost || 0)).toLocaleString('en-IN')}
               </Text>
             </View>
 

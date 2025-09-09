@@ -99,7 +99,6 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
       fast_tag_cost: formData.fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
       mcd_cost: formData.mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
       green_tax_cost: formData.green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
-      commission_cost: formData.commission_cost || 0,
       rto_cost: (formData.rto_cost || 0) + rtoExtras,
       dto_cost: (formData.dto_cost || 0) + dtoExtras,
       municipalities_cost: (formData.municipalities_cost || 0) + municipalitiesExtras,
@@ -217,7 +216,6 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
         fast_tag_cost: formData.fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
         mcd_cost: formData.mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
         green_tax_cost: formData.green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
-        commission_cost: formData.commission_cost || 0,
         rto_cost: (formData.rto_cost || 0) + rtoExtras,
         dto_cost: (formData.dto_cost || 0) + dtoExtras,
         municipalities_cost: (formData.municipalities_cost || 0) + municipalitiesExtras,
@@ -257,9 +255,10 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
 
   const updateFormData = (field: keyof TripFormData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+    // Clear error when user starts typing (limit to scalar fields for typings)
+    const scalarFields: (keyof TripFormErrors)[] = ['truck_id','driver_id','source','destination','fast_tag_cost','mcd_cost','green_tax_cost','rto_cost','dto_cost','municipalities_cost','border_cost','repair_cost'];
+    if ((scalarFields as string[]).includes(field as string)) {
+      setErrors(prev => ({ ...prev, [field as keyof TripFormErrors]: undefined }));
     }
   };
 
@@ -594,7 +593,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                 Diesel: ₹{formData.diesel_purchases.reduce((total, purchase) => 
                   total + (purchase.diesel_quantity * purchase.diesel_price_per_liter), 0
                 ).toLocaleString('en-IN')} | 
-                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost + (formData.commission_cost || 0) + (formData.rto_cost || 0) + (formData.dto_cost || 0) + (formData.municipalities_cost || 0) + (formData.border_cost || 0) + (formData.repair_cost || 0)).toLocaleString('en-IN')}
+                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost + (formData.rto_cost || 0) + (formData.dto_cost || 0) + (formData.municipalities_cost || 0) + (formData.border_cost || 0) + (formData.repair_cost || 0)).toLocaleString('en-IN')}
               </Text>
             </View>
 

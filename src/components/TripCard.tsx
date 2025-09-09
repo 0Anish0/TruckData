@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIZES, FONTS } from '../constants/theme';
-import { Trip } from '../types';
+import { COLORS, SIZES } from '../constants/theme';
+import { Trip, TripWithRelations } from '../types';
 
 interface TripCardProps {
-  trip: Trip | any; // Allow both Trip type and transformed data
+  trip: Trip | TripWithRelations; // Allow both Trip type and transformed data
   truckName: string;
   onPress: () => void;
   onEdit?: () => void;

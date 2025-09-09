@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { SIZES } from '../constants/theme';
 import CustomInput from './CustomInput';
 import CustomButton from './CustomButton';
@@ -18,7 +18,7 @@ const AmountList: React.FC<Props> = ({ title, items, onAdd, onUpdate, onRemove }
       {items.map((amount, index) => (
         <View key={index} style={styles.item}>
           <CustomInput
-            label={`#${index + 2} ${title}` as any}
+            label={`#${index + 2} ${title}`}
             placeholder="0"
             keyboardType="numeric"
             value={(amount || 0).toString()}

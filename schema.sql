@@ -97,6 +97,42 @@ CREATE TABLE IF NOT EXISTS public.repair_events (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Fast tag events per trip
+CREATE TABLE IF NOT EXISTS public.fast_tag_events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency TEXT DEFAULT 'INR',
+    event_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- MCD events per trip
+CREATE TABLE IF NOT EXISTS public.mcd_events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency TEXT DEFAULT 'INR',
+    event_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Green tax events per trip
+CREATE TABLE IF NOT EXISTS public.green_tax_events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency TEXT DEFAULT 'INR',
+    event_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_trucks_user_id ON public.trucks(user_id);
 CREATE INDEX IF NOT EXISTS idx_trips_user_id ON public.trips(user_id);
@@ -109,6 +145,9 @@ CREATE INDEX IF NOT EXISTS idx_diesel_purchases_purchase_date ON public.diesel_p
 CREATE INDEX IF NOT EXISTS idx_commission_events_trip_id ON public.commission_events(trip_id);
 CREATE INDEX IF NOT EXISTS idx_commission_events_state ON public.commission_events(state);
 CREATE INDEX IF NOT EXISTS idx_repair_events_trip_id ON public.repair_events(trip_id);
+CREATE INDEX IF NOT EXISTS idx_fast_tag_events_trip_id ON public.fast_tag_events(trip_id);
+CREATE INDEX IF NOT EXISTS idx_mcd_events_trip_id ON public.mcd_events(trip_id);
+CREATE INDEX IF NOT EXISTS idx_green_tax_events_trip_id ON public.green_tax_events(trip_id);
 
 -- Create function to handle new user signup
 CREATE OR REPLACE FUNCTION handle_new_user()

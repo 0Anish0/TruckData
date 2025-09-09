@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
-import { Trip, TripWithRelations, Truck } from '../types';
+import { TripWithRelations, Truck } from '../types';
 import TripCard from '../components/TripCard';
 import CustomButton from '../components/CustomButton';
 import { tripService } from '../services/tripService';
@@ -27,9 +27,7 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const [trips, setTrips] = useState<TripWithRelations[]>([]);
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const loadData = async () => {
     try {
@@ -43,7 +41,7 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load data';
       Alert.alert('Error', errorMessage);
     } finally {
-      setLoading(false);
+      // Loading state handled by refreshing
     }
   };
 
@@ -67,15 +65,15 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       return false;
     }
     
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        trip.source.toLowerCase().includes(query) ||
-        trip.destination.toLowerCase().includes(query) ||
-        getTruckName(trip).toLowerCase().includes(query)
-      );
-    }
+    // Search functionality removed for now
+    // if (searchQuery) {
+    //   const query = searchQuery.toLowerCase();
+    //   return (
+    //     trip.source.toLowerCase().includes(query) ||
+    //     trip.destination.toLowerCase().includes(query) ||
+    //     getTruckName(trip).toLowerCase().includes(query)
+    //   );
+    // }
     
     return true;
   });
@@ -231,7 +229,7 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
             <Ionicons name="map-outline" size={64} color={COLORS.textTertiary} />
             <Text style={styles.emptyStateTitle}>No trips found</Text>
             <Text style={styles.emptyStateSubtitle}>
-              {searchQuery ? 'Try adjusting your search' : 'Add your first trip to get started'}
+              Add your first trip to get started
             </Text>
           </View>
         )}

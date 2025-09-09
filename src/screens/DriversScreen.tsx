@@ -200,7 +200,7 @@ const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.licenseModalHeader}>
-              <Text style={styles.licenseModalTitle}>{selectedDriverName}'s License</Text>
+              <Text style={styles.licenseModalTitle}>{selectedDriverName}&apos;s License</Text>
               <TouchableOpacity
                 onPress={closeLicenseModal}
                 style={styles.licenseModalCloseButton}

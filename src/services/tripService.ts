@@ -7,9 +7,6 @@ type TripInsert = Database['public']['Tables']['trips']['Insert'];
 type TripUpdate = Database['public']['Tables']['trips']['Update'];
 type DieselPurchaseInsert = Database['public']['Tables']['diesel_purchases']['Insert'];
 type DieselPurchaseUpdate = Database['public']['Tables']['diesel_purchases']['Update'];
-type FastTagEventInsert = Database['public']['Tables']['fast_tag_events']['Insert'];
-type McdEventInsert = Database['public']['Tables']['mcd_events']['Insert'];
-type GreenTaxEventInsert = Database['public']['Tables']['green_tax_events']['Insert'];
 
 // Helper function to handle auth errors
 const handleAuthError = (error: unknown) => {

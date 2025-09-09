@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIZES, FONTS } from '../constants/theme';
+import { COLORS, SIZES } from '../constants/theme';
 import { TripWithRelations, Truck } from '../types';
 import { tripService } from '../services/tripService';
 import TripCard from '../components/TripCard';

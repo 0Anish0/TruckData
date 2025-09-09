@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIZES, FONTS } from '../constants/theme';
+import { COLORS, SIZES } from '../constants/theme';
 import { useAuth } from '../contexts/AuthContext';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
@@ -21,7 +21,7 @@ interface AuthScreenProps {
   };
 }
 
-const AuthScreen: React.FC<AuthScreenProps> = ({ navigation }) => {
+const AuthScreen: React.FC<AuthScreenProps> = () => {
   const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');

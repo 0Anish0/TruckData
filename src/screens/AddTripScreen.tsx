@@ -11,15 +11,14 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIZES, FONTS } from '../constants/theme';
-import { TripFormData, TripFormErrors, DieselPurchaseFormData, INDIAN_STATES, RtoEventFormData, DtoEventFormData, MunicipalitiesEventFormData, BorderEventFormData } from '../types';
+import { COLORS, SIZES } from '../constants/theme';
+import { TripFormData, TripFormErrors, DieselPurchaseFormData, RtoEventFormData, DtoEventFormData, MunicipalitiesEventFormData, BorderEventFormData } from '../types';
 import { truckService } from '../services/truckService';
 import { tripService } from '../services/tripService';
 import { driverService } from '../services/driverService';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
-import CommissionCategoryList from '../components/CommissionCategoryList';
 import AmountList from '../components/AmountList';
 
 interface AddTripScreenProps {

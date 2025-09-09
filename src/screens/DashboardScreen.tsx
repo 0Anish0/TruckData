@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIZES, FONTS } from '../constants/theme';
+import { COLORS, SIZES } from '../constants/theme';
 import { useAuth } from '../contexts/AuthContext';
 import { truckService } from '../services/truckService';
 import { tripService } from '../services/tripService';
@@ -108,7 +108,7 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
           
           if (expiresAt <= fiveMinutesFromNow) {
             console.log('Session expiring soon, refreshing...');
-            const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
+            const { error } = await supabase.auth.refreshSession();
             if (error) {
               console.error('Failed to refresh session:', error);
             }

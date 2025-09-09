@@ -11,7 +11,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIZES, FONTS } from '../constants/theme';
+import { COLORS, SIZES } from '../constants/theme';
 import { TripFormData, TripFormErrors, DieselPurchaseFormData, RtoEventFormData, DtoEventFormData, MunicipalitiesEventFormData, BorderEventFormData } from '../types';
 import { truckService } from '../services/truckService';
 import { tripService } from '../services/tripService';
@@ -19,7 +19,6 @@ import { supabase } from '../lib/supabase';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
-import CommissionCategoryList from '../components/CommissionCategoryList';
 import AmountList from '../components/AmountList';
 
 interface EditTripScreenProps {
@@ -100,7 +99,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
   const [errors, setErrors] = useState<TripFormErrors>({});
   const [loading, setLoading] = useState(false);
   const [trucks, setTrucks] = useState<any[]>([]);
-  const [loadingTrucks, setLoadingTrucks] = useState(true);
+  const [, setLoadingTrucks] = useState(true);
 
   useEffect(() => {
     loadTrucks();
@@ -111,7 +110,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
         if (fullTrip) {
           setFormData(buildFormDataFromTrip(fullTrip));
         }
-      } catch (e) {
+      } catch {
         console.warn('Failed to refresh trip, using route data');
       }
     })();

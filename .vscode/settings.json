@@ -23,5 +23,8 @@
   "files.associations": {
     "*.tsx": "typescriptreact",
     "*.ts": "typescript"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
   }
 }

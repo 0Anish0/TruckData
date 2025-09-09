@@ -262,7 +262,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       // Replace RTO events
       const existingRto = (trip as any).rto_events || [];
       for (const e of existingRto) {
-        try { await supabase.from('rto_events').delete().eq('id', e.id); } catch {}
+        try { await supabase.from('rto_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting rto event:', e); }
       }
       for (const rtoCost of formData.rto_costs) {
         await supabase.from('rto_events').insert([{
@@ -279,7 +279,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       // Replace DTO events
       const existingDto = (trip as any).dto_events || [];
       for (const e of existingDto) {
-        try { await supabase.from('dto_events').delete().eq('id', e.id); } catch {}
+        try { await supabase.from('dto_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting dto event:', e); }
       }
       for (const dtoCost of formData.dto_costs) {
         await supabase.from('dto_events').insert([{
@@ -296,7 +296,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       // Replace Municipalities events
       const existingMunicipalities = (trip as any).municipalities_events || [];
       for (const e of existingMunicipalities) {
-        try { await supabase.from('municipalities_events').delete().eq('id', e.id); } catch {}
+        try { await supabase.from('municipalities_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting municipalities event:', e); }
       }
       for (const municipalitiesCost of formData.municipalities_costs) {
         await supabase.from('municipalities_events').insert([{
@@ -313,7 +313,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       // Replace Border events
       const existingBorder = (trip as any).border_events || [];
       for (const e of existingBorder) {
-        try { await supabase.from('border_events').delete().eq('id', e.id); } catch {}
+        try { await supabase.from('border_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting border event:', e); }
       }
       for (const borderCost of formData.border_costs) {
         await supabase.from('border_events').insert([{
@@ -330,7 +330,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       // Replace fast tag events
       const existingFastTag = (trip as any).fast_tag_events || [];
       for (const e of existingFastTag) {
-        try { await supabase.from('fast_tag_events').delete().eq('id', e.id); } catch {}
+        try { await supabase.from('fast_tag_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting fast tag event:', e); }
       }
       for (const amount of formData.fast_tag_costs.filter(cost => cost > 0)) {
         await supabase.from('fast_tag_events').insert([{
@@ -344,7 +344,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       // Replace MCD events
       const existingMcd = (trip as any).mcd_events || [];
       for (const e of existingMcd) {
-        try { await supabase.from('mcd_events').delete().eq('id', e.id); } catch {}
+        try { await supabase.from('mcd_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting mcd event:', e); }
       }
       for (const amount of formData.mcd_costs.filter(cost => cost > 0)) {
         await supabase.from('mcd_events').insert([{
@@ -358,7 +358,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       // Replace green tax events
       const existingGreenTax = (trip as any).green_tax_events || [];
       for (const e of existingGreenTax) {
-        try { await supabase.from('green_tax_events').delete().eq('id', e.id); } catch {}
+        try { await supabase.from('green_tax_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting green tax event:', e); }
       }
       for (const amount of formData.green_tax_costs.filter(cost => cost > 0)) {
         await supabase.from('green_tax_events').insert([{

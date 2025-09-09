@@ -271,7 +271,8 @@ const styles = StyleSheet.create({
   },
   stateList: {
     backgroundColor: COLORS.surface,
-    flex: 1,
+    maxHeight: 300,
+    minHeight: 200,
   },
   stateOption: {
     padding: SIZES.spacingMd,

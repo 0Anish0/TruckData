@@ -152,20 +152,20 @@ const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
                           <Ionicons name="eye" size={16} color={COLORS.surface} />
                         </View>
                       </TouchableOpacity>
-                    ) : (
-                      <View style={styles.avatarPlaceholder}>
-                        <Ionicons name="person" size={20} color={COLORS.surface} />
-                      </View>
-                    )}
+                  ) : (
+                    <View style={styles.avatarPlaceholder}>
+                      <Ionicons name="person" size={20} color={COLORS.surface} />
+                    </View>
+                  )}
                     <View style={styles.driverDetails}>
                       <Text style={styles.driverName}>{driver.name}</Text>
                       {driver.phone && <Text style={styles.driverPhone}>{driver.phone}</Text>}
                       {driver.license_number && <Text style={styles.driverLicense}>License: {driver.license_number}</Text>}
                     </View>
-                  </View>
                 </View>
               </View>
-            ))
+            </View>
+          ))
           ) : (
             <View style={styles.emptyState}>
               <Ionicons name="people-outline" size={48} color={COLORS.textTertiary} />
@@ -185,26 +185,47 @@ const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
         animationType="fade"
         onRequestClose={closeLicenseModal}
       >
-        <View style={styles.licenseModalOverlay}>
-          <View style={styles.licenseModalContainer}>
+        <TouchableOpacity 
+          style={styles.licenseModalOverlay}
+          activeOpacity={1}
+          onPress={closeLicenseModal}
+        >
+          <TouchableOpacity 
+            style={styles.licenseModalContainer}
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+          >
             <View style={styles.licenseModalHeader}>
               <Text style={styles.licenseModalTitle}>{selectedDriverName}'s License</Text>
               <TouchableOpacity
                 onPress={closeLicenseModal}
                 style={styles.licenseModalCloseButton}
+                activeOpacity={0.7}
               >
                 <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
             </View>
             <View style={styles.licenseImageContainer}>
+              {/* Debug Info */}
+              <View style={styles.debugContainer}>
+                <Text style={styles.debugText}>Image Data Length: {selectedLicenseImage.length}</Text>
+                <Text style={styles.debugText}>Driver: {selectedDriverName}</Text>
+              </View>
+              
               <Image
                 source={{ uri: `data:image/jpeg;base64,${selectedLicenseImage}` }}
                 style={styles.licenseImage}
                 resizeMode="contain"
+                onLoad={() => console.log('✅ License image loaded successfully!')}
+                onError={(error) => {
+                  console.log('❌ License image failed to load:', error);
+                  console.log('Image data length:', selectedLicenseImage.length);
+                  console.log('First 100 chars:', selectedLicenseImage.substring(0, 100));
+                }}
               />
             </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );
@@ -421,20 +442,38 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeLg,
     fontWeight: '700',
     color: COLORS.textPrimary,
+    flex: 1,
   },
   licenseModalCloseButton: {
     padding: SIZES.spacingSm,
+    borderRadius: SIZES.radius,
+    backgroundColor: COLORS.background,
   },
   licenseImageContainer: {
     flex: 1,
     padding: SIZES.spacingLg,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: COLORS.background,
   },
   licenseImage: {
     width: '100%',
-    height: '100%',
-    minHeight: 300,
+    height: 400,
+    maxWidth: 350,
+    backgroundColor: COLORS.surface,
+    borderRadius: SIZES.radius,
+  },
+  debugContainer: {
+    backgroundColor: COLORS.primaryLight,
+    padding: SIZES.spacingSm,
+    borderRadius: SIZES.radius,
+    marginBottom: SIZES.spacingMd,
+    alignItems: 'center',
+  },
+  debugText: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textPrimary,
+    fontWeight: '600',
   },
 });
 

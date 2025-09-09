@@ -19,7 +19,7 @@ import { truckService } from '../services/truckService';
 
 interface TripsScreenProps {
   navigation: {
-    navigate: (screen: string, params?: { trip?: Trip }) => void;
+    navigate: (screen: string, params?: { trip?: TripWithRelations }) => void;
   };
 }
 
@@ -39,8 +39,9 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       ]);
       setTrips(tripsData);
       setTrucks(trucksData);
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to load data');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load data';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,7 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
     setRefreshing(false);
   };
 
-  const getTruckName = (trip: Trip) => {
+  const getTruckName = (trip: TripWithRelations) => {
     return trip.trucks?.name || 'Unknown Truck';
   };
 
@@ -83,16 +84,16 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const totalCost = filteredTrips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
   const avgCost = totalTrips > 0 ? totalCost / totalTrips : 0;
 
-  const handleTripPress = (trip: Trip) => {
+  const handleTripPress = (trip: TripWithRelations) => {
     // Navigate to trip details
     console.log('Trip pressed:', trip);
   };
 
-  const handleEditTrip = (trip: Trip) => {
+  const handleEditTrip = (trip: TripWithRelations) => {
     navigation.navigate('EditTrip', { trip });
   };
 
-  const handleDeleteTrip = (trip: Trip) => {
+  const handleDeleteTrip = (trip: TripWithRelations) => {
     Alert.alert(
       'Delete Trip',
       'Are you sure you want to delete this trip? This action cannot be undone.',
@@ -107,8 +108,9 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
               // Refresh the data after deletion
               loadData();
               Alert.alert('Success', 'Trip deleted successfully');
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to delete trip');
+            } catch (error: unknown) {
+              const errorMessage = error instanceof Error ? error.message : 'Failed to delete trip';
+              Alert.alert('Error', errorMessage);
               console.error('Delete trip error:', error);
             }
           },

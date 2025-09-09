@@ -12,15 +12,18 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
+import { Truck } from '../types';
 import { truckService } from '../services/truckService';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 
 interface EditTruckScreenProps {
-  navigation: any;
+  navigation: {
+    goBack: () => void;
+  };
   route: {
     params: {
-      truck: any;
+      truck: Truck;
     };
   };
 }
@@ -76,8 +79,9 @@ const EditTruckScreen: React.FC<EditTruckScreenProps> = ({ navigation, route }) 
           },
         ]
       );
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to update truck');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update truck';
+      Alert.alert('Error', errorMessage);
       console.error('Update truck error:', error);
     } finally {
       setLoading(false);
@@ -107,8 +111,9 @@ const EditTruckScreen: React.FC<EditTruckScreenProps> = ({ navigation, route }) 
                   },
                 ]
               );
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to delete truck');
+            } catch (error: unknown) {
+              const errorMessage = error instanceof Error ? error.message : 'Failed to delete truck';
+              Alert.alert('Error', errorMessage);
               console.error('Delete truck error:', error);
             } finally {
               setLoading(false);
@@ -152,8 +157,8 @@ const EditTruckScreen: React.FC<EditTruckScreenProps> = ({ navigation, route }) 
           {/* Form */}
           <View style={styles.form}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Truck Name</Text>
               <CustomInput
+                label="Truck Name"
                 value={formData.name}
                 onChangeText={(text) => setFormData({ ...formData, name: text })}
                 placeholder="Enter truck name"
@@ -162,8 +167,8 @@ const EditTruckScreen: React.FC<EditTruckScreenProps> = ({ navigation, route }) 
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Truck Number</Text>
               <CustomInput
+                label="Truck Number"
                 value={formData.truck_number}
                 onChangeText={(text) => setFormData({ ...formData, truck_number: text })}
                 placeholder="Enter truck number"
@@ -172,8 +177,8 @@ const EditTruckScreen: React.FC<EditTruckScreenProps> = ({ navigation, route }) 
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Model</Text>
               <CustomInput
+                label="Model"
                 value={formData.model}
                 onChangeText={(text) => setFormData({ ...formData, model: text })}
                 placeholder="Enter truck model"
@@ -239,12 +244,6 @@ const styles = StyleSheet.create({
   },
   inputGroup: {
     marginBottom: SIZES.spacingLg,
-  },
-  label: {
-    fontSize: SIZES.fontSizeMd,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: SIZES.spacingSm,
   },
 });
 

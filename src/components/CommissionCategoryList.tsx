@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { COLORS, SIZES } from '../constants/theme';
+import { SIZES } from '../constants/theme';
 import CustomInput from './CustomInput';
 import CustomButton from './CustomButton';
 import { CommissionItemFormData, AuthorityType } from '../types';
@@ -42,17 +42,6 @@ const styles = StyleSheet.create({
   containerCompact: {
     gap: SIZES.spacingSm,
     marginBottom: SIZES.spacingMd,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: SIZES.spacingMd,
-  },
-  title: {
-    fontSize: SIZES.fontSizeMd,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
   },
   stackRow: {
     marginBottom: SIZES.spacingSm,

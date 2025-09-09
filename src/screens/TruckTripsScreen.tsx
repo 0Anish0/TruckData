@@ -41,7 +41,7 @@ const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route, navigation }
 
   useEffect(() => {
     loadTruckTrips();
-  }, [truck.id]);
+  }, [truck.id, loadTruckTrips]);
 
   const loadTruckTrips = async () => {
     try {

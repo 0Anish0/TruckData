@@ -33,6 +33,15 @@ export const COLORS = {
   shadow: 'rgba(0, 0, 0, 0.08)',
   shadowStrong: 'rgba(0, 0, 0, 0.12)',
   
+  // Overlay colors
+  overlay: 'rgba(0, 0, 0, 0.3)',
+  overlayDark: 'rgba(0, 0, 0, 0.4)',
+  overlayStrong: 'rgba(0, 0, 0, 0.5)',
+  overlayStronger: 'rgba(0, 0, 0, 0.8)',
+  
+  // Transparent
+  transparent: 'transparent',
+  
   // Fuel related colors
   fuel: '#F59E0B', // Orange for fuel costs
   cost: '#EF4444', // Red for costs

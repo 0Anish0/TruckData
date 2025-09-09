@@ -114,7 +114,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
         console.warn('Failed to refresh trip, using route data');
       }
     })();
-  }, []);
+  }, [trip.id]);
 
   const loadTrucks = async () => {
     try {

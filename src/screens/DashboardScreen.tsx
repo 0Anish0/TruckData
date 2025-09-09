@@ -88,7 +88,7 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
     if (user) {
       loadDashboardData();
     }
-  }, [user]);
+  }, [user, loadDashboardData]);
 
   // Add session refresh check
   useEffect(() => {
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     left: -1000,
     right: -1000,
     bottom: -1000,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        backgroundColor: COLORS.overlay,
     zIndex: 9999,
   },
   profileButton: {

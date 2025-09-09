@@ -30,7 +30,7 @@ const TripCard: React.FC<TripCardProps> = ({
         month: 'short',
         year: 'numeric',
       });
-    } catch (error) {
+    } catch {
       return 'Invalid Date';
     }
   };

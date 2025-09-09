@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: COLORS.overlayStrong,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SIZES.spacingLg,

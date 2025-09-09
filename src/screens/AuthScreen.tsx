@@ -211,17 +211,6 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontWeight: '600',
   },
-  demoInfo: {
-    alignItems: 'center',
-    paddingHorizontal: SIZES.spacingLg,
-  },
-  demoText: {
-    fontSize: SIZES.fontSizeXs,
-    color: COLORS.textTertiary,
-    textAlign: 'center',
-    lineHeight: 18,
-    fontWeight: '500',
-  },
 });
 
 export default AuthScreen;

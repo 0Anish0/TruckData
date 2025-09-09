@@ -7,6 +7,9 @@ type TripInsert = Database['public']['Tables']['trips']['Insert'];
 type TripUpdate = Database['public']['Tables']['trips']['Update'];
 type DieselPurchaseInsert = Database['public']['Tables']['diesel_purchases']['Insert'];
 type DieselPurchaseUpdate = Database['public']['Tables']['diesel_purchases']['Update'];
+type FastTagEventInsert = Database['public']['Tables']['fast_tag_events']['Insert'];
+type McdEventInsert = Database['public']['Tables']['mcd_events']['Insert'];
+type GreenTaxEventInsert = Database['public']['Tables']['green_tax_events']['Insert'];
 
 // Helper function to handle auth errors
 const handleAuthError = (error: any) => {
@@ -57,12 +60,17 @@ export const tripService = {
     municipalities_cost?: number;
     border_cost?: number;
     repair_cost?: number;
+    fast_tag_events_sum?: number;
+    mcd_events_sum?: number;
+    green_tax_events_sum?: number;
+    repair_events_sum?: number;
   }): number {
     const dieselCost = trip.diesel_purchases.reduce((total, purchase) => {
       return total + (purchase.diesel_quantity * purchase.diesel_price_per_liter);
     }, 0);
     const splitCommissionSum = (trip.rto_cost || 0) + (trip.dto_cost || 0) + (trip.municipalities_cost || 0) + (trip.border_cost || 0);
-    const totalCost = dieselCost + trip.fast_tag_cost + trip.mcd_cost + trip.green_tax_cost + splitCommissionSum + (trip.repair_cost || 0);
+    const eventSums = (trip.fast_tag_events_sum || 0) + (trip.mcd_events_sum || 0) + (trip.green_tax_events_sum || 0) + (trip.repair_events_sum || 0);
+    const totalCost = dieselCost + trip.fast_tag_cost + trip.mcd_cost + trip.green_tax_cost + splitCommissionSum + (trip.repair_cost || 0) + eventSums;
     return Math.round(totalCost * 100) / 100; // Round to 2 decimal places
   },
 
@@ -329,6 +337,29 @@ export const tripService = {
         }
       }
 
+      // Create fast tag/mcd/green tax extras if provided via temporary fields (optional)
+      const extraFastTag: number[] = ((trip as any).fast_tag_extras || []) as number[];
+      for (let i = 0; i < (extraFastTag || []).length; i++) {
+        const amount = Number(extraFastTag[i]) || 0;
+        if (amount > 0) {
+          await supabase.from('fast_tag_events').insert([{ trip_id: tripData.id, amount, event_time: new Date(Date.now() + i).toISOString() } as FastTagEventInsert]);
+        }
+      }
+      const extraMcd: number[] = ((trip as any).mcd_extras || []) as number[];
+      for (let i = 0; i < (extraMcd || []).length; i++) {
+        const amount = Number(extraMcd[i]) || 0;
+        if (amount > 0) {
+          await supabase.from('mcd_events').insert([{ trip_id: tripData.id, amount, event_time: new Date(Date.now() + i).toISOString() } as McdEventInsert]);
+        }
+      }
+      const extraGreen: number[] = ((trip as any).green_tax_extras || []) as number[];
+      for (let i = 0; i < (extraGreen || []).length; i++) {
+        const amount = Number(extraGreen[i]) || 0;
+        if (amount > 0) {
+          await supabase.from('green_tax_events').insert([{ trip_id: tripData.id, amount, event_time: new Date(Date.now() + i).toISOString() } as GreenTaxEventInsert]);
+        }
+      }
+
       // Fetch the complete trip with diesel purchases
       const created = await this.getTrip(tripData.id);
       // getTrip can return null in types; ensure non-null
@@ -363,6 +394,14 @@ export const tripService = {
         // Merge current data with updates
         // Calculate new total cost using existing diesel purchases
         const dieselPurchases = (currentTrip as any).diesel_purchases || [];
+        // Sum event tables
+        const [fastTagSum, mcdSum, greenSum, repairSum] = await Promise.all([
+          supabase.from('fast_tag_events').select('amount').eq('trip_id', id),
+          supabase.from('mcd_events').select('amount').eq('trip_id', id),
+          supabase.from('green_tax_events').select('amount').eq('trip_id', id),
+          supabase.from('repair_events').select('amount').eq('trip_id', id),
+        ]).then(results => results.map(r => (r.data || []).reduce((s, row: any) => s + Number(row.amount || 0), 0)));
+
         updates.total_cost = this.calculateTotalCost({
           diesel_purchases: dieselPurchases.map((p: any) => ({
             state: p.state,
@@ -379,6 +418,10 @@ export const tripService = {
           municipalities_cost: (updates as any).municipalities_cost ?? (currentTrip as any).municipalities_cost ?? 0,
           border_cost: (updates as any).border_cost ?? (currentTrip as any).border_cost ?? 0,
           repair_cost: (updates as any).repair_cost ?? (currentTrip as any).repair_cost ?? 0,
+          fast_tag_events_sum: fastTagSum,
+          mcd_events_sum: mcdSum,
+          green_tax_events_sum: greenSum,
+          repair_events_sum: repairSum,
         });
       }
 

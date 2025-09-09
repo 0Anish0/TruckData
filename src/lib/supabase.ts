@@ -158,6 +158,102 @@ export interface Database {
           updated_at?: string;
         };
       };
+      fast_tag_events: {
+        Row: {
+          id: string;
+          trip_id: string;
+          amount: number;
+          currency: string | null;
+          event_time: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id: string;
+          amount: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string;
+          amount?: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      mcd_events: {
+        Row: {
+          id: string;
+          trip_id: string;
+          amount: number;
+          currency: string | null;
+          event_time: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id: string;
+          amount: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string;
+          amount?: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      green_tax_events: {
+        Row: {
+          id: string;
+          trip_id: string;
+          amount: number;
+          currency: string | null;
+          event_time: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id: string;
+          amount: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string;
+          amount?: number;
+          currency?: string | null;
+          event_time?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       commission_events: {
         Row: {
           id: string;

@@ -15,6 +15,7 @@ import { COLORS, SIZES, FONTS } from '../constants/theme';
 import { TripFormData, TripFormErrors, DieselPurchaseFormData, INDIAN_STATES } from '../types';
 import { truckService } from '../services/truckService';
 import { tripService } from '../services/tripService';
+import { driverService } from '../services/driverService';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
@@ -80,12 +81,8 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
 
   const loadDrivers = async () => {
     try {
-      const { data, error } = await (await import('../lib/supabase')).supabase
-        .from('drivers')
-        .select('id, name')
-        .order('name');
-      if (error) throw error;
-      setDrivers(data || []);
+      const data = await driverService.getDrivers();
+      setDrivers((data || []).map(d => ({ id: d.id, name: d.name })));
     } catch (error) {
       console.error('Load drivers error:', error);
     }

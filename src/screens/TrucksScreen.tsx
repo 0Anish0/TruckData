@@ -10,14 +10,20 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIZES, FONTS } from '../constants/theme';
-import { Truck, Trip } from '../types';
+import { COLORS, SIZES } from '../constants/theme';
+import { Truck, Trip, DieselPurchase } from '../types';
 import TruckCard from '../components/TruckCard';
 import CustomButton from '../components/CustomButton';
 import { truckService } from '../services/truckService';
 import { tripService } from '../services/tripService';
 
-const TrucksScreen: React.FC = ({ navigation }: any) => {
+interface TrucksScreenProps {
+  navigation: {
+    navigate: (screen: string, params?: { truck?: Truck }) => void;
+  };
+}
+
+const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -31,8 +37,9 @@ const TrucksScreen: React.FC = ({ navigation }: any) => {
       ]);
       setTrucks(trucksData);
       setTrips(tripsData);
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to load data');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load data';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

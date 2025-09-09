@@ -32,6 +32,85 @@ export interface DieselPurchase {
   updated_at: string;
 }
 
+// Event interfaces for database records
+export interface FastTagEvent {
+  id: string;
+  trip_id: string;
+  amount: number;
+  event_time: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface McdEvent {
+  id: string;
+  trip_id: string;
+  amount: number;
+  event_time: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GreenTaxEvent {
+  id: string;
+  trip_id: string;
+  amount: number;
+  event_time: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RtoEvent {
+  id: string;
+  trip_id: string;
+  state: string;
+  checkpoint?: string;
+  amount: number;
+  event_time: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DtoEvent {
+  id: string;
+  trip_id: string;
+  state: string;
+  checkpoint?: string;
+  amount: number;
+  event_time: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MunicipalitiesEvent {
+  id: string;
+  trip_id: string;
+  state: string;
+  checkpoint?: string;
+  amount: number;
+  event_time: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BorderEvent {
+  id: string;
+  trip_id: string;
+  state: string;
+  checkpoint?: string;
+  amount: number;
+  event_time: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Trip {
   id: string;
   truck_id: string;
@@ -63,6 +142,13 @@ export interface Trip {
     name: string;
   };
   diesel_purchases?: DieselPurchase[];
+  fast_tag_events?: FastTagEvent[];
+  mcd_events?: McdEvent[];
+  green_tax_events?: GreenTaxEvent[];
+  rto_events?: RtoEvent[];
+  dto_events?: DtoEvent[];
+  municipalities_events?: MunicipalitiesEvent[];
+  border_events?: BorderEvent[];
 }
 
 export interface User {
@@ -94,15 +180,14 @@ export interface TripFormData {
   source: string;
   destination: string;
   diesel_purchases: DieselPurchaseFormData[];
-  commission_items?: CommissionItemFormData[];
   repair_items?: RepairItemFormData[];
   fast_tag_costs: number[]; 
   mcd_costs: number[]; 
   green_tax_costs: number[]; 
-  rto_cost?: number;
-  dto_cost?: number;
-  municipalities_cost?: number;
-  border_cost?: number;
+  rto_costs: RtoEventFormData[];
+  dto_costs: DtoEventFormData[];
+  municipalities_costs: MunicipalitiesEventFormData[];
+  border_costs: BorderEventFormData[];
   repair_cost?: number;
 }
 
@@ -115,10 +200,10 @@ export interface TripFormErrors {
   fast_tag_costs?: string;
   mcd_costs?: string;
   green_tax_costs?: string;
-  rto_cost?: string;
-  dto_cost?: string;
-  municipalities_cost?: string;
-  border_cost?: string;
+  rto_costs?: string;
+  dto_costs?: string;
+  municipalities_costs?: string;
+  border_costs?: string;
   repair_cost?: string;
 }
 
@@ -153,6 +238,38 @@ export interface McdEventFormData {
 }
 
 export interface GreenTaxEventFormData {
+  amount: number;
+  notes?: string;
+  event_time?: string; // ISO
+}
+
+export interface RtoEventFormData {
+  state: string;
+  checkpoint?: string;
+  amount: number;
+  notes?: string;
+  event_time?: string; // ISO
+}
+
+export interface DtoEventFormData {
+  state: string;
+  checkpoint?: string;
+  amount: number;
+  notes?: string;
+  event_time?: string; // ISO
+}
+
+export interface MunicipalitiesEventFormData {
+  state: string;
+  checkpoint?: string;
+  amount: number;
+  notes?: string;
+  event_time?: string; // ISO
+}
+
+export interface BorderEventFormData {
+  state: string;
+  checkpoint?: string;
   amount: number;
   notes?: string;
   event_time?: string; // ISO

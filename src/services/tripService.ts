@@ -105,6 +105,7 @@ export const tripService = {
           ),
           diesel_purchases (
             id,
+            trip_id,
             state,
             city,
             diesel_quantity,
@@ -147,6 +148,46 @@ export const tripService = {
             notes,
             created_at,
             updated_at
+          ),
+          rto_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          dto_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          municipalities_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          border_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
           )
         `)
         .eq('user_id', user.id)
@@ -157,7 +198,7 @@ export const tripService = {
         throw new Error(`Error fetching trips: ${error.message}`);
       }
 
-      return data || [];
+      return (data || []) as unknown as Trip[];
     } catch (error) {
       handleAuthError(error);
       throw error;
@@ -190,6 +231,7 @@ export const tripService = {
           ),
           diesel_purchases (
             id,
+            trip_id,
             state,
             city,
             diesel_quantity,
@@ -232,6 +274,46 @@ export const tripService = {
             notes,
             created_at,
             updated_at
+          ),
+          rto_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          dto_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          municipalities_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          border_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
           )
         `)
         .eq('truck_id', truckId)
@@ -243,7 +325,7 @@ export const tripService = {
         throw new Error(`Error fetching truck trips: ${error.message}`);
       }
 
-      return data || [];
+      return (data || []) as unknown as Trip[];
     } catch (error) {
       handleAuthError(error);
       throw error;
@@ -276,6 +358,7 @@ export const tripService = {
           ),
           diesel_purchases (
             id,
+            trip_id,
             state,
             city,
             diesel_quantity,
@@ -318,6 +401,46 @@ export const tripService = {
             notes,
             created_at,
             updated_at
+          ),
+          rto_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          dto_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          municipalities_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          border_events (
+            id,
+            state,
+            checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
           )
         `)
         .eq('id', id)
@@ -342,6 +465,10 @@ export const tripService = {
     fast_tag_costs?: number[];
     mcd_costs?: number[];
     green_tax_costs?: number[];
+    rto_costs?: any[];
+    dto_costs?: any[];
+    municipalities_costs?: any[];
+    border_costs?: any[];
   }): Promise<Trip> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -459,6 +586,82 @@ export const tripService = {
         
         if (greenTaxEvents.length > 0) {
           await supabase.from('green_tax_events').insert(greenTaxEvents);
+        }
+      }
+
+      // Create RTO events from array
+      if (trip.rto_costs && trip.rto_costs.length > 0) {
+        const rtoEvents = trip.rto_costs
+          .filter(cost => cost.amount > 0)
+          .map((cost, index) => ({
+            trip_id: tripData.id,
+            state: cost.state,
+            checkpoint: cost.checkpoint || null,
+            amount: cost.amount,
+            notes: cost.notes || null,
+            event_time: cost.event_time || new Date(Date.now() + index * 1000).toISOString(),
+            currency: 'INR'
+          }));
+        
+        if (rtoEvents.length > 0) {
+          await supabase.from('rto_events').insert(rtoEvents);
+        }
+      }
+
+      // Create DTO events from array
+      if (trip.dto_costs && trip.dto_costs.length > 0) {
+        const dtoEvents = trip.dto_costs
+          .filter(cost => cost.amount > 0)
+          .map((cost, index) => ({
+            trip_id: tripData.id,
+            state: cost.state,
+            checkpoint: cost.checkpoint || null,
+            amount: cost.amount,
+            notes: cost.notes || null,
+            event_time: cost.event_time || new Date(Date.now() + index * 1000).toISOString(),
+            currency: 'INR'
+          }));
+        
+        if (dtoEvents.length > 0) {
+          await supabase.from('dto_events').insert(dtoEvents);
+        }
+      }
+
+      // Create Municipalities events from array
+      if (trip.municipalities_costs && trip.municipalities_costs.length > 0) {
+        const municipalitiesEvents = trip.municipalities_costs
+          .filter(cost => cost.amount > 0)
+          .map((cost, index) => ({
+            trip_id: tripData.id,
+            state: cost.state,
+            checkpoint: cost.checkpoint || null,
+            amount: cost.amount,
+            notes: cost.notes || null,
+            event_time: cost.event_time || new Date(Date.now() + index * 1000).toISOString(),
+            currency: 'INR'
+          }));
+        
+        if (municipalitiesEvents.length > 0) {
+          await supabase.from('municipalities_events').insert(municipalitiesEvents);
+        }
+      }
+
+      // Create Border events from array
+      if (trip.border_costs && trip.border_costs.length > 0) {
+        const borderEvents = trip.border_costs
+          .filter(cost => cost.amount > 0)
+          .map((cost, index) => ({
+            trip_id: tripData.id,
+            state: cost.state,
+            checkpoint: cost.checkpoint || null,
+            amount: cost.amount,
+            notes: cost.notes || null,
+            event_time: cost.event_time || new Date(Date.now() + index * 1000).toISOString(),
+            currency: 'INR'
+          }));
+        
+        if (borderEvents.length > 0) {
+          await supabase.from('border_events').insert(borderEvents);
         }
       }
 
@@ -592,8 +795,15 @@ export const tripService = {
           mcd_cost,
           green_tax_cost,
           diesel_purchases (
+            id,
+            trip_id,
+            state,
+            city,
             diesel_quantity,
-            diesel_price_per_liter
+            diesel_price_per_liter,
+            purchase_date,
+            created_at,
+            updated_at
           )
         `)
         .eq('user_id', user.id);
@@ -641,8 +851,15 @@ export const tripService = {
         .select(`
           total_cost,
           diesel_purchases (
+            id,
+            trip_id,
+            state,
+            city,
             diesel_quantity,
-            diesel_price_per_liter
+            diesel_price_per_liter,
+            purchase_date,
+            created_at,
+            updated_at
           )
         `)
         .eq('truck_id', truckId)
@@ -797,7 +1014,7 @@ export const tripService = {
         .eq('trip_id', tripId)
         .order('event_time', { ascending: true });
       if (error) throw error;
-      return data || [];
+      return (data || []) as unknown as Trip[];
     } catch (error) {
       handleAuthError(error);
       throw error;
@@ -928,6 +1145,82 @@ export const tripService = {
           .update({ total_cost: newTotalCost })
           .eq('id', purchase.trip_id);
       }
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  // RTO Events CRUD
+  async addRtoEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('rto_events')
+        .insert([{ ...event, trip_id: tripId }])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  // DTO Events CRUD
+  async addDtoEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('dto_events')
+        .insert([{ ...event, trip_id: tripId }])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  // Municipalities Events CRUD
+  async addMunicipalitiesEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('municipalities_events')
+        .insert([{ ...event, trip_id: tripId }])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    }
+  },
+
+  // Border Events CRUD
+  async addBorderEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('border_events')
+        .insert([{ ...event, trip_id: tripId }])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
     } catch (error) {
       handleAuthError(error);
       throw error;

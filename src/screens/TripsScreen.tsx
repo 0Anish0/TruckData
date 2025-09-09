@@ -11,15 +11,21 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
-import { Trip } from '../types';
+import { Trip, TripWithRelations, Truck } from '../types';
 import TripCard from '../components/TripCard';
 import CustomButton from '../components/CustomButton';
 import { tripService } from '../services/tripService';
 import { truckService } from '../services/truckService';
 
-const TripsScreen: React.FC = ({ navigation }: any) => {
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [trucks, setTrucks] = useState<any[]>([]);
+interface TripsScreenProps {
+  navigation: {
+    navigate: (screen: string, params?: { trip?: Trip }) => void;
+  };
+}
+
+const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
+  const [trips, setTrips] = useState<TripWithRelations[]>([]);
+  const [trucks, setTrucks] = useState<Truck[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');

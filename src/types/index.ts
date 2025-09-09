@@ -151,6 +151,45 @@ export interface Trip {
   border_events?: BorderEvent[];
 }
 
+// Type for trips with database relations (used by tripService)
+export interface TripWithRelations {
+  id: string;
+  truck_id: string;
+  source: string;
+  destination: string;
+  driver_id: string | null;
+  fast_tag_cost: number;
+  mcd_cost: number;
+  green_tax_cost: number;
+  rto_cost: number;
+  dto_cost: number;
+  municipalities_cost: number;
+  border_cost: number;
+  repair_cost: number;
+  total_cost: number;
+  trip_date: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  trucks?: {
+    id: string;
+    name: string;
+    truck_number: string;
+    model: string;
+  };
+  drivers?: {
+    id: string;
+    name: string;
+  };
+  diesel_purchases?: {
+    state: string;
+    city: string | null;
+    diesel_quantity: number;
+    diesel_price_per_liter: number;
+    purchase_date: string;
+  }[];
+}
+
 export interface User {
   id: string;
   email: string;

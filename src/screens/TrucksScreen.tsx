@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
-import { Truck, Trip, DieselPurchase } from '../types';
+import { Truck, TripWithRelations } from '../types';
 import TruckCard from '../components/TruckCard';
 import CustomButton from '../components/CustomButton';
 import { truckService } from '../services/truckService';
@@ -25,7 +25,7 @@ interface TrucksScreenProps {
 
 const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
   const [trucks, setTrucks] = useState<Truck[]>([]);
-  const [trips, setTrips] = useState<Trip[]>([]);
+  const [trips, setTrips] = useState<TripWithRelations[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -59,9 +59,9 @@ const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
     const truckTrips = trips.filter(trip => trip.truck_id === truckId);
     const tripCount = truckTrips.length;
     const totalCost = truckTrips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
-    const totalDiesel = truckTrips.reduce((sum, trip: any) => {
+    const totalDiesel = truckTrips.reduce((sum, trip) => {
       const qty = (trip.diesel_purchases || []).reduce(
-        (s: number, p: any) => s + Number(p.diesel_quantity || 0),
+        (s: number, p) => s + Number(p.diesel_quantity || 0),
         0
       );
       return sum + qty;
@@ -102,8 +102,9 @@ const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
               await truckService.deleteTruck(truck.id);
               await loadData(); // Refresh the data
               Alert.alert('Success', 'Truck deleted successfully');
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to delete truck');
+            } catch (error: unknown) {
+              const errorMessage = error instanceof Error ? error.message : 'Failed to delete truck';
+              Alert.alert('Error', errorMessage);
             }
           }
         },

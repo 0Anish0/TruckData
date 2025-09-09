@@ -19,7 +19,9 @@ import { driverService } from '../services/driverService';
 import * as ImagePicker from 'expo-image-picker';
 
 interface AddDriverScreenProps {
-  navigation: any;
+  navigation: {
+    goBack: () => void;
+  };
 }
 
 const AddDriverScreen: React.FC<AddDriverScreenProps> = ({ navigation }) => {
@@ -103,8 +105,9 @@ const AddDriverScreen: React.FC<AddDriverScreenProps> = ({ navigation }) => {
           },
         ]
       );
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to add driver. Please try again.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add driver. Please try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

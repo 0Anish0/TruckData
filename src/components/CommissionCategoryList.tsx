@@ -15,7 +15,7 @@ interface Props {
   startFrom?: number; // numbering start (defaults to 1)
 }
 
-const CommissionCategoryList: React.FC<Props> = ({ title, authorityType, items, onAdd, onUpdate, onRemove, startFrom = 1 }) => {
+const CommissionCategoryList: React.FC<Props> = ({ authorityType, items, onAdd, onUpdate, onRemove, startFrom = 1 }) => {
   return (
     <View style={styles.containerCompact}>
       {items.map((item, index) => (
@@ -64,5 +64,3 @@ const styles = StyleSheet.create({
 });
 
 export default CommissionCategoryList;
-
-

@@ -16,7 +16,9 @@ import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 
 interface AuthScreenProps {
-  navigation: any;
+  navigation: {
+    navigate: (screen: string) => void;
+  };
 }
 
 const AuthScreen: React.FC<AuthScreenProps> = ({ navigation }) => {

@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Database } from '../lib/supabase';
-import { DieselPurchase, DieselPurchaseFormData } from '../types';
+import { DieselPurchase, DieselPurchaseFormData, RtoEventFormData, DtoEventFormData, MunicipalitiesEventFormData, BorderEventFormData } from '../types';
 
 type Trip = Database['public']['Tables']['trips']['Row'];
 type TripInsert = Database['public']['Tables']['trips']['Insert'];
@@ -12,9 +12,12 @@ type McdEventInsert = Database['public']['Tables']['mcd_events']['Insert'];
 type GreenTaxEventInsert = Database['public']['Tables']['green_tax_events']['Insert'];
 
 // Helper function to handle auth errors
-const handleAuthError = (error: any) => {
-  if (error?.message?.includes('JWT expired') || error?.message?.includes('Invalid JWT')) {
-    throw new Error('Session expired. Please sign in again.');
+const handleAuthError = (error: unknown) => {
+  if (error && typeof error === 'object' && 'message' in error) {
+    const errorMessage = (error as { message: string }).message;
+    if (errorMessage.includes('JWT expired') || errorMessage.includes('Invalid JWT')) {
+      throw new Error('Session expired. Please sign in again.');
+    }
   }
   throw error;
 };
@@ -465,10 +468,10 @@ export const tripService = {
     fast_tag_costs?: number[];
     mcd_costs?: number[];
     green_tax_costs?: number[];
-    rto_costs?: any[];
-    dto_costs?: any[];
-    municipalities_costs?: any[];
-    border_costs?: any[];
+    rto_costs?: RtoEventFormData[];
+    dto_costs?: DtoEventFormData[];
+    municipalities_costs?: MunicipalitiesEventFormData[];
+    border_costs?: BorderEventFormData[];
   }): Promise<Trip> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -705,10 +708,10 @@ export const tripService = {
           supabase.from('mcd_events').select('amount').eq('trip_id', id),
           supabase.from('green_tax_events').select('amount').eq('trip_id', id),
           supabase.from('repair_events').select('amount').eq('trip_id', id),
-        ]).then(results => results.map(r => (r.data || []).reduce((s, row: any) => s + Number(row.amount || 0), 0)));
+        ]).then(results => results.map(r => (r.data || []).reduce((s, row: { amount?: number }) => s + Number(row.amount || 0), 0)));
 
         updates.total_cost = this.calculateTotalCost({
-          diesel_purchases: dieselPurchases.map((p: any) => ({
+          diesel_purchases: dieselPurchases.map((p: { state: string; city: string | null; diesel_quantity: number; diesel_price_per_liter: number; purchase_date: string }) => ({
             state: p.state,
             city: p.city || '',
             diesel_quantity: Number(p.diesel_quantity) || 0,
@@ -816,9 +819,9 @@ export const tripService = {
       const trips = data || [];
       const totalTrips = trips.length;
       const totalCost = trips.reduce((sum, trip) => sum + Number(trip.total_cost), 0);
-      const totalDiesel = trips.reduce((sum, trip: any) => {
+      const totalDiesel = trips.reduce((sum, trip: { diesel_purchases?: { diesel_quantity: number }[] }) => {
         const qty = (trip.diesel_purchases || []).reduce(
-          (s: number, p: any) => s + Number(p.diesel_quantity || 0),
+          (s: number, p: { diesel_quantity: number }) => s + Number(p.diesel_quantity || 0),
           0
         );
         return sum + qty;

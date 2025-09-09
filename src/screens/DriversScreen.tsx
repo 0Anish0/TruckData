@@ -4,13 +4,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
 import { driverService } from '../services/driverService';
 import CustomButton from '../components/CustomButton';
+import { Driver } from '../types';
 
 interface DriversScreenProps {
-  navigation: any;
+  navigation: {
+    navigate: (screen: string) => void;
+  };
 }
 
 const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
-  const [drivers, setDrivers] = useState<any[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showLicenseModal, setShowLicenseModal] = useState(false);
@@ -22,8 +25,9 @@ const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
       setLoading(true);
       const data = await driverService.getDrivers();
       setDrivers(data);
-    } catch (e: any) {
-      Alert.alert('Error', e.message || 'Failed to load drivers');
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'Failed to load drivers';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -478,5 +482,3 @@ const styles = StyleSheet.create({
 });
 
 export default DriversScreen;
-
-

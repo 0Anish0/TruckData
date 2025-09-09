@@ -6,9 +6,12 @@ type TruckInsert = Database['public']['Tables']['trucks']['Insert'];
 type TruckUpdate = Database['public']['Tables']['trucks']['Update'];
 
 // Helper function to handle auth errors
-const handleAuthError = (error: any) => {
-  if (error?.message?.includes('JWT expired') || error?.message?.includes('Invalid JWT')) {
-    throw new Error('Session expired. Please sign in again.');
+const handleAuthError = (error: unknown) => {
+  if (error && typeof error === 'object' && 'message' in error) {
+    const errorMessage = (error as { message: string }).message;
+    if (errorMessage.includes('JWT expired') || errorMessage.includes('Invalid JWT')) {
+      throw new Error('Session expired. Please sign in again.');
+    }
   }
   throw error;
 };

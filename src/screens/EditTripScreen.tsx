@@ -15,6 +15,7 @@ import { COLORS, SIZES, FONTS } from '../constants/theme';
 import { TripFormData, TripFormErrors, DieselPurchaseFormData } from '../types';
 import { truckService } from '../services/truckService';
 import { tripService } from '../services/tripService';
+import { supabase } from '../lib/supabase';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
@@ -60,9 +61,9 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       diesel_price_per_liter: 0,
       purchase_date: new Date().toISOString().split('T')[0],
     }],
-    fast_tag_cost: Number(t.fast_tag_cost || 0),
-    mcd_cost: Number(t.mcd_cost || 0),
-    green_tax_cost: Number(t.green_tax_cost || 0),
+    fast_tag_costs: (t.fast_tag_events || []).map((e: any) => Number(e.amount || 0)),
+    mcd_costs: (t.mcd_events || []).map((e: any) => Number(e.amount || 0)),
+    green_tax_costs: (t.green_tax_events || []).map((e: any) => Number(e.amount || 0)),
     rto_cost: Number((t as any).rto_cost || 0),
     dto_cost: Number((t as any).dto_cost || 0),
     municipalities_cost: Number((t as any).municipalities_cost || 0),
@@ -128,11 +129,16 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     const municipalitiesExtras = (formData.commission_items || []).filter(i => i.authority_type === 'Municipalities').reduce((s, i) => s + (i.amount || 0), 0);
     const borderExtras = (formData.commission_items || []).filter(i => i.authority_type === 'State Border').reduce((s, i) => s + (i.amount || 0), 0);
 
+    // Calculate totals from arrays
+    const fastTagTotal = formData.fast_tag_costs.reduce((sum, cost) => sum + cost, 0);
+    const mcdTotal = formData.mcd_costs.reduce((sum, cost) => sum + cost, 0);
+    const greenTaxTotal = formData.green_tax_costs.reduce((sum, cost) => sum + cost, 0);
+
     return tripService.calculateTotalCost({
       diesel_purchases: formData.diesel_purchases,
-      fast_tag_cost: (formData as any).fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
-      mcd_cost: (formData as any).mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
-      green_tax_cost: (formData as any).green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
+      fast_tag_cost: fastTagTotal,
+      mcd_cost: mcdTotal,
+      green_tax_cost: greenTaxTotal,
       rto_cost: (formData as any).rto_cost + rtoExtras,
       dto_cost: (formData as any).dto_cost + dtoExtras,
       municipalities_cost: (formData as any).municipalities_cost + municipalitiesExtras,
@@ -181,16 +187,17 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       }
     }
 
-    if (formData.fast_tag_cost < 0) {
-      newErrors.fast_tag_cost = 'Fast tag cost cannot be negative';
+    // Validate cost arrays
+    if (formData.fast_tag_costs.some(cost => cost < 0)) {
+      newErrors.fast_tag_costs = 'Fast tag costs cannot be negative';
     }
 
-    if (formData.mcd_cost < 0) {
-      newErrors.mcd_cost = 'MCD cost cannot be negative';
+    if (formData.mcd_costs.some(cost => cost < 0)) {
+      newErrors.mcd_costs = 'MCD costs cannot be negative';
     }
 
-    if (formData.green_tax_cost < 0) {
-      newErrors.green_tax_cost = 'Green tax cost cannot be negative';
+    if (formData.green_tax_costs.some(cost => cost < 0)) {
+      newErrors.green_tax_costs = 'Green tax costs cannot be negative';
     }
 
     setErrors(newErrors);
@@ -212,13 +219,18 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       const municipalitiesSum = (formData.commission_items || []).filter(i => i.authority_type === 'Municipalities').reduce((s, i) => s + (i.amount || 0), 0);
       const borderSum = (formData.commission_items || []).filter(i => i.authority_type === 'State Border').reduce((s, i) => s + (i.amount || 0), 0);
 
+      // Calculate totals from arrays
+      const fastTagTotal = formData.fast_tag_costs.reduce((sum, cost) => sum + cost, 0);
+      const mcdTotal = formData.mcd_costs.reduce((sum, cost) => sum + cost, 0);
+      const greenTaxTotal = formData.green_tax_costs.reduce((sum, cost) => sum + cost, 0);
+
       await tripService.updateTrip(trip.id, {
         truck_id: formData.truck_id,
         source: formData.source.trim(),
         destination: formData.destination.trim(),
-        fast_tag_cost: (formData as any).fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
-        mcd_cost: (formData as any).mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
-        green_tax_cost: (formData as any).green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
+        fast_tag_cost: fastTagTotal,
+        mcd_cost: mcdTotal,
+        green_tax_cost: greenTaxTotal,
         rto_cost: rtoSum,
         dto_cost: dtoSum,
         municipalities_cost: municipalitiesSum,
@@ -242,6 +254,48 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
           notes: item.notes,
           event_time: new Date(Date.now() + idx).toISOString(),
         });
+      }
+
+      // Replace fast tag events
+      const existingFastTag = (trip as any).fast_tag_events || [];
+      for (const e of existingFastTag) {
+        try { await supabase.from('fast_tag_events').delete().eq('id', e.id); } catch {}
+      }
+      for (const amount of formData.fast_tag_costs.filter(cost => cost > 0)) {
+        await supabase.from('fast_tag_events').insert([{
+          trip_id: trip.id,
+          amount,
+          event_time: new Date().toISOString(),
+          currency: 'INR'
+        }]);
+      }
+
+      // Replace MCD events
+      const existingMcd = (trip as any).mcd_events || [];
+      for (const e of existingMcd) {
+        try { await supabase.from('mcd_events').delete().eq('id', e.id); } catch {}
+      }
+      for (const amount of formData.mcd_costs.filter(cost => cost > 0)) {
+        await supabase.from('mcd_events').insert([{
+          trip_id: trip.id,
+          amount,
+          event_time: new Date().toISOString(),
+          currency: 'INR'
+        }]);
+      }
+
+      // Replace green tax events
+      const existingGreenTax = (trip as any).green_tax_events || [];
+      for (const e of existingGreenTax) {
+        try { await supabase.from('green_tax_events').delete().eq('id', e.id); } catch {}
+      }
+      for (const amount of formData.green_tax_costs.filter(cost => cost > 0)) {
+        await supabase.from('green_tax_events').insert([{
+          trip_id: trip.id,
+          amount,
+          event_time: new Date().toISOString(),
+          currency: 'INR'
+        }]);
       }
 
       Alert.alert(
@@ -441,57 +495,120 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
             {/* Additional Costs */}
             <View style={styles.row}>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <CustomInput
-                  label="#1 Fast Tag Cost (₹)"
-                  value={formData.fast_tag_cost.toString()}
-                  onChangeText={(text) => setFormData({ ...formData, fast_tag_cost: Number(text) || 0 })}
-                  placeholder="0"
-                  keyboardType="numeric"
-                  error={errors.fast_tag_cost}
-                />
-                <AmountList
-                  title="Fast Tag Cost (₹)"
-                  items={((formData as any).fast_tag_extras || []) as any}
-                  onAdd={() => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || [], 0]) as any}))}
-                  onUpdate={(i, val) => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
-                  onRemove={(i) => setFormData(prev => ({...prev, fast_tag_extras: ([...(prev as any).fast_tag_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+                <Text style={styles.label}>Fast Tag Costs</Text>
+                {formData.fast_tag_costs.map((cost, index) => (
+                  <View key={index} style={styles.costItemContainer}>
+                    <CustomInput
+                      label={`#${index + 1} Fast Tag Cost (₹)`}
+                      placeholder="0"
+                      value={cost.toString()}
+                      onChangeText={(text) => {
+                        const newCosts = [...formData.fast_tag_costs];
+                        newCosts[index] = parseFloat(text) || 0;
+                        setFormData(prev => ({ ...prev, fast_tag_costs: newCosts }));
+                      }}
+                      keyboardType="numeric"
+                      error={errors.fast_tag_costs}
+                    />
+                    {formData.fast_tag_costs.length > 1 && (
+                      <CustomButton
+                        title="Remove"
+                        onPress={() => {
+                          const newCosts = formData.fast_tag_costs.filter((_, i) => i !== index);
+                          setFormData(prev => ({ ...prev, fast_tag_costs: newCosts }));
+                        }}
+                        variant="outline"
+                        size="small"
+                      />
+                    )}
+                  </View>
+                ))}
+                <CustomButton
+                  title="Add Fast Tag Cost"
+                  onPress={() => {
+                    setFormData(prev => ({ ...prev, fast_tag_costs: [...prev.fast_tag_costs, 0] }));
+                  }}
+                  variant="outline"
+                  size="small"
                 />
               </View>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <CustomInput
-                  label="#1 MCD Cost (₹)"
-                  value={formData.mcd_cost.toString()}
-                  onChangeText={(text) => setFormData({ ...formData, mcd_cost: Number(text) || 0 })}
-                  placeholder="0"
-                  keyboardType="numeric"
-                  error={errors.mcd_cost}
-                />
-                <AmountList
-                  title="MCD Cost (₹)"
-                  items={((formData as any).mcd_extras || []) as any}
-                  onAdd={() => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || [], 0]) as any}))}
-                  onUpdate={(i, val) => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
-                  onRemove={(i) => setFormData(prev => ({...prev, mcd_extras: ([...(prev as any).mcd_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+                <Text style={styles.label}>MCD Costs</Text>
+                {formData.mcd_costs.map((cost, index) => (
+                  <View key={index} style={styles.costItemContainer}>
+                    <CustomInput
+                      label={`#${index + 1} MCD Cost (₹)`}
+                      placeholder="0"
+                      value={cost.toString()}
+                      onChangeText={(text) => {
+                        const newCosts = [...formData.mcd_costs];
+                        newCosts[index] = parseFloat(text) || 0;
+                        setFormData(prev => ({ ...prev, mcd_costs: newCosts }));
+                      }}
+                      keyboardType="numeric"
+                      error={errors.mcd_costs}
+                    />
+                    {formData.mcd_costs.length > 1 && (
+                      <CustomButton
+                        title="Remove"
+                        onPress={() => {
+                          const newCosts = formData.mcd_costs.filter((_, i) => i !== index);
+                          setFormData(prev => ({ ...prev, mcd_costs: newCosts }));
+                        }}
+                        variant="outline"
+                        size="small"
+                      />
+                    )}
+                  </View>
+                ))}
+                <CustomButton
+                  title="Add MCD Cost"
+                  onPress={() => {
+                    setFormData(prev => ({ ...prev, mcd_costs: [...prev.mcd_costs, 0] }));
+                  }}
+                  variant="outline"
+                  size="small"
                 />
               </View>
             </View>
 
             {/* Other Costs */}
             <View style={styles.inputGroup}>
-              <CustomInput
-                label="#1 Green Tax Cost (₹)"
-                value={formData.green_tax_cost.toString()}
-                onChangeText={(text) => setFormData({ ...formData, green_tax_cost: Number(text) || 0 })}
-                placeholder="0"
-                keyboardType="numeric"
-                error={errors.green_tax_cost}
-              />
-              <AmountList
-                title="Green Tax Cost (₹)"
-                items={((formData as any).green_tax_extras || []) as any}
-                onAdd={() => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || [], 0]) as any}))}
-                onUpdate={(i, val) => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
-                onRemove={(i) => setFormData(prev => ({...prev, green_tax_extras: ([...(prev as any).green_tax_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+              <Text style={styles.label}>Green Tax Costs</Text>
+              {formData.green_tax_costs.map((cost, index) => (
+                <View key={index} style={styles.costItemContainer}>
+                  <CustomInput
+                    label={`#${index + 1} Green Tax Cost (₹)`}
+                    placeholder="0"
+                    value={cost.toString()}
+                    onChangeText={(text) => {
+                      const newCosts = [...formData.green_tax_costs];
+                      newCosts[index] = parseFloat(text) || 0;
+                      setFormData(prev => ({ ...prev, green_tax_costs: newCosts }));
+                    }}
+                    keyboardType="numeric"
+                    error={errors.green_tax_costs}
+                  />
+                  {formData.green_tax_costs.length > 1 && (
+                    <CustomButton
+                      title="Remove"
+                      onPress={() => {
+                        const newCosts = formData.green_tax_costs.filter((_, i) => i !== index);
+                        setFormData(prev => ({ ...prev, green_tax_costs: newCosts }));
+                      }}
+                      variant="outline"
+                      size="small"
+                    />
+                  )}
+                </View>
+              ))}
+              <CustomButton
+                title="Add Green Tax Cost"
+                onPress={() => {
+                  setFormData(prev => ({ ...prev, green_tax_costs: [...prev.green_tax_costs, 0] }));
+                }}
+                variant="outline"
+                size="small"
               />
               <CustomInput
                 label="Repair/Defect Cost (₹)"
@@ -632,7 +749,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 Diesel: ₹{formData.diesel_purchases.reduce((total, purchase) => 
                   total + (purchase.diesel_quantity * purchase.diesel_price_per_liter), 0
                 ).toLocaleString('en-IN')} | 
-                Other: ₹{(formData.fast_tag_cost + formData.mcd_cost + formData.green_tax_cost + ((formData as any).rto_cost || 0) + ((formData as any).dto_cost || 0) + ((formData as any).municipalities_cost || 0) + ((formData as any).border_cost || 0) + ((formData as any).repair_cost || 0)).toLocaleString('en-IN')}
+                Other: ₹{(formData.fast_tag_costs.reduce((sum, cost) => sum + cost, 0) + formData.mcd_costs.reduce((sum, cost) => sum + cost, 0) + formData.green_tax_costs.reduce((sum, cost) => sum + cost, 0) + ((formData as any).rto_cost || 0) + ((formData as any).dto_cost || 0) + ((formData as any).municipalities_cost || 0) + ((formData as any).border_cost || 0) + ((formData as any).repair_cost || 0)).toLocaleString('en-IN')}
               </Text>
             </View>
 
@@ -768,6 +885,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
     marginTop: SIZES.spacingSm,
+  },
+  costItemContainer: {
+    marginBottom: SIZES.spacingMd,
   },
 });
 

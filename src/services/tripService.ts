@@ -123,6 +123,30 @@ export const tripService = {
             notes,
             created_at,
             updated_at
+          ),
+          fast_tag_events (
+            id,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          mcd_events (
+            id,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          green_tax_events (
+            id,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
           )
         `)
         .eq('user_id', user.id)
@@ -179,6 +203,30 @@ export const tripService = {
             state,
             authority_type,
             checkpoint,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          fast_tag_events (
+            id,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          mcd_events (
+            id,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          green_tax_events (
+            id,
             amount,
             event_time,
             notes,
@@ -246,6 +294,30 @@ export const tripService = {
             notes,
             created_at,
             updated_at
+          ),
+          fast_tag_events (
+            id,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          mcd_events (
+            id,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
+          ),
+          green_tax_events (
+            id,
+            amount,
+            event_time,
+            notes,
+            created_at,
+            updated_at
           )
         `)
         .eq('id', id)
@@ -265,7 +337,12 @@ export const tripService = {
   },
 
   // Create a new trip
-  async createTrip(trip: Omit<TripInsert, 'user_id' | 'total_cost'> & { diesel_purchases: DieselPurchaseFormData[] }): Promise<Trip> {
+  async createTrip(trip: Omit<TripInsert, 'user_id' | 'total_cost'> & { 
+    diesel_purchases: DieselPurchaseFormData[];
+    fast_tag_costs?: number[];
+    mcd_costs?: number[];
+    green_tax_costs?: number[];
+  }): Promise<Trip> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -337,26 +414,51 @@ export const tripService = {
         }
       }
 
-      // Create fast tag/mcd/green tax extras if provided via temporary fields (optional)
-      const extraFastTag: number[] = ((trip as any).fast_tag_extras || []) as number[];
-      for (let i = 0; i < (extraFastTag || []).length; i++) {
-        const amount = Number(extraFastTag[i]) || 0;
-        if (amount > 0) {
-          await supabase.from('fast_tag_events').insert([{ trip_id: tripData.id, amount, event_time: new Date(Date.now() + i).toISOString() } as FastTagEventInsert]);
+      // Create fast tag events from array
+      if (trip.fast_tag_costs && trip.fast_tag_costs.length > 0) {
+        const fastTagEvents = trip.fast_tag_costs
+          .filter(amount => amount > 0)
+          .map((amount, index) => ({
+            trip_id: tripData.id,
+            amount,
+            event_time: new Date(Date.now() + index * 1000).toISOString(),
+            currency: 'INR'
+          }));
+        
+        if (fastTagEvents.length > 0) {
+          await supabase.from('fast_tag_events').insert(fastTagEvents);
         }
       }
-      const extraMcd: number[] = ((trip as any).mcd_extras || []) as number[];
-      for (let i = 0; i < (extraMcd || []).length; i++) {
-        const amount = Number(extraMcd[i]) || 0;
-        if (amount > 0) {
-          await supabase.from('mcd_events').insert([{ trip_id: tripData.id, amount, event_time: new Date(Date.now() + i).toISOString() } as McdEventInsert]);
+
+      // Create MCD events from array
+      if (trip.mcd_costs && trip.mcd_costs.length > 0) {
+        const mcdEvents = trip.mcd_costs
+          .filter(amount => amount > 0)
+          .map((amount, index) => ({
+            trip_id: tripData.id,
+            amount,
+            event_time: new Date(Date.now() + index * 1000).toISOString(),
+            currency: 'INR'
+          }));
+        
+        if (mcdEvents.length > 0) {
+          await supabase.from('mcd_events').insert(mcdEvents);
         }
       }
-      const extraGreen: number[] = ((trip as any).green_tax_extras || []) as number[];
-      for (let i = 0; i < (extraGreen || []).length; i++) {
-        const amount = Number(extraGreen[i]) || 0;
-        if (amount > 0) {
-          await supabase.from('green_tax_events').insert([{ trip_id: tripData.id, amount, event_time: new Date(Date.now() + i).toISOString() } as GreenTaxEventInsert]);
+
+      // Create green tax events from array
+      if (trip.green_tax_costs && trip.green_tax_costs.length > 0) {
+        const greenTaxEvents = trip.green_tax_costs
+          .filter(amount => amount > 0)
+          .map((amount, index) => ({
+            trip_id: tripData.id,
+            amount,
+            event_time: new Date(Date.now() + index * 1000).toISOString(),
+            currency: 'INR'
+          }));
+        
+        if (greenTaxEvents.length > 0) {
+          await supabase.from('green_tax_events').insert(greenTaxEvents);
         }
       }
 

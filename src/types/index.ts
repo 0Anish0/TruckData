@@ -96,10 +96,9 @@ export interface TripFormData {
   diesel_purchases: DieselPurchaseFormData[];
   commission_items?: CommissionItemFormData[];
   repair_items?: RepairItemFormData[];
-  fast_tag_cost: number;
-  mcd_cost: number;
-  green_tax_cost: number;
-  commission_cost?: number; // deprecated aggregate
+  fast_tag_costs: number[]; 
+  mcd_costs: number[]; 
+  green_tax_costs: number[]; 
   rto_cost?: number;
   dto_cost?: number;
   municipalities_cost?: number;
@@ -113,10 +112,9 @@ export interface TripFormErrors {
   source?: string;
   destination?: string;
   diesel_purchases?: string;
-  fast_tag_cost?: string;
-  mcd_cost?: string;
-  green_tax_cost?: string;
-  commission_cost?: string;
+  fast_tag_costs?: string;
+  mcd_costs?: string;
+  green_tax_costs?: string;
   rto_cost?: string;
   dto_cost?: string;
   municipalities_cost?: string;
@@ -137,6 +135,24 @@ export interface CommissionItemFormData {
 
 export interface RepairItemFormData {
   part_or_defect: string;
+  amount: number;
+  notes?: string;
+  event_time?: string; // ISO
+}
+
+export interface FastTagEventFormData {
+  amount: number;
+  notes?: string;
+  event_time?: string; // ISO
+}
+
+export interface McdEventFormData {
+  amount: number;
+  notes?: string;
+  event_time?: string; // ISO
+}
+
+export interface GreenTaxEventFormData {
   amount: number;
   notes?: string;
   event_time?: string; // ISO

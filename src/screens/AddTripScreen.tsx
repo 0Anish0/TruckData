@@ -225,13 +225,15 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
       });
 
       if ((formData.commission_items || []).length > 0) {
-        for (const item of (formData.commission_items || [])) {
+        for (let idx = 0; idx < (formData.commission_items || []).length; idx++) {
+          const item = (formData.commission_items || [])[idx];
           await tripService.addCommissionEvent((created as any).id, {
             state: item.state,
             authority_type: item.authority_type,
             checkpoint: item.checkpoint,
             amount: item.amount,
             notes: item.notes,
+            event_time: new Date(Date.now() + idx).toISOString(),
           });
         }
       }

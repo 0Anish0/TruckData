@@ -37,7 +37,17 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     truck_id: t.truck_id,
     source: t.source,
     destination: t.destination,
-    diesel_purchases: (t.diesel_purchases || []).map((p: any) => ({
+    diesel_purchases: (t.diesel_purchases || [])
+      .slice()
+      .sort((a: any, b: any) => {
+        const ad = new Date(a.purchase_date || a.created_at || 0).getTime();
+        const bd = new Date(b.purchase_date || b.created_at || 0).getTime();
+        if (ad !== bd) return ad - bd;
+        const ac = new Date(a.created_at || 0).getTime();
+        const bc = new Date(b.created_at || 0).getTime();
+        return ac - bc;
+      })
+      .map((p: any) => ({
       state: p.state,
       city: p.city || '',
       diesel_quantity: Number(p.diesel_quantity) || 0,
@@ -58,7 +68,17 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     municipalities_cost: Number((t as any).municipalities_cost || 0),
     border_cost: Number((t as any).border_cost || 0),
     repair_cost: Number((t as any).repair_cost || 0),
-    commission_items: (t as any).commission_events?.map((e: any) => ({
+    commission_items: ((t as any).commission_events || [])
+      .slice()
+      .sort((a: any, b: any) => {
+        const at = new Date(a.event_time || a.created_at || 0).getTime();
+        const bt = new Date(b.event_time || b.created_at || 0).getTime();
+        if (at !== bt) return at - bt;
+        const ac = new Date(a.created_at || 0).getTime();
+        const bc = new Date(b.created_at || 0).getTime();
+        return ac - bc;
+      })
+      .map((e: any) => ({
       state: e.state,
       authority_type: e.authority_type,
       amount: Number(e.amount),
@@ -212,13 +232,15 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       for (const e of existing) {
         try { await tripService.deleteCommissionEvent(e.id); } catch {}
       }
-      for (const item of (formData.commission_items || [])) {
+      for (let idx = 0; idx < (formData.commission_items || []).length; idx++) {
+        const item = (formData.commission_items || [])[idx];
         await tripService.addCommissionEvent(trip.id, {
           state: item.state,
           authority_type: item.authority_type,
           checkpoint: item.checkpoint,
           amount: item.amount,
           notes: item.notes,
+          event_time: new Date(Date.now() + idx).toISOString(),
         });
       }
 

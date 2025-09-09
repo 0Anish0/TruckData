@@ -522,6 +522,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                 onAdd={() => addCategoryItem('RTO')}
                 onUpdate={(i, updated) => updateCategoryItem('RTO', i, updated)}
                 onRemove={(i) => removeCategoryItem('RTO', i)}
+                startFrom={2}
               />
               <CustomInput
                 label="#1 DTO Cost (₹)"
@@ -537,6 +538,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                 onAdd={() => addCategoryItem('DTO')}
                 onUpdate={(i, updated) => updateCategoryItem('DTO', i, updated)}
                 onRemove={(i) => removeCategoryItem('DTO', i)}
+                startFrom={2}
               />
               <CustomInput
                 label="#1 Municipalities Cost (₹)"
@@ -552,6 +554,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                 onAdd={() => addCategoryItem('Municipalities')}
                 onUpdate={(i, updated) => updateCategoryItem('Municipalities', i, updated)}
                 onRemove={(i) => removeCategoryItem('Municipalities', i)}
+                startFrom={2}
               />
               <CustomInput
                 label="#1 Border Cost (₹)"
@@ -567,6 +570,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                 onAdd={() => addCategoryItem('State Border')}
                 onUpdate={(i, updated) => updateCategoryItem('State Border', i, updated)}
                 onRemove={(i) => removeCategoryItem('State Border', i)}
+                startFrom={2}
               />
               <CustomInput
                 label="#1 Repair/Defect Cost (₹)"

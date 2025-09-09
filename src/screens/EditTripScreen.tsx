@@ -475,11 +475,20 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
               />
             </View>
 
-            {/* Commission Payments - Per Category */}
+            {/* Commission Payments - Base inputs + extras per category */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Commission Payments</Text>
+
+              {/* Base inputs (always visible) */}
+              <CustomInput
+                label="#1 RTO Cost (₹)"
+                placeholder="0"
+                value={((formData as any).rto_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, rto_cost: Number(text) || 0 } as any)}
+                keyboardType="numeric"
+                error={(errors as any).rto_cost}
+              />
               <CommissionCategoryList
-                title="#1 RTO Cost (₹)"
                 authorityType="RTO"
                 items={(formData.commission_items || []).filter(i => i.authority_type === 'RTO') as any}
                 onAdd={() => setFormData(prev => ({ ...prev, commission_items: [ ...(prev.commission_items || []), { state: '', authority_type: 'RTO', amount: 0, checkpoint: '', notes: '' } ] }))}
@@ -495,9 +504,18 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                   list.splice(indices[i], 1);
                   setFormData(prev => ({ ...prev, commission_items: list }));
                 }}
+                startFrom={2}
+              />
+
+              <CustomInput
+                label="#1 DTO Cost (₹)"
+                placeholder="0"
+                value={((formData as any).dto_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, dto_cost: Number(text) || 0 } as any)}
+                keyboardType="numeric"
+                error={(errors as any).dto_cost}
               />
               <CommissionCategoryList
-                title="#1 DTO Cost (₹)"
                 authorityType="DTO"
                 items={(formData.commission_items || []).filter(i => i.authority_type === 'DTO') as any}
                 onAdd={() => setFormData(prev => ({ ...prev, commission_items: [ ...(prev.commission_items || []), { state: '', authority_type: 'DTO', amount: 0, checkpoint: '', notes: '' } ] }))}
@@ -513,9 +531,18 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                   list.splice(indices[i], 1);
                   setFormData(prev => ({ ...prev, commission_items: list }));
                 }}
+                startFrom={2}
+              />
+
+              <CustomInput
+                label="#1 Municipalities Cost (₹)"
+                placeholder="0"
+                value={((formData as any).municipalities_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, municipalities_cost: Number(text) || 0 } as any)}
+                keyboardType="numeric"
+                error={(errors as any).municipalities_cost}
               />
               <CommissionCategoryList
-                title="#1 Municipalities Cost (₹)"
                 authorityType="Municipalities"
                 items={(formData.commission_items || []).filter(i => i.authority_type === 'Municipalities') as any}
                 onAdd={() => setFormData(prev => ({ ...prev, commission_items: [ ...(prev.commission_items || []), { state: '', authority_type: 'Municipalities', amount: 0, checkpoint: '', notes: '' } ] }))}
@@ -531,9 +558,18 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                   list.splice(indices[i], 1);
                   setFormData(prev => ({ ...prev, commission_items: list }));
                 }}
+                startFrom={2}
+              />
+
+              <CustomInput
+                label="#1 Border Cost (₹)"
+                placeholder="0"
+                value={((formData as any).border_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, border_cost: Number(text) || 0 } as any)}
+                keyboardType="numeric"
+                error={(errors as any).border_cost}
               />
               <CommissionCategoryList
-                title="#1 Border Cost (₹)"
                 authorityType="State Border"
                 items={(formData.commission_items || []).filter(i => i.authority_type === 'State Border') as any}
                 onAdd={() => setFormData(prev => ({ ...prev, commission_items: [ ...(prev.commission_items || []), { state: '', authority_type: 'State Border', amount: 0, checkpoint: '', notes: '' } ] }))}
@@ -549,6 +585,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                   list.splice(indices[i], 1);
                   setFormData(prev => ({ ...prev, commission_items: list }));
                 }}
+                startFrom={2}
               />
             </View>
 

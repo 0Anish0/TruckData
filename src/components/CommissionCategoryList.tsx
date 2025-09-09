@@ -12,20 +12,16 @@ interface Props {
   onAdd: () => void;
   onUpdate: (index: number, updated: CommissionItemFormData) => void;
   onRemove: (index: number) => void;
+  startFrom?: number; // numbering start (defaults to 1)
 }
 
-const CommissionCategoryList: React.FC<Props> = ({ title, authorityType, items, onAdd, onUpdate, onRemove }) => {
-  const toOrdinal = (n: number) => {
-    const s = ["th", "st", "nd", "rd"]; 
-    const v = n % 100; 
-    return n + (s[(v - 20) % 10] || s[v] || s[0]);
-  };
+const CommissionCategoryList: React.FC<Props> = ({ title, authorityType, items, onAdd, onUpdate, onRemove, startFrom = 1 }) => {
   return (
     <View style={styles.containerCompact}>
       {items.map((item, index) => (
         <View key={index} style={styles.stackRow}>
           <CustomInput
-            label={`#${index + 2} ${(title || authorityType)} Cost (₹)` as any}
+            label={`#${startFrom + index} ${authorityType} Cost (₹)` as any}
             placeholder="0"
             keyboardType="numeric"
             value={(item.amount || 0).toString()}

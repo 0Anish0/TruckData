@@ -52,7 +52,6 @@ export const tripService = {
     fast_tag_cost: number;
     mcd_cost: number;
     green_tax_cost: number;
-    commission_cost?: number;
     rto_cost?: number;
     dto_cost?: number;
     municipalities_cost?: number;

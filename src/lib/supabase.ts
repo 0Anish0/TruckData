@@ -72,6 +72,13 @@ export interface Database {
           created_at: string;
           updated_at: string;
           user_id: string;
+          diesel_purchases?: {
+            state: string;
+            city: string | null;
+            diesel_quantity: number;
+            diesel_price_per_liter: number;
+            purchase_date: string;
+          }[];
         };
         Insert: {
           id?: string;

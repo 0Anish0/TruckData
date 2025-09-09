@@ -53,7 +53,6 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
     fast_tag_cost: Number(t.fast_tag_cost || 0),
     mcd_cost: Number(t.mcd_cost || 0),
     green_tax_cost: Number(t.green_tax_cost || 0),
-    commission_cost: Number((t as any).commission_cost || 0),
     rto_cost: Number((t as any).rto_cost || 0),
     dto_cost: Number((t as any).dto_cost || 0),
     municipalities_cost: Number((t as any).municipalities_cost || 0),
@@ -114,7 +113,6 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       fast_tag_cost: (formData as any).fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
       mcd_cost: (formData as any).mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
       green_tax_cost: (formData as any).green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
-      commission_cost: (formData as any).commission_cost || 0,
       rto_cost: (formData as any).rto_cost + rtoExtras,
       dto_cost: (formData as any).dto_cost + dtoExtras,
       municipalities_cost: (formData as any).municipalities_cost + municipalitiesExtras,
@@ -195,14 +193,16 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       const borderSum = (formData.commission_items || []).filter(i => i.authority_type === 'State Border').reduce((s, i) => s + (i.amount || 0), 0);
 
       await tripService.updateTrip(trip.id, {
-        ...formData,
+        truck_id: formData.truck_id,
+        source: formData.source.trim(),
+        destination: formData.destination.trim(),
+        fast_tag_cost: (formData as any).fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
+        mcd_cost: (formData as any).mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
+        green_tax_cost: (formData as any).green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
         rto_cost: rtoSum,
         dto_cost: dtoSum,
         municipalities_cost: municipalitiesSum,
         border_cost: borderSum,
-        fast_tag_cost: (formData as any).fast_tag_cost + ((formData as any).fast_tag_extras || []).reduce((s:number,n:number)=>s+n,0),
-        mcd_cost: (formData as any).mcd_cost + ((formData as any).mcd_extras || []).reduce((s:number,n:number)=>s+n,0),
-        green_tax_cost: (formData as any).green_tax_cost + ((formData as any).green_tax_extras || []).reduce((s:number,n:number)=>s+n,0),
         repair_cost: (formData as any).repair_cost + ((formData as any).repair_extras || []).reduce((s:number,n:number)=>s+n,0),
         total_cost: totalCost,
       });

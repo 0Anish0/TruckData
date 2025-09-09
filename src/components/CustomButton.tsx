@@ -22,7 +22,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   style,
 }) => {
   const getButtonStyle = (): ViewStyle[] => {
-    let buttonStyle: ViewStyle[] = [styles.button];
+    const buttonStyle: ViewStyle[] = [styles.button];
     
     // Add size styles
     if (size === 'small') buttonStyle.push(styles.small);
@@ -41,7 +41,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   };
 
   const getTextStyle = (): TextStyle[] => {
-    let textStyle: TextStyle[] = [styles.text];
+    const textStyle: TextStyle[] = [styles.text];
     
     // Add size styles
     if (size === 'small') textStyle.push(styles.smallText);

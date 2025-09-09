@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Modal,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
@@ -88,41 +90,48 @@ const DieselPurchaseForm: React.FC<DieselPurchaseFormProps> = ({
       </View>
 
       {/* State Picker Modal */}
-      {showStatePicker && (
-        <View style={styles.statePickerContainer}>
-          <View style={styles.statePickerHeader}>
-            <Text style={styles.statePickerTitle}>Select State</Text>
-            <TouchableOpacity
-              onPress={() => setShowStatePicker(false)}
-              style={styles.closeButton}
-            >
-              <Ionicons name="close" size={24} color={COLORS.textPrimary} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.stateList}>
-            {INDIAN_STATES.map((state) => (
+      <Modal
+        visible={showStatePicker}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowStatePicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.statePickerHeader}>
+              <Text style={styles.statePickerTitle}>Select State</Text>
               <TouchableOpacity
-                key={state}
-                style={[
-                  styles.stateOption,
-                  purchase.state === state && styles.stateOptionSelected,
-                ]}
-                onPress={() => selectState(state)}
-                activeOpacity={0.7}
+                onPress={() => setShowStatePicker(false)}
+                style={styles.closeButton}
               >
-                <Text
-                  style={[
-                    styles.stateOptionText,
-                    purchase.state === state && styles.stateOptionTextSelected,
-                  ]}
-                >
-                  {state}
-                </Text>
+                <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
-            ))}
+            </View>
+            <ScrollView style={styles.stateList} showsVerticalScrollIndicator={true}>
+              {INDIAN_STATES.map((state) => (
+                <TouchableOpacity
+                  key={state}
+                  style={[
+                    styles.stateOption,
+                    purchase.state === state && styles.stateOptionSelected,
+                  ]}
+                  onPress={() => selectState(state)}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.stateOptionText,
+                      purchase.state === state && styles.stateOptionTextSelected,
+                    ]}
+                  >
+                    {state}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         </View>
-      )}
+      </Modal>
 
       {/* City */}
       <CustomInput
@@ -228,16 +237,20 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: COLORS.textSecondary,
   },
-  statePickerContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  modalOverlay: {
+    flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
+    padding: SIZES.spacingLg,
+  },
+  modalContainer: {
+    backgroundColor: COLORS.surface,
+    borderRadius: SIZES.radiusLg,
+    width: '100%',
+    maxWidth: 400,
+    maxHeight: '80%',
+    overflow: 'hidden',
   },
   statePickerHeader: {
     flexDirection: 'row',
@@ -245,8 +258,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SIZES.spacingLg,
     backgroundColor: COLORS.surface,
-    borderTopLeftRadius: SIZES.radiusLg,
-    borderTopRightRadius: SIZES.radiusLg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
   statePickerTitle: {
     fontSize: SIZES.fontSizeLg,
@@ -258,9 +271,7 @@ const styles = StyleSheet.create({
   },
   stateList: {
     backgroundColor: COLORS.surface,
-    maxHeight: 300,
-    borderBottomLeftRadius: SIZES.radiusLg,
-    borderBottomRightRadius: SIZES.radiusLg,
+    flex: 1,
   },
   stateOption: {
     padding: SIZES.spacingMd,

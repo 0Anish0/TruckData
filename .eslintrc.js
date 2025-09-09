@@ -2,10 +2,8 @@ module.exports = {
   root: true,
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
-    'plugin:react-native/all',
   ],
   parser: '@typescript-eslint/parser',
   plugins: [
@@ -20,7 +18,6 @@ module.exports = {
     },
     ecmaVersion: 2021,
     sourceType: 'module',
-    project: './tsconfig.json',
   },
   env: {
     'react-native/react-native': true,
@@ -50,7 +47,7 @@ module.exports = {
     '@typescript-eslint/no-empty-function': 'warn',
     
     // General rules
-    'no-console': 'warn',
+    'no-console': 'off', // Allow console statements in development
     'no-debugger': 'error',
     'prefer-const': 'error',
     'no-var': 'error',

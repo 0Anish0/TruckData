@@ -147,7 +147,7 @@ const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
                   <View style={styles.driverInfo}>
                     {driver.license_image_url ? (
                       <TouchableOpacity 
-                        onPress={() => handleLicenseImagePress(driver.license_image_url, driver.name)}
+                        onPress={() => handleLicenseImagePress(driver.license_image_url!, driver.name)}
                         activeOpacity={0.7}
                         style={styles.avatarContainer}
                       >

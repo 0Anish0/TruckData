@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SIZES } from '../constants/theme';
 import CustomInput from './CustomInput';
 import CustomButton from './CustomButton';
-import { CommissionItemFormData, AuthorityType, INDIAN_STATES } from '../types';
+import { CommissionItemFormData, AuthorityType } from '../types';
 
 interface Props {
   item: CommissionItemFormData;
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const CommissionPaymentForm: React.FC<Props> = ({ item, index, canRemove, errors = {}, onUpdate, onRemove }) => {
-  const update = (field: keyof CommissionItemFormData, value: any) => {
+  const update = (field: keyof CommissionItemFormData, value: string | number) => {
     onUpdate({ ...item, [field]: value });
   };
 

@@ -12,7 +12,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../constants/theme';
 import { DieselPurchaseFormData, DieselPurchaseFormErrors, INDIAN_STATES } from '../types';
 import CustomInput from './CustomInput';
-import CustomButton from './CustomButton';
 
 interface DieselPurchaseFormProps {
   purchase: DieselPurchaseFormData;
@@ -206,7 +205,7 @@ const styles = StyleSheet.create({
   removeButton: {
     padding: SIZES.spacingSm,
     borderRadius: SIZES.radius,
-    backgroundColor: COLORS.errorLight,
+    backgroundColor: COLORS.error,
   },
   inputGroup: {
     marginBottom: SIZES.spacingLg,

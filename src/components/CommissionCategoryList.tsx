@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { COLORS, SIZES } from '../constants/theme';
 import CustomInput from './CustomInput';
 import CustomButton from './CustomButton';

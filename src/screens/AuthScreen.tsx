@@ -55,8 +55,9 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ navigation }) => {
           );
         }
       }
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'An unexpected error occurred');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

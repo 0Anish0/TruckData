@@ -23,7 +23,10 @@ import CommissionCategoryList from '../components/CommissionCategoryList';
 import AmountList from '../components/AmountList';
 
 interface AddTripScreenProps {
-  navigation: any;
+  navigation: {
+    goBack: () => void;
+    navigate: (screen: string) => void;
+  };
   route?: {
     params?: {
       truckId?: string;
@@ -69,7 +72,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
       setLoadingTrucks(true);
       const trucksData = await truckService.getTrucks();
       setTrucks(trucksData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert('Error', 'Failed to load trucks');
       console.error('Load trucks error:', error);
     } finally {
@@ -327,8 +330,9 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
           },
         ]
       );
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to add trip. Please try again.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add trip. Please try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

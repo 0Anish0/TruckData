@@ -16,7 +16,9 @@ import CustomButton from '../components/CustomButton';
 import { truckService } from '../services/truckService';
 
 interface AddTruckScreenProps {
-  navigation: any;
+  navigation: {
+    goBack: () => void;
+  };
 }
 
 const AddTruckScreen: React.FC<AddTruckScreenProps> = ({ navigation }) => {
@@ -79,8 +81,9 @@ const AddTruckScreen: React.FC<AddTruckScreenProps> = ({ navigation }) => {
           },
         ]
       );
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to add truck. Please try again.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add truck. Please try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

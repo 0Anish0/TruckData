@@ -11,14 +11,27 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, FONTS } from '../constants/theme';
+import { TripWithRelations, Truck } from '../types';
 import { tripService } from '../services/tripService';
 import TripCard from '../components/TripCard';
 import CustomButton from '../components/CustomButton';
 
-const TruckTripsScreen: React.FC<any> = ({ route, navigation }) => {
+interface TruckTripsScreenProps {
+  route: {
+    params: {
+      truck: Truck;
+    };
+  };
+  navigation: {
+    navigate: (screen: string, params?: { trip?: TripWithRelations; truckId?: string }) => void;
+    goBack: () => void;
+  };
+}
+
+const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route, navigation }) => {
   const { truck } = route.params;
   const [refreshing, setRefreshing] = useState(false);
-  const [trips, setTrips] = useState<any[]>([]);
+  const [trips, setTrips] = useState<TripWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalTrips: 0,
@@ -40,7 +53,7 @@ const TruckTripsScreen: React.FC<any> = ({ route, navigation }) => {
 
       setTrips(tripsData);
       setStats(tripStats);
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert('Error', 'Failed to load truck trips');
       console.error('Load truck trips error:', error);
     } finally {
@@ -54,16 +67,16 @@ const TruckTripsScreen: React.FC<any> = ({ route, navigation }) => {
     setRefreshing(false);
   };
 
-  const handleTripPress = (trip: any) => {
+  const handleTripPress = (trip: TripWithRelations) => {
     // Navigate to trip details
     console.log('Trip pressed:', trip);
   };
 
-  const handleEditTrip = (trip: any) => {
+  const handleEditTrip = (trip: TripWithRelations) => {
     navigation.navigate('EditTrip', { trip });
   };
 
-  const handleDeleteTrip = (trip: any) => {
+  const handleDeleteTrip = (trip: TripWithRelations) => {
     Alert.alert(
       'Delete Trip',
       'Are you sure you want to delete this trip? This action cannot be undone.',
@@ -78,8 +91,9 @@ const TruckTripsScreen: React.FC<any> = ({ route, navigation }) => {
               // Refresh the data after deletion
               loadTruckTrips();
               Alert.alert('Success', 'Trip deleted successfully');
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to delete trip');
+            } catch (error: unknown) {
+              const errorMessage = error instanceof Error ? error.message : 'Failed to delete trip';
+              Alert.alert('Error', errorMessage);
               console.error('Delete trip error:', error);
             }
           },

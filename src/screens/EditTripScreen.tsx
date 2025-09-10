@@ -19,13 +19,43 @@ import { supabase } from '../lib/supabase';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
-import AmountList from '../components/AmountList';
 
 interface EditTripScreenProps {
-  navigation: any;
+  navigation: {
+    goBack: () => void;
+    navigate: (screen: string, params?: { trip?: { id: string; truck_id: string; source: string; destination: string; total_cost: number; trip_date: string }; truck?: { id: string; name: string; truck_number: string; model: string }; truckId?: string }) => void;
+  };
   route: {
     params: {
-      trip: any;
+      trip: {
+        id: string;
+        truck_id: string;
+        source: string;
+        destination: string;
+        driver_id?: string | null;
+        fast_tag_cost: number;
+        mcd_cost: number;
+        green_tax_cost: number;
+        commission_cost?: number;
+        rto_cost?: number;
+        dto_cost?: number;
+        municipalities_cost?: number;
+        border_cost?: number;
+        repair_cost?: number;
+        total_cost: number;
+        trip_date: string;
+        created_at: string;
+        updated_at: string;
+        user_id: string;
+        diesel_purchases?: { state: string; city?: string; diesel_quantity: number; diesel_price_per_liter: number; purchase_date: string; created_at?: string }[];
+        fast_tag_events?: { id: string; amount: number; event_time: string; notes?: string }[];
+        mcd_events?: { id: string; amount: number; event_time: string; notes?: string }[];
+        green_tax_events?: { id: string; amount: number; event_time: string; notes?: string }[];
+        rto_events?: { id: string; state: string; checkpoint?: string; amount: number; event_time: string; notes?: string }[];
+        dto_events?: { id: string; state: string; checkpoint?: string; amount: number; event_time: string; notes?: string }[];
+        municipalities_events?: { id: string; state: string; checkpoint?: string; amount: number; event_time: string; notes?: string }[];
+        border_events?: { id: string; state: string; checkpoint?: string; amount: number; event_time: string; notes?: string }[];
+      };
     };
   };
 }
@@ -33,13 +63,13 @@ interface EditTripScreenProps {
 const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) => {
   const { trip } = route.params;
   
-  const buildFormDataFromTrip = (t: any): TripFormData => ({
+  const buildFormDataFromTrip = (t: EditTripScreenProps['route']['params']['trip']): TripFormData => ({
     truck_id: t.truck_id,
     source: t.source,
     destination: t.destination,
     diesel_purchases: (t.diesel_purchases || [])
       .slice()
-      .sort((a: any, b: any) => {
+      .sort((a: { purchase_date?: string; created_at?: string }, b: { purchase_date?: string; created_at?: string }) => {
         const ad = new Date(a.purchase_date || a.created_at || 0).getTime();
         const bd = new Date(b.purchase_date || b.created_at || 0).getTime();
         if (ad !== bd) return ad - bd;
@@ -47,7 +77,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
         const bc = new Date(b.created_at || 0).getTime();
         return ac - bc;
       })
-      .map((p: any) => ({
+      .map((p: { state: string; city?: string; diesel_quantity: number; diesel_price_per_liter: number; purchase_date: string }) => ({
       state: p.state,
       city: p.city || '',
       diesel_quantity: Number(p.diesel_quantity) || 0,
@@ -60,45 +90,45 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       diesel_price_per_liter: 0,
       purchase_date: new Date().toISOString().split('T')[0],
     }],
-    fast_tag_costs: (t.fast_tag_events || []).map((e: any) => Number(e.amount || 0)),
-    mcd_costs: (t.mcd_events || []).map((e: any) => Number(e.amount || 0)),
-    green_tax_costs: (t.green_tax_events || []).map((e: any) => Number(e.amount || 0)),
-    rto_costs: (t.rto_events || []).map((e: any) => ({
+    fast_tag_costs: (t.fast_tag_events || []).map((e: { amount: number }) => Number(e.amount || 0)),
+    mcd_costs: (t.mcd_events || []).map((e: { amount: number }) => Number(e.amount || 0)),
+    green_tax_costs: (t.green_tax_events || []).map((e: { amount: number }) => Number(e.amount || 0)),
+    rto_costs: (t.rto_events || []).map((e: { state?: string; checkpoint?: string; amount: number; notes?: string; event_time?: string }) => ({
       state: e.state || '',
       checkpoint: e.checkpoint || '',
       amount: Number(e.amount || 0),
       notes: e.notes || '',
       event_time: e.event_time || new Date().toISOString(),
     })),
-    dto_costs: (t.dto_events || []).map((e: any) => ({
+    dto_costs: (t.dto_events || []).map((e: { state?: string; checkpoint?: string; amount: number; notes?: string; event_time?: string }) => ({
       state: e.state || '',
       checkpoint: e.checkpoint || '',
       amount: Number(e.amount || 0),
       notes: e.notes || '',
       event_time: e.event_time || new Date().toISOString(),
     })),
-    municipalities_costs: (t.municipalities_events || []).map((e: any) => ({
+    municipalities_costs: (t.municipalities_events || []).map((e: { state?: string; checkpoint?: string; amount: number; notes?: string; event_time?: string }) => ({
       state: e.state || '',
       checkpoint: e.checkpoint || '',
       amount: Number(e.amount || 0),
       notes: e.notes || '',
       event_time: e.event_time || new Date().toISOString(),
     })),
-    border_costs: (t.border_events || []).map((e: any) => ({
+    border_costs: (t.border_events || []).map((e: { state?: string; checkpoint?: string; amount: number; notes?: string; event_time?: string }) => ({
       state: e.state || '',
       checkpoint: e.checkpoint || '',
       amount: Number(e.amount || 0),
       notes: e.notes || '',
       event_time: e.event_time || new Date().toISOString(),
     })),
-    repair_cost: Number((t as any).repair_cost || 0),
+    repair_cost: Number(t.repair_cost || 0),
   });
 
   const [formData, setFormData] = useState<TripFormData>(buildFormDataFromTrip(trip));
 
   const [errors, setErrors] = useState<TripFormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [trucks, setTrucks] = useState<any[]>([]);
+  const [trucks, setTrucks] = useState<{ id: string; name: string; truck_number: string; model: string }[]>([]);
   const [, setLoadingTrucks] = useState(true);
 
   useEffect(() => {
@@ -121,7 +151,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       setLoadingTrucks(true);
       const trucksData = await truckService.getTrucks();
       setTrucks(trucksData);
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert('Error', 'Failed to load trucks');
       console.error('Load trucks error:', error);
     } finally {
@@ -148,7 +178,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       dto_cost: dtoTotal,
       municipalities_cost: municipalitiesTotal,
       border_cost: borderTotal,
-      repair_cost: (formData as any).repair_cost || 0,
+      repair_cost: formData.repair_cost || 0,
     });
   };
 
@@ -255,12 +285,12 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
         dto_cost: dtoTotal,
         municipalities_cost: municipalitiesTotal,
         border_cost: borderTotal,
-        repair_cost: (formData as any).repair_cost + ((formData as any).repair_extras || []).reduce((s:number,n:number)=>s+n,0),
+        repair_cost: formData.repair_cost || 0,
         total_cost: totalCost,
       });
 
       // Replace RTO events
-      const existingRto = (trip as any).rto_events || [];
+      const existingRto = trip.rto_events || [];
       for (const e of existingRto) {
         try { await supabase.from('rto_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting rto event:', e); }
       }
@@ -277,7 +307,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       }
 
       // Replace DTO events
-      const existingDto = (trip as any).dto_events || [];
+      const existingDto = trip.dto_events || [];
       for (const e of existingDto) {
         try { await supabase.from('dto_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting dto event:', e); }
       }
@@ -294,7 +324,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       }
 
       // Replace Municipalities events
-      const existingMunicipalities = (trip as any).municipalities_events || [];
+      const existingMunicipalities = trip.municipalities_events || [];
       for (const e of existingMunicipalities) {
         try { await supabase.from('municipalities_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting municipalities event:', e); }
       }
@@ -311,7 +341,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       }
 
       // Replace Border events
-      const existingBorder = (trip as any).border_events || [];
+      const existingBorder = trip.border_events || [];
       for (const e of existingBorder) {
         try { await supabase.from('border_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting border event:', e); }
       }
@@ -328,7 +358,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       }
 
       // Replace fast tag events
-      const existingFastTag = (trip as any).fast_tag_events || [];
+      const existingFastTag = trip.fast_tag_events || [];
       for (const e of existingFastTag) {
         try { await supabase.from('fast_tag_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting fast tag event:', e); }
       }
@@ -342,7 +372,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       }
 
       // Replace MCD events
-      const existingMcd = (trip as any).mcd_events || [];
+      const existingMcd = trip.mcd_events || [];
       for (const e of existingMcd) {
         try { await supabase.from('mcd_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting mcd event:', e); }
       }
@@ -356,7 +386,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       }
 
       // Replace green tax events
-      const existingGreenTax = (trip as any).green_tax_events || [];
+      const existingGreenTax = trip.green_tax_events || [];
       for (const e of existingGreenTax) {
         try { await supabase.from('green_tax_events').delete().eq('id', e.id); } catch (e) { console.warn('Error deleting green tax event:', e); }
       }
@@ -379,8 +409,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
           },
         ]
       );
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to update trip');
+    } catch (error: unknown) {
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to update trip');
       console.error('Update trip error:', error);
     } finally {
       setLoading(false);
@@ -410,8 +440,8 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                   },
                 ]
               );
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to delete trip');
+            } catch (error: unknown) {
+              Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete trip');
               console.error('Delete trip error:', error);
             } finally {
               setLoading(false);
@@ -771,18 +801,11 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
               />
               <CustomInput
                 label="Repair/Defect Cost (₹)"
-                value={((formData as any).repair_cost || 0).toString()}
-                onChangeText={(text) => setFormData({ ...formData, repair_cost: Number(text) || 0 } as any)}
+                value={(formData.repair_cost || 0).toString()}
+                onChangeText={(text) => setFormData({ ...formData, repair_cost: Number(text) || 0 })}
                 placeholder="0"
                 keyboardType="numeric"
-                error={(errors as any).repair_cost}
-              />
-              <AmountList
-                title="Repair/Defect Cost (₹)"
-                items={((formData as any).repair_extras || []) as any}
-                onAdd={() => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || [], 0]) as any}))}
-                onUpdate={(i, val) => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
-                onRemove={(i) => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
+                error={errors.repair_cost}
               />
             </View>
 
@@ -982,7 +1005,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
                 Diesel: ₹{formData.diesel_purchases.reduce((total, purchase) => 
                   total + (purchase.diesel_quantity * purchase.diesel_price_per_liter), 0
                 ).toLocaleString('en-IN')} | 
-                Other: ₹{(formData.fast_tag_costs.reduce((sum, cost) => sum + cost, 0) + formData.mcd_costs.reduce((sum, cost) => sum + cost, 0) + formData.green_tax_costs.reduce((sum, cost) => sum + cost, 0) + formData.rto_costs.reduce((sum, cost) => sum + cost.amount, 0) + formData.dto_costs.reduce((sum, cost) => sum + cost.amount, 0) + formData.municipalities_costs.reduce((sum, cost) => sum + cost.amount, 0) + formData.border_costs.reduce((sum, cost) => sum + cost.amount, 0) + ((formData as any).repair_cost || 0)).toLocaleString('en-IN')}
+                Other: ₹{(formData.fast_tag_costs.reduce((sum, cost) => sum + cost, 0) + formData.mcd_costs.reduce((sum, cost) => sum + cost, 0) + formData.green_tax_costs.reduce((sum, cost) => sum + cost, 0) + formData.rto_costs.reduce((sum, cost) => sum + cost.amount, 0) + formData.dto_costs.reduce((sum, cost) => sum + cost.amount, 0) + formData.municipalities_costs.reduce((sum, cost) => sum + cost.amount, 0) + formData.border_costs.reduce((sum, cost) => sum + cost.amount, 0) + (formData.repair_cost || 0)).toLocaleString('en-IN')}
               </Text>
             </View>
 

@@ -5,7 +5,7 @@ import { COLORS, SIZES } from '../constants/theme';
 import { Trip, TripWithRelations } from '../types';
 
 interface TripCardProps {
-  trip: Trip | TripWithRelations; // Allow both Trip type and transformed data
+  trip: Trip | TripWithRelations; 
   truckName: string;
   onPress: () => void;
   onEdit?: () => void;
@@ -44,7 +44,7 @@ const TripCard: React.FC<TripCardProps> = ({
 
   // Handle both data formats (raw database and transformed)
   const getTripDate = () => {
-    return trip.tripDate || trip.trip_date;
+    return trip.trip_date;
   };
 
   const getDieselPurchases = () => {
@@ -64,19 +64,19 @@ const TripCard: React.FC<TripCardProps> = ({
   };
 
   const getFastTagCost = () => {
-    return trip.fastTagCost || trip.fast_tag_cost || 0;
+    return trip.fast_tag_cost || 0;
   };
 
   const getMcdCost = () => {
-    return trip.mcdCost || trip.mcd_cost || 0;
+    return trip.mcd_cost || 0;
   };
 
   const getGreenTaxCost = () => {
-    return trip.greenTaxCost || trip.green_tax_cost || 0;
+    return trip.green_tax_cost || 0;
   };
 
   const getTotalCost = () => {
-    return trip.totalCost || trip.total_cost || 0;
+    return trip.total_cost || 0;
   };
 
   const handleEditPress = () => {

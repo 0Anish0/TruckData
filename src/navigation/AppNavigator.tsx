@@ -30,8 +30,8 @@ const DashboardStack = () => (
     <Stack.Screen name="AddTrip" component={AddTripScreen} />
     <Stack.Screen name="AddTruck" component={AddTruckScreen} />
     <Stack.Screen name="TruckTrips" component={TruckTripsScreen} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen as any} />
-    <Stack.Screen name="EditTruck" component={EditTruckScreen as any} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen} />
+    <Stack.Screen name="EditTruck" component={EditTruckScreen} />
   </Stack.Navigator>
 );
 
@@ -39,7 +39,7 @@ const TripsStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TripsMain" component={TripsScreen} />
     <Stack.Screen name="AddTrip" component={AddTripScreen} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen as any} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen} />
   </Stack.Navigator>
 );
 
@@ -47,8 +47,8 @@ const TrucksStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TrucksMain" component={TrucksScreen} />
     <Stack.Screen name="AddTruck" component={AddTruckScreen} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen as any} />
-    <Stack.Screen name="EditTruck" component={EditTruckScreen as any} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen} />
+    <Stack.Screen name="EditTruck" component={EditTruckScreen} />
   </Stack.Navigator>
 );
 

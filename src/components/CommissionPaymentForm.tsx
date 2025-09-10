@@ -50,7 +50,7 @@ const CommissionPaymentForm: React.FC<Props> = ({ item, index, canRemove, errors
         keyboardType="numeric"
         value={(item.amount || 0).toString()}
         onChangeText={(text) => update('amount', parseFloat(text) || 0)}
-        error={errors.amount as any}
+        error={errors.amount}
       />
 
       <CustomInput

@@ -19,7 +19,6 @@ import { driverService } from '../services/driverService';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
-import AmountList from '../components/AmountList';
 
 interface AddTripScreenProps {
   navigation: {
@@ -57,8 +56,8 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
 
   const [errors, setErrors] = useState<TripFormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [trucks, setTrucks] = useState<any[]>([]);
-  const [drivers, setDrivers] = useState<any[]>([]);
+  const [trucks, setTrucks] = useState<{ id: string; name: string; truck_number: string; model: string }[]>([]);
+  const [drivers, setDrivers] = useState<{ id: string; name: string }[]>([]);
   const [loadingTrucks, setLoadingTrucks] = useState(true);
 
   useEffect(() => {
@@ -288,7 +287,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
         dto_cost: dtoTotal,
         municipalities_cost: municipalitiesTotal,
         border_cost: borderTotal,
-        repair_cost: (formData.repair_cost || 0) + ((formData as any).repair_extras || []).reduce((s:number,n:number)=>s+n,0),
+        repair_cost: (formData.repair_cost || 0),
         trip_date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
         fast_tag_costs: formData.fast_tag_costs,
         mcd_costs: formData.mcd_costs,
@@ -301,22 +300,22 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
 
       // Create RTO events
       for (const rtoCost of formData.rto_costs) {
-        await tripService.addRtoEvent((created as any).id, rtoCost);
+        await tripService.addRtoEvent(created.id, rtoCost);
       }
 
       // Create DTO events
       for (const dtoCost of formData.dto_costs) {
-        await tripService.addDtoEvent((created as any).id, dtoCost);
+        await tripService.addDtoEvent(created.id, dtoCost);
       }
 
       // Create Municipalities events
       for (const municipalitiesCost of formData.municipalities_costs) {
-        await tripService.addMunicipalitiesEvent((created as any).id, municipalitiesCost);
+        await tripService.addMunicipalitiesEvent(created.id, municipalitiesCost);
       }
 
       // Create Border events
       for (const borderCost of formData.border_costs) {
-        await tripService.addBorderEvent((created as any).id, borderCost);
+        await tripService.addBorderEvent(created.id, borderCost);
       }
 
       Alert.alert(
@@ -468,7 +467,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                         styles.truckOption,
                         formData.driver_id === d.id && styles.truckOptionSelected,
                       ]}
-                      onPress={() => updateFormData('driver_id' as any, d.id)}
+                      onPress={() => updateFormData('driver_id', d.id)}
                       activeOpacity={0.8}
                     >
                       <Text style={[
@@ -827,16 +826,9 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation, route }) => {
                 label="#1 Repair/Defect Cost (₹)"
                 placeholder="0"
                 value={(formData.repair_cost || 0).toString()}
-                onChangeText={(text) => updateFormData('repair_cost' as any, parseFloat(text) || 0)}
+                onChangeText={(text) => updateFormData('repair_cost', parseFloat(text) || 0)}
                 keyboardType="numeric"
                 error={errors.repair_cost}
-              />
-              <AmountList
-                title="Repair/Defect Cost (₹)"
-                items={((formData as any).repair_extras || []) as any}
-                onAdd={() => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || [], 0]) as any}))}
-                onUpdate={(i, val) => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || []].map((n:number, idx:number)=> idx===i ? val : n)) as any}))}
-                onRemove={(i) => setFormData(prev => ({...prev, repair_extras: ([...(prev as any).repair_extras || []].filter((_:number, idx:number)=> idx!==i)) as any}))}
               />
             </View>
 

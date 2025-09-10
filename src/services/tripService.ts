@@ -483,11 +483,11 @@ export const tripService = {
         fast_tag_cost: trip.fast_tag_cost || 0,
         mcd_cost: trip.mcd_cost || 0,
         green_tax_cost: trip.green_tax_cost || 0,
-        rto_cost: (trip as any).rto_cost || 0,
-        dto_cost: (trip as any).dto_cost || 0,
-        municipalities_cost: (trip as any).municipalities_cost || 0,
-        border_cost: (trip as any).border_cost || 0,
-        repair_cost: (trip as any).repair_cost || 0,
+        rto_cost: trip.rto_cost || 0,
+        dto_cost: trip.dto_cost || 0,
+        municipalities_cost: trip.municipalities_cost || 0,
+        border_cost: trip.border_cost || 0,
+        repair_cost: trip.repair_cost || 0,
       });
 
       // Create the trip first
@@ -497,15 +497,15 @@ export const tripService = {
           truck_id: trip.truck_id,
           source: trip.source,
           destination: trip.destination,
-          driver_id: (trip as any).driver_id ?? null,
+          driver_id: trip.driver_id ?? null,
           fast_tag_cost: trip.fast_tag_cost || 0,
           mcd_cost: trip.mcd_cost || 0,
           green_tax_cost: trip.green_tax_cost || 0,
-          rto_cost: (trip as any).rto_cost || 0,
-          dto_cost: (trip as any).dto_cost || 0,
-          municipalities_cost: (trip as any).municipalities_cost || 0,
-          border_cost: (trip as any).border_cost || 0,
-          repair_cost: (trip as any).repair_cost || 0,
+          rto_cost: trip.rto_cost || 0,
+          dto_cost: trip.dto_cost || 0,
+          municipalities_cost: trip.municipalities_cost || 0,
+          border_cost: trip.border_cost || 0,
+          repair_cost: trip.repair_cost || 0,
           total_cost: totalCost,
           trip_date: trip.trip_date,
           user_id: user.id
@@ -671,7 +671,7 @@ export const tripService = {
       if (!created) {
         throw new Error('Trip creation succeeded but fetch failed');
       }
-      return created as any;
+      return created;
     } catch (error) {
       handleAuthError(error);
       throw error;
@@ -688,7 +688,7 @@ export const tripService = {
       }
 
       // If cost-related fields on trip are being updated, recalculate total cost
-      if (updates.fast_tag_cost || updates.mcd_cost || updates.green_tax_cost || (updates as any).rto_cost || (updates as any).dto_cost || (updates as any).municipalities_cost || (updates as any).border_cost || (updates as any).repair_cost) {
+      if (updates.fast_tag_cost || updates.mcd_cost || updates.green_tax_cost || updates.rto_cost || updates.dto_cost || updates.municipalities_cost || updates.border_cost || updates.repair_cost) {
         
         // Get current trip data
         const currentTrip = await this.getTrip(id);
@@ -698,7 +698,7 @@ export const tripService = {
 
         // Merge current data with updates
         // Calculate new total cost using existing diesel purchases
-        const dieselPurchases = (currentTrip as any).diesel_purchases || [];
+        const dieselPurchases = currentTrip.diesel_purchases || [];
         // Sum event tables
         const [fastTagSum, mcdSum, greenSum, repairSum] = await Promise.all([
           supabase.from('fast_tag_events').select('amount').eq('trip_id', id),
@@ -718,11 +718,11 @@ export const tripService = {
           fast_tag_cost: updates.fast_tag_cost ?? currentTrip.fast_tag_cost,
           mcd_cost: updates.mcd_cost ?? currentTrip.mcd_cost,
           green_tax_cost: updates.green_tax_cost ?? currentTrip.green_tax_cost,
-          rto_cost: (updates as any).rto_cost ?? (currentTrip as any).rto_cost ?? 0,
-          dto_cost: (updates as any).dto_cost ?? (currentTrip as any).dto_cost ?? 0,
-          municipalities_cost: (updates as any).municipalities_cost ?? (currentTrip as any).municipalities_cost ?? 0,
-          border_cost: (updates as any).border_cost ?? (currentTrip as any).border_cost ?? 0,
-          repair_cost: (updates as any).repair_cost ?? (currentTrip as any).repair_cost ?? 0,
+          rto_cost: updates.rto_cost ?? currentTrip.rto_cost ?? 0,
+          dto_cost: updates.dto_cost ?? currentTrip.dto_cost ?? 0,
+          municipalities_cost: updates.municipalities_cost ?? currentTrip.municipalities_cost ?? 0,
+          border_cost: updates.border_cost ?? currentTrip.border_cost ?? 0,
+          repair_cost: updates.repair_cost ?? currentTrip.repair_cost ?? 0,
           fast_tag_events_sum: fastTagSum,
           mcd_events_sum: mcdSum,
           green_tax_events_sum: greenSum,
@@ -955,7 +955,7 @@ export const tripService = {
   },
 
   // Commission events CRUD
-  async addCommissionEvent(tripId: string, event: { state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+  async addCommissionEvent(tripId: string, event: { state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<{ id: string; trip_id: string; state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time: string; created_at: string; updated_at: string }> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -977,7 +977,7 @@ export const tripService = {
     }
   },
 
-  async updateCommissionEvent(eventId: string, updates: Partial<{ state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }>): Promise<any> {
+  async updateCommissionEvent(eventId: string, updates: Partial<{ state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }>): Promise<{ id: string; trip_id: string; state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time: string; created_at: string; updated_at: string }> {
     try {
       const { data, error } = await supabase
         .from('commission_events')
@@ -1006,7 +1006,7 @@ export const tripService = {
     }
   },
 
-  async getCommissionEvents(tripId: string): Promise<any[]> {
+  async getCommissionEvents(tripId: string): Promise<{ id: string; trip_id: string; state: string; authority_type: string; checkpoint?: string; amount: number; notes?: string; event_time: string; created_at: string; updated_at: string }[]> {
     try {
       const { data, error } = await supabase
         .from('commission_events')
@@ -1014,7 +1014,7 @@ export const tripService = {
         .eq('trip_id', tripId)
         .order('event_time', { ascending: true });
       if (error) throw error;
-      return (data || []) as unknown as Trip[];
+      return data || [];
     } catch (error) {
       handleAuthError(error);
       throw error;
@@ -1152,7 +1152,7 @@ export const tripService = {
   },
 
   // RTO Events CRUD
-  async addRtoEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+  async addRtoEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<{ id: string; trip_id: string; state: string; checkpoint?: string; amount: number; notes?: string; event_time: string; created_at: string; updated_at: string }> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -1171,7 +1171,7 @@ export const tripService = {
   },
 
   // DTO Events CRUD
-  async addDtoEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+  async addDtoEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<{ id: string; trip_id: string; state: string; checkpoint?: string; amount: number; notes?: string; event_time: string; created_at: string; updated_at: string }> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -1190,7 +1190,7 @@ export const tripService = {
   },
 
   // Municipalities Events CRUD
-  async addMunicipalitiesEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+  async addMunicipalitiesEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<{ id: string; trip_id: string; state: string; checkpoint?: string; amount: number; notes?: string; event_time: string; created_at: string; updated_at: string }> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -1209,7 +1209,7 @@ export const tripService = {
   },
 
   // Border Events CRUD
-  async addBorderEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<any> {
+  async addBorderEvent(tripId: string, event: { state: string; checkpoint?: string; amount: number; notes?: string; event_time?: string; }): Promise<{ id: string; trip_id: string; state: string; checkpoint?: string; amount: number; notes?: string; event_time: string; created_at: string; updated_at: string }> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');

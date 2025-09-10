@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,13 +20,19 @@ import TripCard from '../components/TripCard';
 import CustomButton from '../components/CustomButton';
 
 interface DashboardData {
-  trucks: any[];
-  trips: any[];
+  trucks: { id: string; name: string; truck_number: string; model: string; created_at: string; updated_at: string; user_id: string }[];
+  trips: { id: string; truck_id: string; source: string; destination: string; driver_id: string | null; fast_tag_cost: number; mcd_cost: number; green_tax_cost: number; commission_cost?: number; rto_cost?: number; dto_cost?: number; municipalities_cost?: number; border_cost?: number; repair_cost?: number; total_cost: number; trip_date: string; created_at: string; updated_at: string; user_id: string }[];
   totalTrips: number;
   totalCost: number;
 }
 
-const DashboardScreen: React.FC<any> = ({ navigation }) => {
+interface DashboardScreenProps {
+  navigation: {
+    navigate: (screen: string, params?: { trip?: { id: string; truck_id: string; source: string; destination: string; total_cost: number; trip_date: string }; truck?: { id: string; name: string; truck_number: string; model: string }; truckId?: string }) => void;
+  };
+}
+
+const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState<DashboardData>({
@@ -47,7 +53,7 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
     }
   }, [user]);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -76,13 +82,13 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
         totalTrips: tripStats.totalTrips,
         totalCost: tripStats.totalCost,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert('Error', 'Failed to load dashboard data');
       console.error('Dashboard load error:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -148,20 +154,20 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
     navigation.navigate('AddTrip');
   };
 
-  const handleTruckPress = (truck: any) => {
+  const handleTruckPress = (truck: { id: string; name: string; truck_number: string; model: string }) => {
     navigation.navigate('TruckTrips', { truck });
   };
 
-  const handleTripPress = (trip: any) => {
+  const handleTripPress = (trip: { id: string; truck_id: string; source: string; destination: string; total_cost: number; trip_date: string }) => {
     // Navigate to trip details (you can implement this later)
     console.log('Trip pressed:', trip);
   };
 
-  const handleEditTrip = (trip: any) => {
+  const handleEditTrip = (trip: { id: string; truck_id: string; source: string; destination: string; total_cost: number; trip_date: string }) => {
     navigation.navigate('EditTrip', { trip });
   };
 
-  const handleDeleteTrip = (trip: any) => {
+  const handleDeleteTrip = (trip: { id: string; truck_id: string; source: string; destination: string; total_cost: number; trip_date: string }) => {
     Alert.alert(
       'Delete Trip',
       'Are you sure you want to delete this trip? This action cannot be undone.',
@@ -176,8 +182,8 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
               // Refresh the dashboard data after deletion
               loadDashboardData();
               Alert.alert('Success', 'Trip deleted successfully');
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to delete trip');
+            } catch (error: unknown) {
+              Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete trip');
               console.error('Delete trip error:', error);
             }
           },
@@ -186,11 +192,11 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
     );
   };
 
-  const handleEditTruck = (truck: any) => {
+  const handleEditTruck = (truck: { id: string; name: string; truck_number: string; model: string }) => {
     navigation.navigate('EditTruck', { truck });
   };
 
-  const handleDeleteTruck = (truck: any) => {
+  const handleDeleteTruck = (truck: { id: string; name: string; truck_number: string; model: string }) => {
     Alert.alert(
       'Delete Truck',
       `Are you sure you want to delete ${truck.name}? This will also delete all associated trips.`,
@@ -205,8 +211,8 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
               // Refresh the dashboard data after deletion
               loadDashboardData();
               Alert.alert('Success', 'Truck deleted successfully');
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to delete truck');
+            } catch (error: unknown) {
+              Alert.alert('Error', error instanceof Error ? error.message : 'Failed to delete truck');
               console.error('Delete truck error:', error);
             }
           },
@@ -251,7 +257,7 @@ const DashboardScreen: React.FC<any> = ({ navigation }) => {
     return email;
   };
 
-  const getDisplayName = (user: any) => {
+  const getDisplayName = (user: { user_metadata?: { full_name?: string }; email?: string }) => {
     // Try to get name from user metadata first
     if (user?.user_metadata?.full_name) {
       return user.user_metadata.full_name;

@@ -21,7 +21,7 @@ const CommissionCategoryList: React.FC<Props> = ({ authorityType, items, onAdd, 
       {items.map((item, index) => (
         <View key={index} style={styles.stackRow}>
           <CustomInput
-            label={`#${startFrom + index} ${authorityType} Cost (₹)` as any}
+            label={`#${startFrom + index} ${authorityType} Cost (₹)`}
             placeholder="0"
             keyboardType="numeric"
             value={(item.amount || 0).toString()}

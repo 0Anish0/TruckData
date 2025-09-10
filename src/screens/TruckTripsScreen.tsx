@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,18 +15,14 @@ import { TripWithRelations, Truck } from '../types';
 import { tripService } from '../services/tripService';
 import TripCard from '../components/TripCard';
 import CustomButton from '../components/CustomButton';
+import { StackScreenProps } from '@react-navigation/stack';
 
-interface TruckTripsScreenProps {
-  route: {
-    params: {
-      truck: Truck;
-    };
-  };
-  navigation: {
-    navigate: (screen: string, params?: { trip?: TripWithRelations; truckId?: string }) => void;
-    goBack: () => void;
-  };
-}
+type RootStackParamList = {
+  TruckTrips: { truck: Truck };
+  EditTrip: { trip: TripWithRelations };
+};
+
+type TruckTripsScreenProps = StackScreenProps<RootStackParamList, 'TruckTrips'>;
 
 const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route, navigation }) => {
   const { truck } = route.params;
@@ -39,11 +35,7 @@ const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route, navigation }
     avgCost: 0,
   });
 
-  useEffect(() => {
-    loadTruckTrips();
-  }, [truck.id, loadTruckTrips]);
-
-  const loadTruckTrips = async () => {
+  const loadTruckTrips = useCallback(async () => {
     try {
       setLoading(true);
       const [tripsData, tripStats] = await Promise.all([
@@ -59,7 +51,11 @@ const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route, navigation }
     } finally {
       setLoading(false);
     }
-  };
+  }, [truck.id]);
+
+  useEffect(() => {
+    loadTruckTrips();
+  }, [loadTruckTrips]);
 
   const onRefresh = async () => {
     setRefreshing(true);

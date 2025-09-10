@@ -1,4 +1,4 @@
-import { NavigationProp, CompositeNavigationProp } from '@react-navigation/native';
+import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { Truck, TripWithRelations } from './index';

@@ -276,8 +276,8 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
               key={trip.id}
               trip={trip}
               truckName={getTruckName(trip.truck_id)}
-              onPress={() => navigation.navigate('EditTrip', { trip })}
-              onEdit={() => navigation.navigate('EditTrip', { trip })}
+              onPress={() => navigation.navigate('EditTrip', { trip: trip as any })}
+              onEdit={() => navigation.navigate('EditTrip', { trip: trip as any })}
               onDelete={() => {
                 // TODO: Implement delete functionality
                 console.log('Delete trip:', trip.id);

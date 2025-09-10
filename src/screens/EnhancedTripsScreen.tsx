@@ -18,10 +18,10 @@ import { Trip, Truck } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CompositeNavigationProp } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { RootStackParamList } from '../types/navigation';
+import { RootStackParamList, TripsStackParamList } from '../types/navigation';
 
 type TripsScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<RootStackParamList, 'TripsMain'>,
+  StackNavigationProp<TripsStackParamList, 'TripsMain'>,
   BottomTabNavigationProp<RootStackParamList>
 >;
 

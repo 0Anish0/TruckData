@@ -19,46 +19,12 @@ import { supabase } from '../lib/supabase';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
+import { StackScreenProps } from '@react-navigation/stack';
+import { TripWithRelations } from '../types';
 
-interface EditTripScreenProps {
-  navigation: {
-    goBack: () => void;
-    navigate: (screen: string, params?: { trip?: { id: string; truck_id: string; source: string; destination: string; total_cost: number; trip_date: string }; truck?: { id: string; name: string; truck_number: string; model: string }; truckId?: string }) => void;
-  };
-  route: {
-    params: {
-      trip: {
-        id: string;
-        truck_id: string;
-        source: string;
-        destination: string;
-        driver_id?: string | null;
-        fast_tag_cost: number;
-        mcd_cost: number;
-        green_tax_cost: number;
-        commission_cost?: number;
-        rto_cost?: number;
-        dto_cost?: number;
-        municipalities_cost?: number;
-        border_cost?: number;
-        repair_cost?: number;
-        total_cost: number;
-        trip_date: string;
-        created_at: string;
-        updated_at: string;
-        user_id: string;
-        diesel_purchases?: { state: string; city?: string; diesel_quantity: number; diesel_price_per_liter: number; purchase_date: string; created_at?: string }[];
-        fast_tag_events?: { id: string; amount: number; event_time: string; notes?: string }[];
-        mcd_events?: { id: string; amount: number; event_time: string; notes?: string }[];
-        green_tax_events?: { id: string; amount: number; event_time: string; notes?: string }[];
-        rto_events?: { id: string; state: string; checkpoint?: string; amount: number; event_time: string; notes?: string }[];
-        dto_events?: { id: string; state: string; checkpoint?: string; amount: number; event_time: string; notes?: string }[];
-        municipalities_events?: { id: string; state: string; checkpoint?: string; amount: number; event_time: string; notes?: string }[];
-        border_events?: { id: string; state: string; checkpoint?: string; amount: number; event_time: string; notes?: string }[];
-      };
-    };
-  };
-}
+type EditTripScreenProps = StackScreenProps<{
+  EditTrip: { trip: TripWithRelations };
+}, 'EditTrip'>;
 
 const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) => {
   const { trip } = route.params;

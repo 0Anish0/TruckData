@@ -16,17 +16,11 @@ import { Truck } from '../types';
 import { truckService } from '../services/truckService';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
+import { StackScreenProps } from '@react-navigation/stack';
 
-interface EditTruckScreenProps {
-  navigation: {
-    goBack: () => void;
-  };
-  route: {
-    params: {
-      truck: Truck;
-    };
-  };
-}
+type EditTruckScreenProps = StackScreenProps<{
+  EditTruck: { truck: Truck };
+}, 'EditTruck'>;
 
 const EditTruckScreen: React.FC<EditTruckScreenProps> = ({ navigation, route }) => {
   const { truck } = route.params;

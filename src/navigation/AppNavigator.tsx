@@ -7,6 +7,9 @@ import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SIZES } from '../constants/theme';
 import { useAuth } from '../contexts/AuthContext';
+import { 
+  RootStackParamList
+} from '../types/navigation';
 
 // Screens
 import AuthScreen from '../screens/AuthScreen';
@@ -21,7 +24,7 @@ import EditTruckScreen from '../screens/EditTruckScreen';
 import DriversScreen from '../screens/DriversScreen';
 import AddDriverScreen from '../screens/AddDriverScreen';
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createStackNavigator();
 
 const DashboardStack = () => (
@@ -29,9 +32,9 @@ const DashboardStack = () => (
     <Stack.Screen name="DashboardMain" component={DashboardScreen} />
     <Stack.Screen name="AddTrip" component={AddTripScreen} />
     <Stack.Screen name="AddTruck" component={AddTruckScreen} />
-    <Stack.Screen name="TruckTrips" component={TruckTripsScreen} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen} />
-    <Stack.Screen name="EditTruck" component={EditTruckScreen} />
+    <Stack.Screen name="TruckTrips" component={TruckTripsScreen as React.ComponentType} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen as React.ComponentType} />
+    <Stack.Screen name="EditTruck" component={EditTruckScreen as React.ComponentType} />
   </Stack.Navigator>
 );
 
@@ -39,7 +42,7 @@ const TripsStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TripsMain" component={TripsScreen} />
     <Stack.Screen name="AddTrip" component={AddTripScreen} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen as React.ComponentType} />
   </Stack.Navigator>
 );
 
@@ -47,8 +50,8 @@ const TrucksStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TrucksMain" component={TrucksScreen} />
     <Stack.Screen name="AddTruck" component={AddTruckScreen} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen} />
-    <Stack.Screen name="EditTruck" component={EditTruckScreen} />
+    <Stack.Screen name="EditTrip" component={EditTripScreen as React.ComponentType} />
+    <Stack.Screen name="EditTruck" component={EditTruckScreen as React.ComponentType} />
   </Stack.Navigator>
 );
 

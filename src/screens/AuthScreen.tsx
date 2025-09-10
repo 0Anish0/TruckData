@@ -14,11 +14,10 @@ import { COLORS, SIZES } from '../constants/theme';
 import { useAuth } from '../contexts/AuthContext';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
+import { AuthScreenNavigationProp } from '../types/navigation';
 
 interface AuthScreenProps {
-  navigation: {
-    navigate: (screen: string) => void;
-  };
+  navigation: AuthScreenNavigationProp;
 }
 
 const AuthScreen: React.FC<AuthScreenProps> = () => {

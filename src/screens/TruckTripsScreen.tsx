@@ -20,6 +20,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 type RootStackParamList = {
   TruckTrips: { truck: Truck };
   EditTrip: { trip: TripWithRelations };
+  AddTrip: { truckId: string };
 };
 
 type TruckTripsScreenProps = StackScreenProps<RootStackParamList, 'TruckTrips'>;
@@ -185,18 +186,7 @@ const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route, navigation }
           trips.map(trip => (
             <TripCard
               key={trip.id}
-              trip={{
-                id: trip.id,
-                truckId: trip.truck_id,
-                source: trip.source,
-                destination: trip.destination,
-                fastTagCost: Number(trip.fast_tag_cost),
-                mcdCost: Number(trip.mcd_cost),
-                greenTaxCost: Number(trip.green_tax_cost),
-                totalCost: Number(trip.total_cost),
-                tripDate: new Date(trip.trip_date),
-                createdAt: new Date(trip.created_at),
-              }}
+              trip={trip}
               truckName={truck.name}
               onPress={() => handleTripPress(trip)}
               onEdit={() => handleEditTrip(trip)}

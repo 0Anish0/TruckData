@@ -353,3 +353,9 @@ export const INDIAN_STATES = [
   'Lakshadweep',
   'Andaman and Nicobar Islands'
 ];
+
+// Re-export navigation types
+export * from './navigation';
+
+// Re-export global types
+export * from './global';

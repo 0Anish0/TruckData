@@ -305,7 +305,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
           <View style={styles.profileDropdown}>
             <View style={styles.profileInfo}>
               <Ionicons name="person-circle" size={48} color={COLORS.primary} />
-              <Text style={styles.profileName}>{getDisplayName(user)}</Text>
+              <Text style={styles.profileName}>{getDisplayName(user || {})}</Text>
               <Text style={styles.profileEmail}>{formatEmailDisplay(user?.email)}</Text>
             </View>
             <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} activeOpacity={0.7}>
@@ -413,19 +413,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
             data.trips.slice(0, 3).map(trip => (
               <TripCard
                 key={trip.id}
-                trip={{
-                  id: trip.id,
-                  truckId: trip.truck_id,
-                  source: trip.source,
-                  destination: trip.destination,
-                  fastTagCost: Number(trip.fast_tag_cost),
-                  mcdCost: Number(trip.mcd_cost),
-                  greenTaxCost: Number(trip.green_tax_cost),
-                  totalCost: Number(trip.total_cost),
-                  tripDate: new Date(trip.trip_date),
-                  createdAt: new Date(trip.created_at),
-                }}
-                truckName={trip.trucks?.name || 'Unknown Truck'}
+                trip={trip}
+                truckName={data.trucks.find(truck => truck.id === trip.truck_id)?.name || 'Unknown Truck'}
                 onPress={() => handleTripPress(trip)}
                 onEdit={() => handleEditTrip(trip)}
                 onDelete={() => handleDeleteTrip(trip)}

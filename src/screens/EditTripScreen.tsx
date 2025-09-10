@@ -20,10 +20,10 @@ import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import DieselPurchaseForm from '../components/DieselPurchaseForm';
 import { StackScreenProps } from '@react-navigation/stack';
-import { TripWithRelations } from '../types';
+import { Trip } from '../types';
 
 type EditTripScreenProps = StackScreenProps<{
-  EditTrip: { trip: TripWithRelations };
+  EditTrip: { trip: Trip };
 }, 'EditTrip'>;
 
 const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) => {
@@ -104,7 +104,7 @@ const EditTripScreen: React.FC<EditTripScreenProps> = ({ navigation, route }) =>
       try {
         const fullTrip = await tripService.getTrip(trip.id);
         if (fullTrip) {
-          setFormData(buildFormDataFromTrip(fullTrip));
+          setFormData(buildFormDataFromTrip(fullTrip as Trip));
         }
       } catch {
         console.warn('Failed to refresh trip, using route data');

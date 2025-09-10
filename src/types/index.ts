@@ -357,5 +357,5 @@ export const INDIAN_STATES = [
 // Re-export navigation types
 export * from './navigation';
 
-// Global types are declared in global.d.ts and don't need to be re-exported
-// They are automatically available globally
+// Re-export global types
+export * from './global';

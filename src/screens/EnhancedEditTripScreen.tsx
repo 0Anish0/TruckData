@@ -35,7 +35,13 @@ const EnhancedEditTripScreen: React.FC<EnhancedEditTripScreenProps> = ({ route, 
     source: trip.source,
     destination: trip.destination,
     driver_id: trip.driver_id || '',
-    diesel_purchases: trip.diesel_purchases || [],
+    diesel_purchases: (trip.diesel_purchases || []).map(purchase => ({
+      state: purchase.state,
+      city: purchase.city || '',
+      diesel_quantity: purchase.diesel_quantity,
+      diesel_price_per_liter: purchase.diesel_price_per_liter,
+      purchase_date: purchase.purchase_date,
+    })),
     fast_tag_costs: [trip.fast_tag_cost || 0],
     mcd_costs: [trip.mcd_cost || 0],
     green_tax_costs: [trip.green_tax_cost || 0],
@@ -110,8 +116,9 @@ const EnhancedEditTripScreen: React.FC<EnhancedEditTripScreenProps> = ({ route, 
 
     setLoading(true);
     try {
+      const { diesel_purchases, ...tripData } = formData;
       await mockTripService.updateTrip(trip.id, {
-        ...formData,
+        ...tripData,
         total_cost: mockTripService.calculateTotalCost({
           diesel_purchases: formData.diesel_purchases,
           fast_tag_cost: formData.fast_tag_costs.reduce((sum, cost) => sum + cost, 0),
@@ -146,7 +153,7 @@ const EnhancedEditTripScreen: React.FC<EnhancedEditTripScreenProps> = ({ route, 
       ...prev,
       diesel_purchases: [
         ...prev.diesel_purchases,
-        { state: '', city: '', diesel_quantity: 0, diesel_price_per_liter: 0 }
+        { state: '', city: '', diesel_quantity: 0, diesel_price_per_liter: 0, purchase_date: new Date().toISOString() }
       ]
     }));
   };
@@ -453,7 +460,7 @@ const EnhancedEditTripScreen: React.FC<EnhancedEditTripScreenProps> = ({ route, 
               <Text style={styles.sectionTitle}>Additional Costs</Text>
               <EnhancedCustomInput
                 label="Repair Cost"
-                value={formData.repair_cost.toString()}
+                value={(formData.repair_cost || 0).toString()}
                 onChangeText={(text) => setFormData(prev => ({ ...prev, repair_cost: parseFloat(text) || 0 }))}
                 leftIcon="construct"
                 keyboardType="numeric"

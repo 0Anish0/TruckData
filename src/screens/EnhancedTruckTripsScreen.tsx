@@ -59,7 +59,7 @@ const EnhancedTruckTripsScreen: React.FC<EnhancedTruckTripsScreenProps> = ({ rou
     try {
       setLoading(true);
       const tripsData = await mockTripService.getTripsByTruck(truck.id);
-      setTrips(tripsData);
+        setTrips(tripsData as Trip[]);
     } catch (error) {
       console.error('Error loading truck trips data:', error);
     } finally {

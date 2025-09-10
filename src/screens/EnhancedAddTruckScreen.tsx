@@ -274,7 +274,13 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,
-    paddingVertical: SIZES.spacingXl,
+    paddingTop: SIZES.spacingXl + 20, // Add extra padding for status bar/notch
+    paddingBottom: SIZES.spacingLg,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
   },
   headerContent: {
     flexDirection: 'row',
@@ -306,6 +312,7 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidingView: {
     flex: 1,
+    marginTop: 120, // Add margin to account for sticky header height
   },
   scrollView: {
     flex: 1,
@@ -315,7 +322,7 @@ const styles = StyleSheet.create({
     paddingBottom: SIZES.spacingXl,
   },
   formContainer: {
-    marginTop: -SIZES.spacingLg,
+    marginTop: SIZES.spacingLg,
   },
   section: {
     backgroundColor: COLORS.surface,
@@ -404,12 +411,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: SIZES.spacingMd,
     marginBottom: SIZES.spacingLg,
+    paddingHorizontal: SIZES.spacingXs,
   },
   resetButton: {
     flex: 1,
+    minHeight: 48,
   },
   submitButton: {
-    flex: 2,
+    flex: 1,
+    minHeight: 48,
   },
   helpContainer: {
     flexDirection: 'row',

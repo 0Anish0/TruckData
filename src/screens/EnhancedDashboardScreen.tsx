@@ -147,8 +147,8 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         style={styles.statCardGradient}
       >
         <View style={styles.statCardContent}>
-          <View style={[styles.statIcon, { backgroundColor: color + '20' }]}>
-            <Ionicons name={icon} size={24} color={color} />
+          <View style={[styles.statIcon, { backgroundColor: color + '30' }]}>
+            <Ionicons name={icon} size={20} color={color} />
           </View>
           <View style={styles.statTextContainer}>
             <Text style={styles.statValue}>{value}</Text>
@@ -171,6 +171,24 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
 
   return (
     <View style={styles.container}>
+      {/* Sticky Header */}
+      <LinearGradient
+        colors={COLORS.primaryGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <View style={styles.greetingContainer}>
+            <Text style={styles.greeting}>Good morning,</Text>
+            <Text style={styles.userName}>{getDisplayName(user || {})}</Text>
+          </View>
+          <View style={styles.headerIcon}>
+            <Ionicons name="car" size={32} color={COLORS.textInverse} />
+          </View>
+        </View>
+      </LinearGradient>
+
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -184,23 +202,6 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Header */}
-        <LinearGradient
-          colors={COLORS.primaryGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.header}
-        >
-          <View style={styles.headerContent}>
-            <View style={styles.greetingContainer}>
-              <Text style={styles.greeting}>Good morning,</Text>
-              <Text style={styles.userName}>{getDisplayName(user || {})}</Text>
-            </View>
-            <View style={styles.headerIcon}>
-              <Ionicons name="car" size={32} color={COLORS.textInverse} />
-            </View>
-          </View>
-        </LinearGradient>
 
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
@@ -334,9 +335,11 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    marginTop: 120, // Add margin to account for sticky header height
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: SIZES.spacingXl,
   },
   loadingContainer: {
     flex: 1,
@@ -350,8 +353,13 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,
-    paddingTop: SIZES.spacingXl,
+    paddingTop: SIZES.spacingXl + 20, // Add extra padding for status bar/notch
     paddingBottom: SIZES.spacingLg,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
   },
   headerContent: {
     flexDirection: 'row',
@@ -385,15 +393,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: SIZES.spacingLg,
-    marginTop: -SIZES.spacingMd,
+    marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
     justifyContent: 'space-between',
+    gap: SIZES.spacingSm,
   },
   statCard: {
-    width: (width - SIZES.spacingLg * 3) / 2,
+    width: (width - SIZES.spacingLg * 2 - SIZES.spacingSm) / 2,
     marginBottom: SIZES.spacingMd,
     borderRadius: SIZES.radiusLg,
     ...SIZES.shadowMedium,
+    minHeight: 120,
   },
   statCardGradient: {
     padding: SIZES.spacingLg,
@@ -402,29 +412,38 @@ const styles = StyleSheet.create({
   statCardContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   statIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: SIZES.spacingMd,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   statTextContainer: {
     flex: 1,
+    minWidth: 0, // Allow text to wrap properly
   },
   statValue: {
-    fontSize: SIZES.fontSizeXl,
+    fontSize: SIZES.fontSizeLg,
     fontWeight: '800',
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
+    lineHeight: SIZES.fontSizeLg * 1.2,
   },
   statTitle: {
-    fontSize: SIZES.fontSizeSm,
+    fontSize: SIZES.fontSizeXs,
     color: COLORS.textInverse,
     opacity: 0.9,
     fontWeight: '600',
+    lineHeight: SIZES.fontSizeXs * 1.3,
   },
   quickActionsContainer: {
     paddingHorizontal: SIZES.spacingLg,
@@ -443,6 +462,7 @@ const styles = StyleSheet.create({
   },
   quickActionButton: {
     flex: 1,
+    minHeight: 48,
   },
   recentTripsContainer: {
     marginBottom: SIZES.spacingLg,
@@ -465,22 +485,27 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radiusLg,
     padding: SIZES.spacingLg,
     ...SIZES.shadow,
+    minHeight: 100,
   },
   fleetStatItem: {
     alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: SIZES.spacingXs,
   },
   fleetStatValue: {
-    fontSize: SIZES.fontSizeXxl,
+    fontSize: SIZES.fontSizeXl,
     fontWeight: '800',
     color: COLORS.textPrimary,
     marginTop: SIZES.spacingSm,
     marginBottom: SIZES.spacingXs,
+    textAlign: 'center',
   },
   fleetStatLabel: {
-    fontSize: SIZES.fontSizeSm,
+    fontSize: SIZES.fontSizeXs,
     color: COLORS.textSecondary,
     fontWeight: '600',
     textAlign: 'center',
+    lineHeight: SIZES.fontSizeXs * 1.3,
   },
   bottomSpacing: {
     height: SIZES.spacingXl,

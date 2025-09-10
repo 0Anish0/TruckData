@@ -165,10 +165,10 @@ const EnhancedTripCard: React.FC<EnhancedTripCardProps> = ({
               {trip.source} → {trip.destination}
             </Text>
             <Text style={styles.truckName}>{truckName}</Text>
-          </View>
-          <View style={styles.dateContainer}>
-            <Ionicons name="calendar" size={16} color={COLORS.textInverse} />
-            <Text style={styles.dateText}>{formatDate(getTripDate())}</Text>
+            <View style={styles.dateContainer}>
+              <Ionicons name="calendar" size={16} color={COLORS.textInverse} />
+              <Text style={styles.dateText}>{formatDate(getTripDate())}</Text>
+            </View>
           </View>
         </LinearGradient>
 
@@ -286,11 +286,11 @@ const styles = StyleSheet.create({
   header: {
     padding: SIZES.spacingLg,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
   routeInfo: {
     flex: 1,
+    paddingRight: 80, // Add padding to prevent overlap with action buttons
   },
   route: {
     fontSize: SIZES.fontSizeLg,
@@ -311,6 +311,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.spacingSm,
     paddingVertical: SIZES.spacingXs,
     borderRadius: SIZES.radius,
+    marginTop: SIZES.spacingSm,
+    alignSelf: 'flex-start',
   },
   dateText: {
     fontSize: SIZES.fontSizeXs,
@@ -420,11 +422,12 @@ const styles = StyleSheet.create({
     right: SIZES.spacingLg,
     flexDirection: 'row',
     gap: SIZES.spacingSm,
+    zIndex: 10,
   },
   actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     ...SIZES.shadow,

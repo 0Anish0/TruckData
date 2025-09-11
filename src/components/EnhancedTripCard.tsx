@@ -262,8 +262,7 @@ const EnhancedTripCard: React.FC<EnhancedTripCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: SIZES.spacingLg,
-    marginBottom: SIZES.spacingMd,
+    marginBottom: SIZES.spacingLg,
     borderRadius: SIZES.radiusLg,
     ...SIZES.shadowMedium,
     position: 'relative',

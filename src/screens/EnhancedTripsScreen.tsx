@@ -7,6 +7,7 @@ import {
   RefreshControl,
   Animated,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +16,7 @@ import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTripCard from '../components/EnhancedTripCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
 import { Trip, Truck, TripsScreenNavigationProp } from '../types';
+const { width } = Dimensions.get('window');
 
 interface EnhancedTripsScreenProps {
   navigation: TripsScreenNavigationProp;
@@ -357,13 +359,14 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    flexWrap: 'nowrap',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
+    gap: SIZES.spacingMd,
   },
   statCard: {
-    width: '49%',
+    width: (width - SIZES.spacingLg * 2 - SIZES.spacingMd) / 2,
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radiusLg,
     padding: SIZES.spacingLg,

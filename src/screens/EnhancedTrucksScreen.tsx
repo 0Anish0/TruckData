@@ -7,6 +7,7 @@ import {
   RefreshControl,
   Animated,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +16,7 @@ import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTruckCard from '../components/EnhancedTruckCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
 import { Truck, Trip } from '../types';
+const { width } = Dimensions.get('window');
 
 const EnhancedTrucksScreen: React.FC = () => {
   const [trucks, setTrucks] = useState<Truck[]>([]);
@@ -328,13 +330,14 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    flexWrap: 'nowrap',
+    flexWrap: 'wrap',
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
     justifyContent: 'space-between',
+    gap: SIZES.spacingMd,
   },
   statCard: {
-    width: '49%',
+    width: (width - SIZES.spacingLg * 2 - SIZES.spacingMd) / 2,
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radiusLg,
     padding: SIZES.spacingLg,

@@ -203,96 +203,95 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
         </View>
       </LinearGradient>
 
-      <View style={styles.content}>
-        {/* Stats Cards */}
-        <View style={styles.statsContainer}>
-          <StatCard
-            title="Total Trips"
-            value={stats.totalTrips.toString()}
-            icon="trending-up"
-            color={COLORS.info}
+      {/* Make entire screen scrollable using FlatList as root */}
+      <FlatList
+        data={filteredTrips}
+        renderItem={renderTripItem}
+        keyExtractor={(item) => item.id}
+        style={styles.content}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[COLORS.primary]}
+            tintColor={COLORS.primary}
           />
-          <StatCard
-            title="Total Cost"
-            value={formatCurrency(stats.totalCost)}
-            icon="wallet"
-            color={COLORS.success}
-          />
-        </View>
-
-        {/* Filter Buttons */}
-        <View style={styles.filterContainer}>
-          <FilterButton
-            title="All Trips"
-            isActive={filter === 'all'}
-            onPress={() => setFilter('all')}
-            icon="list"
-          />
-          <FilterButton
-            title="Recent"
-            isActive={filter === 'recent'}
-            onPress={() => setFilter('recent')}
-            icon="time"
-          />
-          <FilterButton
-            title="High Cost"
-            isActive={filter === 'high-cost'}
-            onPress={() => setFilter('high-cost')}
-            icon="trending-up"
-          />
-        </View>
-
-        {/* Add Trip Button */}
-        <View style={styles.addButtonContainer}>
-          <EnhancedCustomButton
-            title="Add New Trip"
-            onPress={() => navigation.navigate('AddTrip')}
-            icon="add-circle"
-            variant="primary"
-            size="large"
-            fullWidth
-          />
-        </View>
-
-        {/* Trips List */}
-        <FlatList
-          data={filteredTrips}
-          renderItem={renderTripItem}
-          keyExtractor={(item) => item.id}
-          style={styles.tripsList}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={true}
-          nestedScrollEnabled={true}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[COLORS.primary]}
-              tintColor={COLORS.primary}
-            />
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="car-outline" size={64} color={COLORS.textTertiary} />
-              <Text style={styles.emptyTitle}>No Trips Found</Text>
-              <Text style={styles.emptySubtitle}>
-                {filter === 'all'
-                  ? 'Start by adding your first trip'
-                  : `No trips match the "${filter}" filter`}
-              </Text>
-              <EnhancedCustomButton
-                title="Add Trip"
-                onPress={() => navigation.navigate('AddTrip')}
-                icon="add-circle"
-                variant="outline"
-                size="medium"
-                style={styles.emptyButton}
+        }
+        ListHeaderComponent={
+          <View>
+            {/* Stats Cards */}
+            <View style={styles.statsContainer}>
+              <StatCard
+                title="Total Trips"
+                value={stats.totalTrips.toString()}
+                icon="trending-up"
+                color={COLORS.info}
+              />
+              <StatCard
+                title="Total Cost"
+                value={formatCurrency(stats.totalCost)}
+                icon="wallet"
+                color={COLORS.success}
               />
             </View>
-          }
-        />
-      </View>
+
+            {/* Filter Buttons */}
+            <View style={styles.filterContainer}>
+              <FilterButton
+                title="All Trips"
+                isActive={filter === 'all'}
+                onPress={() => setFilter('all')}
+                icon="list"
+              />
+              <FilterButton
+                title="Recent"
+                isActive={filter === 'recent'}
+                onPress={() => setFilter('recent')}
+                icon="time"
+              />
+              <FilterButton
+                title="High Cost"
+                isActive={filter === 'high-cost'}
+                onPress={() => setFilter('high-cost')}
+                icon="trending-up"
+              />
+            </View>
+
+            {/* Add Trip Button */}
+            <View style={styles.addButtonContainer}>
+              <EnhancedCustomButton
+                title="Add New Trip"
+                onPress={() => navigation.navigate('AddTrip')}
+                icon="add-circle"
+                variant="primary"
+                size="large"
+                fullWidth
+              />
+            </View>
+          </View>
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="car-outline" size={64} color={COLORS.textTertiary} />
+            <Text style={styles.emptyTitle}>No Trips Found</Text>
+            <Text style={styles.emptySubtitle}>
+              {filter === 'all'
+                ? 'Start by adding your first trip'
+                : `No trips match the "${filter}" filter`}
+            </Text>
+            <EnhancedCustomButton
+              title="Add Trip"
+              onPress={() => navigation.navigate('AddTrip')}
+              icon="add-circle"
+              variant="outline"
+              size="medium"
+              style={styles.emptyButton}
+            />
+          </View>
+        }
+      />
     </View>
   );
 };

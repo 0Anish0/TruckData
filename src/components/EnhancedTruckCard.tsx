@@ -191,7 +191,6 @@ const EnhancedTruckCard: React.FC<EnhancedTruckCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: SIZES.spacingLg,
     marginBottom: SIZES.spacingMd,
     borderRadius: SIZES.radiusLg,
     ...SIZES.shadowMedium,

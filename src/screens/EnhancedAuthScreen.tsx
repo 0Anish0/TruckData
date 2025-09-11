@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   },
   appTitle: {
     fontSize: SIZES.fontSizeDisplay,
-    fontWeight: '800',
+    fontWeight: '800' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
     textAlign: 'center',
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeLg,
     color: COLORS.textInverse,
     opacity: 0.9,
-    fontWeight: '500',
+    fontWeight: '500' as const,
     textAlign: 'center',
   },
   formSection: {
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     fontSize: SIZES.fontSizeXxl,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textPrimary,
     textAlign: 'center',
     marginBottom: SIZES.spacingXs,
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   dividerText: {
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textTertiary,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginHorizontal: SIZES.spacingLg,
   },
   toggleButton: {
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textInverse,
     marginLeft: SIZES.spacingSm,
-    fontWeight: '500',
+    fontWeight: '500' as const,
     textAlign: 'center',
     flex: 1,
   },

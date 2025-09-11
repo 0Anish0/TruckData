@@ -253,7 +253,7 @@ const EnhancedDriversScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+      {/* Sticky Header */}
       <LinearGradient
         colors={COLORS.accentGradient}
         start={{ x: 0, y: 0 }}
@@ -273,103 +273,105 @@ const EnhancedDriversScreen: React.FC = () => {
         </View>
       </LinearGradient>
 
-      <View style={styles.content}>
-        {/* Stats Cards */}
-        <View style={styles.statsContainer}>
-          <StatCard
-            title="Total Drivers"
-            value={stats.totalDrivers.toString()}
-            icon="people"
-            color={COLORS.accent}
+      {/* Make entire screen scrollable using FlatList as root */}
+      <FlatList
+        data={sortedDrivers}
+        renderItem={renderDriverItem}
+        keyExtractor={(item) => item.id}
+        style={styles.content}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[COLORS.accent]}
+            tintColor={COLORS.accent}
           />
-          <StatCard
-            title="Avg. Age"
-            value={`${stats.avgAge} years`}
-            icon="calendar"
-            color={COLORS.info}
-          />
-          <StatCard
-            title="Active"
-            value={stats.activeDrivers.toString()}
-            icon="checkmark-circle"
-            color={COLORS.success}
-          />
-          <StatCard
-            title="Total Exp."
-            value={`${stats.totalExperience} years`}
-            icon="time"
-            color={COLORS.warning}
-          />
-        </View>
-
-        {/* Sort Buttons */}
-        <View style={styles.sortContainer}>
-          <SortButton
-            title="Name"
-            isActive={sortBy === 'name'}
-            onPress={() => setSortBy('name')}
-            icon="text"
-          />
-          <SortButton
-            title="Age"
-            isActive={sortBy === 'age'}
-            onPress={() => setSortBy('age')}
-            icon="calendar"
-          />
-          <SortButton
-            title="Experience"
-            isActive={sortBy === 'experience'}
-            onPress={() => setSortBy('experience')}
-            icon="time"
-          />
-        </View>
-
-        {/* Add Driver Button */}
-        <View style={styles.addButtonContainer}>
-          <EnhancedCustomButton
-            title="Add New Driver"
-            onPress={() => {}}
-            icon="person-add"
-            variant="primary"
-            size="large"
-            fullWidth
-          />
-        </View>
-
-        {/* Drivers List */}
-        <FlatList
-          data={sortedDrivers}
-          renderItem={renderDriverItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[COLORS.accent]}
-              tintColor={COLORS.accent}
-            />
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="people-outline" size={64} color={COLORS.textTertiary} />
-              <Text style={styles.emptyTitle}>No Drivers Found</Text>
-              <Text style={styles.emptySubtitle}>
-                Start by adding your first driver to the team
-              </Text>
-              <EnhancedCustomButton
-                title="Add Driver"
-                onPress={() => {}}
-                icon="person-add"
-                variant="outline"
-                size="medium"
-                style={styles.emptyButton}
+        }
+        ListHeaderComponent={
+          <View>
+            {/* Stats Cards */}
+            <View style={styles.statsContainer}>
+              <StatCard
+                title="Total Drivers"
+                value={stats.totalDrivers.toString()}
+                icon="people"
+                color={COLORS.accent}
+              />
+              <StatCard
+                title="Avg. Age"
+                value={`${stats.avgAge} years`}
+                icon="calendar"
+                color={COLORS.info}
+              />
+              <StatCard
+                title="Active"
+                value={stats.activeDrivers.toString()}
+                icon="checkmark-circle"
+                color={COLORS.success}
+              />
+              <StatCard
+                title="Total Exp."
+                value={`${stats.totalExperience} years`}
+                icon="time"
+                color={COLORS.warning}
               />
             </View>
-          }
-        />
-      </View>
+
+            {/* Sort Buttons */}
+            <View style={styles.sortContainer}>
+              <SortButton
+                title="Name"
+                isActive={sortBy === 'name'}
+                onPress={() => setSortBy('name')}
+                icon="text"
+              />
+              <SortButton
+                title="Age"
+                isActive={sortBy === 'age'}
+                onPress={() => setSortBy('age')}
+                icon="calendar"
+              />
+              <SortButton
+                title="Experience"
+                isActive={sortBy === 'experience'}
+                onPress={() => setSortBy('experience')}
+                icon="time"
+              />
+            </View>
+
+            {/* Add Driver Button */}
+            <View style={styles.addButtonContainer}>
+              <EnhancedCustomButton
+                title="Add New Driver"
+                onPress={() => {}}
+                icon="person-add"
+                variant="primary"
+                size="large"
+                fullWidth
+              />
+            </View>
+          </View>
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="people-outline" size={64} color={COLORS.textTertiary} />
+            <Text style={styles.emptyTitle}>No Drivers Found</Text>
+            <Text style={styles.emptySubtitle}>
+              Start by adding your first driver to the team
+            </Text>
+            <EnhancedCustomButton
+              title="Add Driver"
+              onPress={() => {}}
+              icon="person-add"
+              variant="outline"
+              size="medium"
+              style={styles.emptyButton}
+            />
+          </View>
+        }
+      />
     </View>
   );
 };

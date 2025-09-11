@@ -184,7 +184,6 @@ const EnhancedTrucksScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       {/* Sticky Header */}
       <LinearGradient
         colors={COLORS.secondaryGradient}
@@ -205,103 +204,105 @@ const EnhancedTrucksScreen: React.FC = () => {
         </View>
       </LinearGradient>
 
-      <View style={styles.content}>
-        {/* Stats Cards */}
-        <View style={styles.statsContainer}>
-          <StatCard
-            title="Total Trucks"
-            value={stats.totalTrucks.toString()}
-            icon="car-sport"
-            color={COLORS.secondary}
+      {/* Make entire screen scrollable using FlatList as root */}
+      <FlatList
+        data={sortedTrucks}
+        renderItem={renderTruckItem}
+        keyExtractor={(item) => item.id}
+        style={styles.content}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[COLORS.secondary]}
+            tintColor={COLORS.secondary}
           />
-          <StatCard
-            title="Total Trips"
-            value={stats.totalTrips.toString()}
-            icon="trending-up"
-            color={COLORS.info}
-          />
-          <StatCard
-            title="Total Cost"
-            value={formatCurrency(stats.totalCost)}
-            icon="wallet"
-            color={COLORS.success}
-          />
-          <StatCard
-            title="Avg. Cost"
-            value={formatCurrency(stats.avgCostPerTruck)}
-            icon="analytics"
-            color={COLORS.warning}
-          />
-        </View>
-
-        {/* Sort Buttons */}
-        <View style={styles.sortContainer}>
-          <SortButton
-            title="Name"
-            isActive={sortBy === 'name'}
-            onPress={() => setSortBy('name')}
-            icon="text"
-          />
-          <SortButton
-            title="Trips"
-            isActive={sortBy === 'trips'}
-            onPress={() => setSortBy('trips')}
-            icon="trending-up"
-          />
-          <SortButton
-            title="Cost"
-            isActive={sortBy === 'cost'}
-            onPress={() => setSortBy('cost')}
-            icon="wallet"
-          />
-        </View>
-
-        {/* Add Truck Button */}
-        <View style={styles.addButtonContainer}>
-          <EnhancedCustomButton
-            title="Add New Truck"
-            onPress={() => {}}
-            icon="add-circle"
-            variant="secondary"
-            size="large"
-            fullWidth
-          />
-        </View>
-
-        {/* Trucks List */}
-        <FlatList
-          data={sortedTrucks}
-          renderItem={renderTruckItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[COLORS.secondary]}
-              tintColor={COLORS.secondary}
-            />
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="car-outline" size={64} color={COLORS.textTertiary} />
-              <Text style={styles.emptyTitle}>No Trucks Found</Text>
-              <Text style={styles.emptySubtitle}>
-                Start by adding your first truck to the fleet
-              </Text>
-              <EnhancedCustomButton
-                title="Add Truck"
-                onPress={() => {}}
-                icon="add-circle"
-                variant="outline"
-                size="medium"
-                style={styles.emptyButton}
+        }
+        ListHeaderComponent={
+          <View>
+            {/* Stats Cards */}
+            <View style={styles.statsContainer}>
+              <StatCard
+                title="Total Trucks"
+                value={stats.totalTrucks.toString()}
+                icon="car-sport"
+                color={COLORS.secondary}
+              />
+              <StatCard
+                title="Total Trips"
+                value={stats.totalTrips.toString()}
+                icon="trending-up"
+                color={COLORS.info}
+              />
+              <StatCard
+                title="Total Cost"
+                value={formatCurrency(stats.totalCost)}
+                icon="wallet"
+                color={COLORS.success}
+              />
+              <StatCard
+                title="Avg. Cost"
+                value={formatCurrency(stats.avgCostPerTruck)}
+                icon="analytics"
+                color={COLORS.warning}
               />
             </View>
-          }
-        />
-      </View>
+
+            {/* Sort Buttons */}
+            <View style={styles.sortContainer}>
+              <SortButton
+                title="Name"
+                isActive={sortBy === 'name'}
+                onPress={() => setSortBy('name')}
+                icon="text"
+              />
+              <SortButton
+                title="Trips"
+                isActive={sortBy === 'trips'}
+                onPress={() => setSortBy('trips')}
+                icon="trending-up"
+              />
+              <SortButton
+                title="Cost"
+                isActive={sortBy === 'cost'}
+                onPress={() => setSortBy('cost')}
+                icon="wallet"
+              />
+            </View>
+
+            {/* Add Truck Button */}
+            <View style={styles.addButtonContainer}>
+              <EnhancedCustomButton
+                title="Add New Truck"
+                onPress={() => {}}
+                icon="add-circle"
+                variant="secondary"
+                size="large"
+                fullWidth
+              />
+            </View>
+          </View>
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="car-outline" size={64} color={COLORS.textTertiary} />
+            <Text style={styles.emptyTitle}>No Trucks Found</Text>
+            <Text style={styles.emptySubtitle}>
+              Start by adding your first truck to the fleet
+            </Text>
+            <EnhancedCustomButton
+              title="Add Truck"
+              onPress={() => {}}
+              icon="add-circle"
+              variant="outline"
+              size="medium"
+              style={styles.emptyButton}
+            />
+          </View>
+        }
+      />
     </View>
   );
 };

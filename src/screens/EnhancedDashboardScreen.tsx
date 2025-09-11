@@ -338,8 +338,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,
-    paddingTop: SIZES.spacingXl + 30, // Add extra padding for status bar/notch
-    paddingBottom: SIZES.spacingXl,
+    paddingTop: SIZES.spacingXl + 20, // Align with other screens' header top padding
+    paddingBottom: SIZES.spacingLg, // Align with other screens' header bottom padding
     position: 'absolute',
     top: 0,
     left: 0,
@@ -367,9 +367,9 @@ const styles = StyleSheet.create({
     marginTop: SIZES.spacingXs,
   },
   headerIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: COLORS.glassLight,
     alignItems: 'center',
     justifyContent: 'center',

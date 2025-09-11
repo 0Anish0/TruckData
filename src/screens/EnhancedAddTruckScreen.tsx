@@ -87,10 +87,10 @@ const EnhancedAddTruckScreen: React.FC = () => {
         truck_number: '',
         model: '',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(
         'Error',
-        error.message || 'Failed to add truck. Please try again.',
+        error instanceof Error ? error.message : 'Failed to add truck. Please try again.',
         [{ text: 'OK' }]
       );
     } finally {

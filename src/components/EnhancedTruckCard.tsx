@@ -3,17 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import { Truck } from '../types';
-
-interface EnhancedTruckCardProps {
-  truck: Truck;
-  onPress: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  index?: number;
-  tripCount?: number;
-  totalCost?: number;
-}
+import { EnhancedTruckCardProps } from '../types';
 
 const EnhancedTruckCard: React.FC<EnhancedTruckCardProps> = ({
   truck,

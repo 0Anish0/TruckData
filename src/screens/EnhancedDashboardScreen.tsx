@@ -16,25 +16,9 @@ import { mockTripService, mockTruckService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTripCard from '../components/EnhancedTripCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Trip, Truck } from '../types';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { CompositeNavigationProp } from '@react-navigation/native';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { RootStackParamList, DashboardStackParamList } from '../types/navigation';
+import { Trip, Truck, DashboardStats, DashboardScreenNavigationProp, TripWithRelations } from '../types';
 
 const { width } = Dimensions.get('window');
-
-interface DashboardStats {
-  totalTrips: number;
-  totalCost: number;
-  totalDiesel: number;
-  avgCost: number;
-}
-
-type DashboardScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<DashboardStackParamList, 'DashboardMain'>,
-  BottomTabNavigationProp<RootStackParamList>
->;
 
 interface EnhancedDashboardScreenProps {
   navigation: DashboardScreenNavigationProp;
@@ -277,8 +261,8 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
               key={trip.id}
               trip={trip}
               truckName={getTruckName(trip.truck_id)}
-              onPress={() => navigation.navigate('EditTrip', { trip: trip as any })}
-              onEdit={() => navigation.navigate('EditTrip', { trip: trip as any })}
+              onPress={() => navigation.navigate('EditTrip', { trip: trip as TripWithRelations })}
+              onEdit={() => navigation.navigate('EditTrip', { trip: trip as TripWithRelations })}
               onDelete={() => {
                 // TODO: Implement delete functionality
                 console.log('Delete trip:', trip.id);

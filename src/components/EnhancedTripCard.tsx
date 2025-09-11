@@ -3,16 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import { Trip, TripWithRelations } from '../types';
-
-interface EnhancedTripCardProps {
-  trip: Trip | TripWithRelations;
-  truckName: string;
-  onPress: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  index?: number;
-}
+import { EnhancedTripCardProps } from '../types';
 
 const EnhancedTripCard: React.FC<EnhancedTripCardProps> = ({
   trip,

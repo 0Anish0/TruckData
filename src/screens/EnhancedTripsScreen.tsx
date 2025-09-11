@@ -14,16 +14,7 @@ import { mockTripService, mockTruckService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTripCard from '../components/EnhancedTripCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Trip, Truck } from '../types';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { CompositeNavigationProp } from '@react-navigation/native';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { RootStackParamList, TripsStackParamList } from '../types/navigation';
-
-type TripsScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<TripsStackParamList, 'TripsMain'>,
-  BottomTabNavigationProp<RootStackParamList>
->;
+import { Trip, Truck, TripsScreenNavigationProp } from '../types';
 
 interface EnhancedTripsScreenProps {
   navigation: TripsScreenNavigationProp;

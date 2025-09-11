@@ -96,10 +96,10 @@ const EnhancedAddDriverScreen: React.FC = () => {
         license_number: '',
         license_image_url: '',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(
         'Error',
-        error.message || 'Failed to add driver. Please try again.',
+        error instanceof Error ? error.message : 'Failed to add driver. Please try again.',
         [{ text: 'OK' }]
       );
     } finally {

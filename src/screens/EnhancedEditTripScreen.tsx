@@ -16,16 +16,7 @@ import { mockTripService, mockTruckService, mockDriverService } from '../service
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomInput from '../components/EnhancedCustomInput';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Trip, Truck, Driver, TripFormData } from '../types';
-
-interface EnhancedEditTripScreenProps {
-  route: {
-    params: {
-      trip: Trip;
-    };
-  };
-  navigation: any;
-}
+import { Trip, Truck, Driver, TripFormData, EnhancedEditTripScreenProps } from '../types';
 
 const EnhancedEditTripScreen: React.FC<EnhancedEditTripScreenProps> = ({ route, navigation }) => {
   const { trip } = route.params;
@@ -137,10 +128,10 @@ const EnhancedEditTripScreen: React.FC<EnhancedEditTripScreenProps> = ({ route, 
         'Trip updated successfully!',
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(
         'Error',
-        error.message || 'Failed to update trip. Please try again.',
+        error instanceof Error ? error.message : 'Failed to update trip. Please try again.',
         [{ text: 'OK' }]
       );
     } finally {
@@ -165,7 +156,7 @@ const EnhancedEditTripScreen: React.FC<EnhancedEditTripScreenProps> = ({ route, 
     }));
   };
 
-  const updateDieselPurchase = (index: number, field: string, value: any) => {
+  const updateDieselPurchase = (index: number, field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       diesel_purchases: prev.diesel_purchases.map((purchase, i) =>

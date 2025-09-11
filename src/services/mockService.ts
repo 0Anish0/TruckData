@@ -2,7 +2,7 @@ import { Truck, Driver, Trip, TripWithRelations, TripFormData } from '../types';
 import { 
   mockTrucks, 
   mockDrivers, 
-  mockTrips, 
+  mockTrips,  
   getMockTripStats, 
   getMockTruckTripStats 
 } from './mockData';
@@ -102,7 +102,16 @@ export const mockTripService = {
       .filter(trip => trip.truck_id === truckId)
       .map(trip => ({
         ...trip,
-        diesel_purchases: trip.diesel_purchases || [],
+        driver_id: trip.driver_id ?? null,
+        rto_cost: trip.rto_cost ?? 0,
+        dto_cost: trip.dto_cost ?? 0,
+        municipalities_cost: trip.municipalities_cost ?? 0,
+        border_cost: trip.border_cost ?? 0,
+        repair_cost: trip.repair_cost ?? 0,
+        diesel_purchases: (trip.diesel_purchases || []).map(purchase => ({
+          ...purchase,
+          city: purchase.city ?? null,
+        })),
       }));
   },
 
@@ -120,8 +129,8 @@ export const mockTripService = {
       dto_cost: tripData.dto_costs.reduce((sum, cost) => sum + cost.amount, 0),
       municipalities_cost: tripData.municipalities_costs.reduce((sum, cost) => sum + cost.amount, 0),
       border_cost: tripData.border_costs.reduce((sum, cost) => sum + cost.amount, 0),
-      repair_cost: tripData.repair_cost || 0,
-      total_cost: 0, // Will be calculated
+      repair_cost: tripData.repair_cost ?? 0,
+      total_cost: 0, 
       trip_date: new Date().toISOString(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -134,11 +143,11 @@ export const mockTripService = {
       fast_tag_cost: newTrip.fast_tag_cost,
       mcd_cost: newTrip.mcd_cost,
       green_tax_cost: newTrip.green_tax_cost,
-      rto_cost: newTrip.rto_cost,
-      dto_cost: newTrip.dto_cost,
-      municipalities_cost: newTrip.municipalities_cost,
-      border_cost: newTrip.border_cost,
-      repair_cost: newTrip.repair_cost,
+      rto_cost: newTrip.rto_cost ?? 0,
+      dto_cost: newTrip.dto_cost ?? 0,
+      municipalities_cost: newTrip.municipalities_cost ?? 0,
+      border_cost: newTrip.border_cost ?? 0,
+      repair_cost: newTrip.repair_cost ?? 0,
     });
 
     mockTrips.push(newTrip);
@@ -172,7 +181,7 @@ export const mockTripService = {
   },
 
   calculateTotalCost(tripData: {
-    diesel_purchases: any[];
+    diesel_purchases: { diesel_quantity: number; diesel_price_per_liter: number }[];
     fast_tag_cost: number;
     mcd_cost: number;
     green_tax_cost: number;

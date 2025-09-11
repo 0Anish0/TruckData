@@ -12,20 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-
-interface EnhancedCustomButtonProps {
-  title: string;
-  onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-  size?: 'small' | 'medium' | 'large';
-  loading?: boolean;
-  disabled?: boolean;
-  icon?: keyof typeof Ionicons.glyphMap;
-  iconPosition?: 'left' | 'right';
-  fullWidth?: boolean;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
-}
+import { EnhancedCustomButtonProps } from '../types';
 
 const EnhancedCustomButton: React.FC<EnhancedCustomButtonProps> = ({
   title,

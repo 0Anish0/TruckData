@@ -14,16 +14,7 @@ import { mockTripService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTripCard from '../components/EnhancedTripCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Trip, Truck } from '../types';
-
-interface EnhancedTruckTripsScreenProps {
-  route: {
-    params: {
-      truck: Truck;
-    };
-  };
-  navigation: any; // eslint-disable-line @typescript-eslint/no-unused-vars
-}
+import { Trip, Truck, EnhancedTruckTripsScreenProps } from '../types';
 
 const EnhancedTruckTripsScreen: React.FC<EnhancedTruckTripsScreenProps> = ({ route }) => {
   const { truck } = route.params;

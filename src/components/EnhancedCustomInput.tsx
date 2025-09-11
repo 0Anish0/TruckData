@@ -7,23 +7,12 @@ import {
   TouchableOpacity,
   Animated,
   TextInputProps,
+  TextInputFocusEventData,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-
-interface EnhancedCustomInputProps extends TextInputProps {
-  label?: string;
-  error?: string;
-  leftIcon?: keyof typeof Ionicons.glyphMap;
-  rightIcon?: keyof typeof Ionicons.glyphMap;
-  onRightIconPress?: () => void;
-  containerStyle?: any;
-  inputStyle?: any;
-  labelStyle?: any;
-  errorStyle?: any;
-  variant?: 'default' | 'outlined' | 'filled';
-  size?: 'small' | 'medium' | 'large';
-}
+import { ContainerStyle, LabelStyle, EnhancedCustomInputProps } from '../types';
 
 const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
   label,
@@ -60,7 +49,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
     }).start();
   }, [value, isFocused]);
 
-  const handleFocus = (e: any) => {
+  const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(true);
     
     Animated.parallel([
@@ -79,7 +68,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
     if (onFocus) onFocus(e);
   };
 
-  const handleBlur = (e: any) => {
+  const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(false);
     
     Animated.parallel([
@@ -98,8 +87,8 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
     if (onBlur) onBlur(e);
   };
 
-  const getContainerStyle = () => {
-    const baseStyle = {
+  const getContainerStyle = (): ContainerStyle => {
+    const baseStyle: ContainerStyle = {
       borderRadius: SIZES.radiusMd,
       borderWidth: 1,
       borderColor: error ? COLORS.error : isFocused ? COLORS.primary : COLORS.border,
@@ -145,7 +134,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
       flex: 1,
       fontSize: SIZES.fontSizeMd,
       color: COLORS.textPrimary,
-      fontWeight: '500',
+      fontWeight: '500' as const,
     };
 
     // Size styles
@@ -161,8 +150,8 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
     return baseStyle;
   };
 
-  const getLabelStyle = () => {
-    const baseStyle = {
+  const getLabelStyle = (): LabelStyle => {
+    const baseStyle: LabelStyle = {
       fontSize: SIZES.fontSizeSm,
       fontWeight: '600',
       marginBottom: SIZES.spacingXs,

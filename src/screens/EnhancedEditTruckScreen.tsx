@@ -15,16 +15,7 @@ import { mockTruckService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomInput from '../components/EnhancedCustomInput';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Truck } from '../types';
-
-interface EnhancedEditTruckScreenProps {
-  route: {
-    params: {
-      truck: Truck;
-    };
-  };
-  navigation: any;
-}
+import { Truck, EnhancedEditTruckScreenProps } from '../types';
 
 const EnhancedEditTruckScreen: React.FC<EnhancedEditTruckScreenProps> = ({ route, navigation }) => {
   const { truck } = route.params;
@@ -88,10 +79,10 @@ const EnhancedEditTruckScreen: React.FC<EnhancedEditTruckScreenProps> = ({ route
         'Truck updated successfully!',
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(
         'Error',
-        error.message || 'Failed to update truck. Please try again.',
+        error instanceof Error ? error.message : 'Failed to update truck. Please try again.',
         [{ text: 'OK' }]
       );
     } finally {

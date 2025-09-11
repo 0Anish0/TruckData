@@ -1,3 +1,11 @@
+import { ViewStyle, TextStyle, TextInputProps } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { ReactNode } from 'react';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { CompositeNavigationProp, NavigationProp } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { RootStackParamList, DashboardStackParamList, TripsStackParamList } from './navigation';
+
 export interface Truck {
   id: string;
   name: string;
@@ -353,6 +361,134 @@ export const INDIAN_STATES = [
   'Lakshadweep',
   'Andaman and Nicobar Islands'
 ];
+
+// Component Style Interfaces
+export interface ContainerStyle extends ViewStyle {
+  paddingHorizontal?: number;
+  paddingVertical?: number;
+  minHeight?: number;
+}
+
+export interface LabelStyle extends TextStyle {
+  marginBottom?: number;
+}
+
+// Component Prop Interfaces
+export interface EnhancedCustomInputProps extends TextInputProps {
+  label?: string;
+  error?: string;
+  leftIcon?: keyof typeof Ionicons.glyphMap;
+  rightIcon?: keyof typeof Ionicons.glyphMap;
+  onRightIconPress?: () => void;
+  containerStyle?: ViewStyle;
+  inputStyle?: TextStyle;
+  labelStyle?: TextStyle;
+  errorStyle?: TextStyle;
+  variant?: 'default' | 'outlined' | 'filled';
+  size?: 'small' | 'medium' | 'large';
+}
+
+export interface EnhancedTripCardProps {
+  trip: Trip | TripWithRelations;
+  truckName: string;
+  onPress: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  index?: number;
+}
+
+export interface EnhancedTruckCardProps {
+  truck: Truck;
+  onPress: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  index?: number;
+  tripCount?: number;
+  totalCost?: number;
+}
+
+export interface EnhancedCustomButtonProps {
+  title: string;
+  onPress: () => void;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  size?: 'small' | 'medium' | 'large';
+  loading?: boolean;
+  disabled?: boolean;
+  icon?: keyof typeof Ionicons.glyphMap;
+  iconPosition?: 'left' | 'right';
+  fullWidth?: boolean;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
+}
+
+// Screen Prop Interfaces
+export interface EnhancedTruckTripsScreenProps {
+  route: {
+    params: {
+      truck: Truck;
+    };
+  };
+  navigation: NavigationProp<RootStackParamList>;
+}
+
+export interface EnhancedEditTruckScreenProps {
+  route: {
+    params: {
+      truck: Truck;
+    };
+  };
+  navigation: NavigationProp<RootStackParamList>;
+}
+
+export interface EnhancedEditTripScreenProps {
+  route: {
+    params: {
+      trip: Trip;
+    };
+  };
+  navigation: NavigationProp<RootStackParamList>;
+}
+
+// Dashboard Types
+export interface DashboardStats {
+  totalTrips: number;
+  totalCost: number;
+  totalDiesel: number;
+  avgCost: number;
+}
+
+// Auth Context Types
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  user_metadata?: {
+    full_name?: string;
+  };
+}
+
+export interface AuthContextType {
+  user: AuthUser | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<void>;
+  signOut: () => Promise<void>;
+}
+
+export interface AuthProviderProps {
+  children: ReactNode;
+}
+
+// Navigation Types
+export type DashboardScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<DashboardStackParamList, 'DashboardMain'>,
+  BottomTabNavigationProp<RootStackParamList>
+>;
+
+export type TripsScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<TripsStackParamList, 'TripsMain'>,
+  BottomTabNavigationProp<RootStackParamList>
+>;
 
 // Re-export navigation types
 export * from './navigation';

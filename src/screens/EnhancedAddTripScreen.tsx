@@ -105,10 +105,10 @@ const EnhancedAddTripScreen: React.FC = () => {
         'Trip created successfully!',
         [{ text: 'OK', onPress: () => {} }]
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert(
         'Error',
-        error.message || 'Failed to create trip. Please try again.',
+        error instanceof Error ? error.message : 'Failed to create trip. Please try again.',
         [{ text: 'OK' }]
       );
     } finally {
@@ -133,7 +133,7 @@ const EnhancedAddTripScreen: React.FC = () => {
     }));
   };
 
-  const updateDieselPurchase = (index: number, field: string, value: any) => {
+  const updateDieselPurchase = (index: number, field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       diesel_purchases: prev.diesel_purchases.map((purchase, i) =>

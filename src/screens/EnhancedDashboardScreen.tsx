@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.spacingLg,
     paddingTop: SIZES.spacingXl + 20, // Align with other screens' header top padding
     paddingBottom: SIZES.spacingLg, // Align with other screens' header bottom padding
+    height: 140, // Match other screens' header height
     position: 'absolute',
     top: 0,
     left: 0,

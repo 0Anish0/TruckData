@@ -300,22 +300,10 @@ const EnhancedDriversScreen: React.FC = () => {
                 color={COLORS.accent}
               />
               <StatCard
-                title="Avg. Age"
-                value={`${stats.avgAge} years`}
-                icon="calendar"
-                color={COLORS.info}
-              />
-              <StatCard
                 title="Active"
                 value={stats.activeDrivers.toString()}
                 icon="checkmark-circle"
                 color={COLORS.success}
-              />
-              <StatCard
-                title="Total Exp."
-                value={`${stats.totalExperience} years`}
-                icon="time"
-                color={COLORS.warning}
               />
             </View>
 
@@ -437,14 +425,13 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
     justifyContent: 'space-between',
-    gap: SIZES.spacingMd,
   },
   statCard: {
-    width: '48%',
+    width: '49%',
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radiusLg,
     padding: SIZES.spacingLg,

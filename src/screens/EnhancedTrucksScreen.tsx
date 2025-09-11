@@ -236,18 +236,6 @@ const EnhancedTrucksScreen: React.FC = () => {
                 icon="trending-up"
                 color={COLORS.info}
               />
-              <StatCard
-                title="Total Cost"
-                value={formatCurrency(stats.totalCost)}
-                icon="wallet"
-                color={COLORS.success}
-              />
-              <StatCard
-                title="Avg. Cost"
-                value={formatCurrency(stats.avgCostPerTruck)}
-                icon="analytics"
-                color={COLORS.warning}
-              />
             </View>
 
             {/* Sort Buttons */}
@@ -368,14 +356,13 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
     justifyContent: 'space-between',
-    gap: SIZES.spacingMd,
   },
   statCard: {
-    width: '48%',
+    width: '49%',
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radiusLg,
     padding: SIZES.spacingLg,

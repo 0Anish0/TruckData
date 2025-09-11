@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
     ...SIZES.shadowMedium,
     position: 'relative',
     alignSelf: 'stretch',
+    minHeight: 130,
   },
   cardContent: {
     backgroundColor: COLORS.surface,
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
   },
   route: {
     fontSize: SIZES.fontSizeLg,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
   },
@@ -293,7 +294,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textInverse,
     opacity: 0.9,
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   dateContainer: {
     flexDirection: 'row',
@@ -309,7 +310,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeXs,
     color: COLORS.textInverse,
     marginLeft: SIZES.spacingXs,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   content: {
     padding: SIZES.spacingLg,
@@ -324,13 +325,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: SIZES.fontSizeMd,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: COLORS.textPrimary,
     marginLeft: SIZES.spacingSm,
   },
   dieselInfo: {
     fontSize: SIZES.fontSizeLg,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.fuel,
     marginBottom: SIZES.spacingSm,
   },
@@ -352,7 +353,7 @@ const styles = StyleSheet.create({
   dieselPurchaseText: {
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textSecondary,
-    fontWeight: '500',
+    fontWeight: '500' as const,
     flex: 1,
   },
   costsGrid: {
@@ -376,14 +377,14 @@ const styles = StyleSheet.create({
   costLabel: {
     fontSize: SIZES.fontSizeXs,
     color: COLORS.textTertiary,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginBottom: SIZES.spacingXs,
     textAlign: 'center',
   },
   costValue: {
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textPrimary,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     textAlign: 'center',
   },
   totalContainer: {
@@ -399,13 +400,13 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: SIZES.fontSizeMd,
     color: COLORS.textInverse,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginLeft: SIZES.spacingSm,
   },
   totalValue: {
     fontSize: SIZES.fontSizeXl,
     color: COLORS.textInverse,
-    fontWeight: '800',
+    fontWeight: '800' as const,
   },
   actions: {
     position: 'absolute',

@@ -265,8 +265,11 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
           data={filteredTrips}
           renderItem={renderTripItem}
           keyExtractor={(item) => item.id}
+          style={styles.tripsList}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          scrollEnabled={true}
+          nestedScrollEnabled={true}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -426,8 +429,12 @@ const styles = StyleSheet.create({
   addButtonContainer: {
     marginBottom: SIZES.spacingLg,
   },
+  tripsList: {
+    flex: 1,
+  },
   listContainer: {
     paddingBottom: SIZES.spacingXl,
+    flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,

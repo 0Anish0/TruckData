@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: SIZES.fontSizeXxl,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
   },
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeMd,
     color: COLORS.textInverse,
     opacity: 0.9,
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   headerIcon: {
     width: 50,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidingView: {
     flex: 1,
-    marginTop: 120, // Add margin to account for sticky header height
+    marginTop: 140, // Add margin to account for sticky header height
   },
   scrollView: {
     flex: 1,
@@ -320,6 +320,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: SIZES.spacingLg,
     paddingBottom: SIZES.spacingXl,
+    paddingTop: SIZES.spacingSm,
   },
   formContainer: {
     marginTop: SIZES.spacingLg,
@@ -347,7 +348,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: SIZES.fontSizeLg,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textPrimary,
   },
   previewCard: {
@@ -375,7 +376,7 @@ const styles = StyleSheet.create({
   },
   previewName: {
     fontSize: SIZES.fontSizeLg,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
   },
@@ -383,7 +384,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textInverse,
     opacity: 0.9,
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   previewContent: {
     padding: SIZES.spacingLg,
@@ -396,7 +397,7 @@ const styles = StyleSheet.create({
   previewLabel: {
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textSecondary,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginLeft: SIZES.spacingSm,
     marginRight: SIZES.spacingSm,
     minWidth: 60,
@@ -404,7 +405,7 @@ const styles = StyleSheet.create({
   previewValue: {
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textPrimary,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     flex: 1,
   },
   actionsContainer: {

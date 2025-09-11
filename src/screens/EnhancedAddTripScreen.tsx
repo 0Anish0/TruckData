@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: SIZES.fontSizeXxl,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
   },
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeMd,
     color: COLORS.textInverse,
     opacity: 0.9,
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   headerIcon: {
     width: 50,
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidingView: {
     flex: 1,
-    marginTop: 120, // Add margin to account for sticky header height
+    marginTop: 140, // Add margin to account for sticky header height
   },
   scrollView: {
     flex: 1,
@@ -598,6 +598,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: SIZES.spacingLg,
     paddingBottom: SIZES.spacingXl,
+    paddingTop: SIZES.spacingSm,
   },
   formContainer: {
     marginTop: SIZES.spacingLg,
@@ -617,7 +618,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: SIZES.fontSizeLg,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textPrimary,
     marginBottom: SIZES.spacingLg,
   },
@@ -626,7 +627,7 @@ const styles = StyleSheet.create({
   },
   pickerLabel: {
     fontSize: SIZES.fontSizeMd,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: COLORS.textPrimary,
     marginBottom: SIZES.spacingSm,
   },
@@ -647,11 +648,11 @@ const styles = StyleSheet.create({
   pickerOptionText: {
     fontSize: SIZES.fontSizeMd,
     color: COLORS.textPrimary,
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   pickerOptionTextSelected: {
     color: COLORS.primary,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   errorText: {
     fontSize: SIZES.fontSizeSm,
@@ -672,7 +673,7 @@ const styles = StyleSheet.create({
   },
   dieselPurchaseTitle: {
     fontSize: SIZES.fontSizeMd,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: COLORS.textPrimary,
   },
   removeButton: {
@@ -707,7 +708,7 @@ const styles = StyleSheet.create({
   },
   costSectionTitle: {
     fontSize: SIZES.fontSizeLg,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textPrimary,
   },
   addCostButton: {
@@ -728,7 +729,7 @@ const styles = StyleSheet.create({
   },
   complexCostTitle: {
     fontSize: SIZES.fontSizeMd,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: COLORS.textPrimary,
   },
   removeCostButton: {

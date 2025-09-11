@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: SIZES.fontSizeLg,
     color: COLORS.textSecondary,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: SIZES.fontSizeXxl,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
   },
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeMd,
     color: COLORS.textInverse,
     opacity: 0.9,
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   headerIcon: {
     width: 50,
@@ -361,14 +361,17 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginTop: 120, // Add margin to account for sticky header height
+    marginTop: 140, // Add margin to account for sticky header height
     paddingHorizontal: SIZES.spacingLg,
+    paddingTop: SIZES.spacingSm,
   },
   statsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: -SIZES.spacingLg,
+    marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
+    justifyContent: 'space-between',
+    gap: SIZES.spacingMd,
   },
   statCard: {
     width: '48%',
@@ -376,9 +379,9 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radiusLg,
     padding: SIZES.spacingLg,
     marginBottom: SIZES.spacingMd,
-    marginRight: '2%',
     alignItems: 'center',
     ...SIZES.shadow,
+    minHeight: 120,
   },
   statIcon: {
     width: 40,
@@ -390,14 +393,14 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: SIZES.fontSizeLg,
-    fontWeight: '800',
+    fontWeight: '800' as const,
     color: COLORS.textPrimary,
     marginBottom: SIZES.spacingXs,
   },
   statTitle: {
     fontSize: SIZES.fontSizeXs,
     color: COLORS.textSecondary,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     textAlign: 'center',
   },
   sortContainer: {
@@ -422,7 +425,7 @@ const styles = StyleSheet.create({
   },
   sortButtonText: {
     fontSize: SIZES.fontSizeSm,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: COLORS.secondary,
     marginLeft: SIZES.spacingXs,
   },
@@ -443,7 +446,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: SIZES.fontSizeXl,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textPrimary,
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingSm,

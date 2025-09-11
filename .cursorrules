@@ -1,65 +1,124 @@
-# Cursor Rules for Truck Data App
+# Enhanced Cursor Rules for Professional TypeScript Development
 
 ## TypeScript & Code Quality Rules
 
-### 1. Type Safety
+### 1. Type Safety (CRITICAL)
 - **NEVER use `any` type anywhere in the codebase**
 - Always use proper TypeScript types and interfaces
+- Use `unknown` for error handling with proper type guards: `error instanceof Error ? error.message : 'fallback'`
 - Define explicit types for all function parameters, return values, and variables
 - Use type assertions only when absolutely necessary and with proper type guards
 - Import and use types from `src/types/index.ts` for consistency
 
-### 2. Variable Management
+### 2. Error Handling Best Practices
+- Always use `try-catch` blocks for async operations
+- Use `error: unknown` in catch blocks, never `error: any`
+- Implement proper error type guards: `error instanceof Error`
+- Provide meaningful error messages to users
+- Log errors appropriately for debugging
+
+### 3. Event Handler Types
+- Use proper React Native event types: `NativeSyntheticEvent<TextInputFocusEventData>`
+- Import event types from React Native, not React
+- Use specific event types instead of generic ones
+- Define proper callback function signatures
+
+### 4. Navigation & Props Types
+- Use proper navigation prop types: `NavigationProp<RootStackParamList>`
+- Define screen prop interfaces in global types file
+- Use type assertions only when necessary: `trip as TripWithRelations`
+- Import navigation types from `@react-navigation/native`
+
+### 5. Style & Component Props
+- Use proper style types: `ViewStyle`, `TextStyle`, `StyleSheet`
+- Use `as const` for literal types: `fontWeight: '500' as const`
+- Define component prop interfaces in global types file
+- Use theme values from `src/constants/theme.ts`
+
+### 6. Variable Management
 - **NO unused variables, imports, or functions**
 - Remove any unused imports immediately
 - If a variable is declared but not used, either use it for its intended purpose or remove it
 - Use ESLint rules to catch unused variables during development
 - Clean up any dead code or commented-out code blocks
 
-### 3. Theme & Styling
+### 7. Theme & Styling
 - **ALWAYS use global theme colors from `src/constants/theme.ts`**
 - Never hardcode colors, spacing, or typography values inside component files
-- Import theme values: `import { colors, spacing, typography } from '../constants/theme'`
+- Import theme values: `import { COLORS, SIZES, ANIMATIONS } from '../constants/theme'`
 - Use theme-based styling for consistency across the app
 - Follow the established design system patterns
 
-### 4. File Organization
+### 8. File Organization & Imports
 - Keep types and interfaces in `src/types/index.ts`
 - Don't create inline types within component files unless absolutely necessary
 - Import shared types from the types directory
-- Maintain clean separation between components, services, and utilities
-
-### 5. Documentation & Files
-- **DO NOT create README, .md, or documentation files unless explicitly requested**
-- Don't generate unnecessary guide files or documentation
-- Focus on clean, self-documenting code with proper naming conventions
-- Only create files that are directly needed for functionality
-
-### 6. Code Structure
-- Use proper React patterns (hooks, functional components)
-- Implement proper error handling with typed error objects
-- Use consistent naming conventions (camelCase for variables, PascalCase for components)
-- Follow the existing project structure and patterns
-
-### 7. Import Management
-- Use absolute imports where possible (configured in tsconfig.json)
 - Group imports: React imports first, then third-party, then local imports
+- Use absolute imports where possible (configured in tsconfig.json)
 - Remove unused imports immediately
-- Use named imports instead of default imports when possible
 
-### 8. Component Guidelines
+### 9. Function & Method Signatures
+- Always define explicit parameter types
+- Use union types for flexible parameters: `value: string | number`
+- Define proper return types for all functions
+- Use generic types when appropriate
+- Avoid function overloading unless necessary
+
+### 10. Component Guidelines
 - Use TypeScript interfaces for all props
 - Implement proper prop validation
 - Use theme values for all styling
 - Keep components focused and single-purpose
 - Use proper React patterns (useState, useEffect, etc.)
+- Define component interfaces in global types file
+
+### 11. Code Structure & Patterns
+- Use proper React patterns (hooks, functional components)
+- Implement proper error handling with typed error objects
+- Use consistent naming conventions (camelCase for variables, PascalCase for components)
+- Follow the existing project structure and patterns
+- Use proper async/await patterns
+
+### 12. Documentation & Files
+- **DO NOT create README, .md, or documentation files unless explicitly requested**
+- Don't generate unnecessary guide files or documentation
+- Focus on clean, self-documenting code with proper naming conventions
+- Only create files that are directly needed for functionality
 
 ## Examples
 
-### ✅ Good:
+### ✅ Good Error Handling:
+```typescript
+try {
+  await someAsyncOperation();
+} catch (error: unknown) {
+  const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+  Alert.alert('Error', message);
+}
+```
+
+### ✅ Good Event Handlers:
+```typescript
+const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+  // handler logic
+};
+```
+
+### ✅ Good Type Definitions:
+```typescript
+interface ComponentProps {
+  title: string;
+  onPress: () => void;
+  variant?: 'primary' | 'secondary';
+  style?: ViewStyle;
+}
+```
+
+### ✅ Good Component:
 ```typescript
 import React from 'react';
-import { colors, spacing } from '../constants/theme';
+import { View, Text } from 'react-native';
+import { COLORS, SIZES } from '../constants/theme';
 import { Trip } from '../types';
 
 interface TripCardProps {
@@ -69,32 +128,34 @@ interface TripCardProps {
 
 const TripCard: React.FC<TripCardProps> = ({ trip, onPress }) => {
   return (
-    <View style={{ backgroundColor: colors.primary, padding: spacing.md }}>
-      {/* component content */}
+    <View style={{ backgroundColor: COLORS.primary, padding: SIZES.spacingMd }}>
+      <Text style={{ color: COLORS.textPrimary, fontSize: SIZES.fontSizeMd }}>
+        {trip.source} → {trip.destination}
+      </Text>
     </View>
   );
 };
 ```
 
-### ❌ Bad:
+### ❌ Bad Practices:
 ```typescript
-import React from 'react';
-import { any } from 'some-package'; // unused import
+// DON'T use any
+const handleError = (error: any) => { ... }
 
-interface TripCardProps {
-  trip: any; // using any type
-  onPress: (tripId: any) => void; // using any type
-}
+// DON'T use generic event types
+const handlePress = (e: any) => { ... }
 
-const TripCard = ({ trip, onPress }) => { // no proper typing
-  const unusedVariable = 'not used'; // unused variable
-  
-  return (
-    <View style={{ backgroundColor: '#FF0000', padding: 16 }}> {/* hardcoded values */}
-      {/* component content */}
-    </View>
-  );
-};
+// DON'T inline types
+const Component = ({ data }: { data: any }) => { ... }
+
+// DON'T use any for navigation
+navigation.navigate('Screen', { data: data as any })
+
+// DON'T hardcode values
+<View style={{ backgroundColor: '#FF0000', padding: 16 }}>
+
+// DON'T create unused variables
+const unusedVariable = 'not used';
 ```
 
 ## Enforcement
@@ -102,3 +163,4 @@ const TripCard = ({ trip, onPress }) => { // no proper typing
 - Existing code should be refactored to follow these rules when modified
 - Use TypeScript strict mode and ESLint to enforce these practices
 - Regular code reviews should check for compliance with these rules
+- Use proper type definitions and avoid any type shortcuts

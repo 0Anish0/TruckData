@@ -21,7 +21,6 @@ const EnhancedTrucksScreen: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [sortBy, setSortBy] = useState<'name' | 'trips' | 'cost'>('name');
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -83,15 +82,8 @@ const EnhancedTrucksScreen: React.FC = () => {
       ...truck,
       ...getTruckStats(truck.id),
     }));
-
-    switch (sortBy) {
-      case 'trips':
-        return trucksWithStats.sort((a, b) => b.totalTrips - a.totalTrips);
-      case 'cost':
-        return trucksWithStats.sort((a, b) => b.totalCost - a.totalCost);
-      default:
-        return trucksWithStats.sort((a, b) => a.name.localeCompare(b.name));
-    }
+    // Default sort by name
+    return trucksWithStats.sort((a, b) => a.name.localeCompare(b.name));
   };
 
   const formatCurrency = (amount: number) => {
@@ -238,27 +230,7 @@ const EnhancedTrucksScreen: React.FC = () => {
               />
             </View>
 
-            {/* Sort Buttons */}
-            <View style={styles.sortContainer}>
-              <SortButton
-                title="Name"
-                isActive={sortBy === 'name'}
-                onPress={() => setSortBy('name')}
-                icon="text"
-              />
-              <SortButton
-                title="Trips"
-                isActive={sortBy === 'trips'}
-                onPress={() => setSortBy('trips')}
-                icon="trending-up"
-              />
-              <SortButton
-                title="Cost"
-                isActive={sortBy === 'cost'}
-                onPress={() => setSortBy('cost')}
-                icon="wallet"
-              />
-            </View>
+            {/* Sort controls removed as requested */}
 
             {/* Add Truck Button */}
             <View style={styles.addButtonContainer}>

@@ -218,12 +218,6 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
             icon="wallet"
             color={COLORS.success}
           />
-          <StatCard
-            title="Avg. Cost"
-            value={formatCurrency(stats.avgCost)}
-            icon="analytics"
-            color={COLORS.warning}
-          />
         </View>
 
         {/* Filter Buttons */}
@@ -364,16 +358,17 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
+    flexWrap: 'nowrap',
     justifyContent: 'space-between',
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
   },
   statCard: {
-    flex: 1,
+    width: '49%',
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radiusLg,
     padding: SIZES.spacingLg,
-    marginHorizontal: SIZES.spacingXs,
+    marginBottom: SIZES.spacingMd,
     alignItems: 'center',
     ...SIZES.shadow,
   },

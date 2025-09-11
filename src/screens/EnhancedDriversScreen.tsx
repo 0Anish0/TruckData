@@ -19,7 +19,6 @@ const EnhancedDriversScreen: React.FC = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [sortBy, setSortBy] = useState<'name' | 'age' | 'experience'>('name');
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -64,20 +63,8 @@ const EnhancedDriversScreen: React.FC = () => {
 
   const getSortedDrivers = () => {
     const sortedDrivers = [...drivers];
-    
-    switch (sortBy) {
-      case 'age':
-        return sortedDrivers.sort((a, b) => (b.age || 0) - (a.age || 0));
-      case 'experience':
-        // Mock experience based on age
-        return sortedDrivers.sort((a, b) => {
-          const expA = (a.age || 0) - 18; // Assume driving since 18
-          const expB = (b.age || 0) - 18;
-          return expB - expA;
-        });
-      default:
-        return sortedDrivers.sort((a, b) => a.name.localeCompare(b.name));
-    }
+    // Default sort by name
+    return sortedDrivers.sort((a, b) => a.name.localeCompare(b.name));
   };
 
   const getTotalStats = () => {
@@ -307,27 +294,7 @@ const EnhancedDriversScreen: React.FC = () => {
               />
             </View>
 
-            {/* Sort Buttons */}
-            <View style={styles.sortContainer}>
-              <SortButton
-                title="Name"
-                isActive={sortBy === 'name'}
-                onPress={() => setSortBy('name')}
-                icon="text"
-              />
-              <SortButton
-                title="Age"
-                isActive={sortBy === 'age'}
-                onPress={() => setSortBy('age')}
-                icon="calendar"
-              />
-              <SortButton
-                title="Experience"
-                isActive={sortBy === 'experience'}
-                onPress={() => setSortBy('experience')}
-                icon="time"
-              />
-            </View>
+            {/* Sort controls removed as requested */}
 
             {/* Add Driver Button */}
             <View style={styles.addButtonContainer}>

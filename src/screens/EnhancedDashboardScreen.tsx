@@ -131,8 +131,8 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         style={styles.statCardGradient}
       >
         <View style={styles.statCardContent}>
-          <View style={[styles.statIcon, { backgroundColor: color + '30' }]}>
-            <Ionicons name={icon} size={20} color={color} />
+          <View style={styles.statIconContainer}>
+            <Ionicons name={icon} size={24} color={COLORS.textInverse} />
           </View>
           <View style={styles.statTextContainer}>
             <Text style={styles.statValue}>{value}</Text>
@@ -319,11 +319,12 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginTop: 120, // Add margin to account for sticky header height
+    marginTop: 140, // Add margin to account for sticky header height
   },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: SIZES.spacingXl,
+    paddingTop: SIZES.spacingSm,
   },
   loadingContainer: {
     flex: 1,
@@ -337,8 +338,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,
-    paddingTop: SIZES.spacingXl + 20, // Add extra padding for status bar/notch
-    paddingBottom: SIZES.spacingLg,
+    paddingTop: SIZES.spacingXl + 30, // Add extra padding for status bar/notch
+    paddingBottom: SIZES.spacingXl,
     position: 'absolute',
     top: 0,
     left: 0,
@@ -380,83 +381,86 @@ const styles = StyleSheet.create({
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
     justifyContent: 'space-between',
-    gap: SIZES.spacingSm,
+    gap: SIZES.spacingMd,
   },
   statCard: {
-    width: (width - SIZES.spacingLg * 2 - SIZES.spacingSm) / 2,
+    width: (width - SIZES.spacingLg * 2 - SIZES.spacingMd) / 2,
     marginBottom: SIZES.spacingMd,
     borderRadius: SIZES.radiusLg,
     ...SIZES.shadowMedium,
-    minHeight: 120,
+    minHeight: 130,
   },
   statCardGradient: {
     padding: SIZES.spacingLg,
     borderRadius: SIZES.radiusLg,
-  },
-  statCardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
     flex: 1,
   },
-  statIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  statCardContent: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.glassLight,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: SIZES.spacingMd,
+    marginBottom: SIZES.spacingMd,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   statTextContainer: {
     flex: 1,
-    minWidth: 0, // Allow text to wrap properly
+    width: '100%',
   },
   statValue: {
-    fontSize: SIZES.fontSizeLg,
-    fontWeight: '800',
+    fontSize: SIZES.fontSizeXl,
+    fontWeight: '800' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
-    lineHeight: SIZES.fontSizeLg * 1.2,
+    lineHeight: SIZES.fontSizeXl * 1.1,
   },
   statTitle: {
-    fontSize: SIZES.fontSizeXs,
+    fontSize: SIZES.fontSizeSm,
     color: COLORS.textInverse,
     opacity: 0.9,
-    fontWeight: '600',
-    lineHeight: SIZES.fontSizeXs * 1.3,
+    fontWeight: '600' as const,
+    lineHeight: SIZES.fontSizeSm * 1.2,
   },
   quickActionsContainer: {
     paddingHorizontal: SIZES.spacingLg,
-    marginBottom: SIZES.spacingLg,
+    marginBottom: SIZES.spacingXl,
   },
   sectionTitle: {
     fontSize: SIZES.fontSizeXl,
-    fontWeight: '700',
+    fontWeight: '700' as const,
     color: COLORS.textPrimary,
-    marginBottom: SIZES.spacingMd,
+    marginBottom: SIZES.spacingLg,
   },
   quickActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: SIZES.spacingMd,
+    gap: SIZES.spacingLg,
   },
   quickActionButton: {
     flex: 1,
-    minHeight: 48,
+    minHeight: 56,
   },
   recentTripsContainer: {
-    marginBottom: SIZES.spacingLg,
+    marginBottom: SIZES.spacingXl,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: SIZES.spacingLg,
-    marginBottom: SIZES.spacingMd,
+    marginBottom: SIZES.spacingLg,
   },
   fleetContainer: {
     paddingHorizontal: SIZES.spacingLg,

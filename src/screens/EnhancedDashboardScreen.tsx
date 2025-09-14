@@ -325,6 +325,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingBottom: SIZES.spacingXl,
     paddingTop: SIZES.spacingSm,
+    paddingHorizontal: SIZES.spacingLg,
   },
   loadingContainer: {
     flex: 1,
@@ -378,7 +379,6 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: SIZES.spacingLg,
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
     justifyContent: 'space-between',
@@ -435,7 +435,6 @@ const styles = StyleSheet.create({
     lineHeight: SIZES.fontSizeSm * 1.2,
   },
   quickActionsContainer: {
-    paddingHorizontal: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
   },
   sectionTitle: {
@@ -460,11 +459,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: SIZES.spacingLg,
     marginBottom: SIZES.spacingLg,
   },
   fleetContainer: {
-    paddingHorizontal: SIZES.spacingLg,
     marginBottom: SIZES.spacingLg,
   },
   fleetStats: {

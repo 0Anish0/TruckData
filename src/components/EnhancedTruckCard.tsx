@@ -104,11 +104,31 @@ const EnhancedTruckCard: React.FC<EnhancedTruckCardProps> = ({
             <View style={styles.truckDetails}>
               <Text style={styles.truckName}>{truck.name}</Text>
               <Text style={styles.truckNumber}>{truck.truck_number}</Text>
+              <View style={styles.statusContainer}>
+                <View style={styles.statusDot} />
+                <Text style={styles.statusText}>Active</Text>
+              </View>
             </View>
           </View>
-          <View style={styles.statusContainer}>
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>Active</Text>
+          <View style={styles.headerActions}>
+            {onEdit && (
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.editButton]} 
+                onPress={handleEditPress}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="pencil" size={18} color={COLORS.primary} />
+              </TouchableOpacity>
+            )}
+            {onDelete && (
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.deleteButton]} 
+                onPress={handleDeletePress}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="trash" size={18} color={COLORS.error} />
+              </TouchableOpacity>
+            )}
           </View>
         </LinearGradient>
 
@@ -162,29 +182,6 @@ const EnhancedTruckCard: React.FC<EnhancedTruckCardProps> = ({
         </View>
       </TouchableOpacity>
 
-      {/* Action buttons */}
-      {(onEdit || onDelete) && (
-        <View style={styles.actions}>
-          {onEdit && (
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.editButton]} 
-              onPress={handleEditPress}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="pencil" size={18} color={COLORS.primary} />
-            </TouchableOpacity>
-          )}
-          {onDelete && (
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.deleteButton]} 
-              onPress={handleDeletePress}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="trash" size={18} color={COLORS.error} />
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
     </Animated.View>
   );
 };
@@ -244,6 +241,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.spacingSm,
     paddingVertical: SIZES.spacingXs,
     borderRadius: SIZES.radius,
+    marginTop: SIZES.spacingXs,
+    alignSelf: 'flex-start',
   },
   statusDot: {
     width: 8,
@@ -327,6 +326,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: SIZES.spacingXs,
   },
+  headerActions: {
+    position: 'absolute',
+    top: SIZES.spacingLg,
+    right: SIZES.spacingLg,
+    flexDirection: 'row',
+    gap: SIZES.spacingSm,
+    zIndex: 10,
+  },
   actions: {
     position: 'absolute',
     top: SIZES.spacingLg,
@@ -335,9 +342,9 @@ const styles = StyleSheet.create({
     gap: SIZES.spacingSm,
   },
   actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     ...SIZES.shadow,

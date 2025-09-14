@@ -180,10 +180,18 @@ const EnhancedDriversScreen: React.FC = () => {
           <View style={styles.driverInfo}>
             <Text style={styles.driverName}>{driver.name}</Text>
             <Text style={styles.driverLicense}>{driver.license_number}</Text>
+            <View style={styles.driverStatus}>
+              <View style={styles.statusDot} />
+              <Text style={styles.statusText}>Active</Text>
+            </View>
           </View>
-          <View style={styles.driverStatus}>
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>Active</Text>
+          <View style={styles.driverActions}>
+            <TouchableOpacity style={[styles.actionButton, styles.editButton]} activeOpacity={0.7}>
+              <Ionicons name="pencil" size={18} color={COLORS.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} activeOpacity={0.7}>
+              <Ionicons name="trash" size={18} color={COLORS.error} />
+            </TouchableOpacity>
           </View>
         </LinearGradient>
 
@@ -206,15 +214,6 @@ const EnhancedDriversScreen: React.FC = () => {
               <Text style={styles.detailLabel}>Phone</Text>
               <Text style={styles.detailValue}>{driver.phone}</Text>
             </View>
-          </View>
-
-          <View style={styles.driverActions}>
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.7}>
-              <Ionicons name="pencil" size={18} color={COLORS.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.7}>
-              <Ionicons name="trash" size={18} color={COLORS.error} />
-            </TouchableOpacity>
           </View>
         </View>
       </Animated.View>
@@ -505,6 +504,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.spacingSm,
     paddingVertical: SIZES.spacingXs,
     borderRadius: SIZES.radius,
+    marginTop: SIZES.spacingXs,
+    alignSelf: 'flex-start',
   },
   statusDot: {
     width: 8,
@@ -544,18 +545,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   driverActions: {
+    position: 'absolute',
+    top: SIZES.spacingLg,
+    right: SIZES.spacingLg,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     gap: SIZES.spacingSm,
+    zIndex: 10,
   },
   actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.backgroundSecondary,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    ...SIZES.shadowSubtle,
+    ...SIZES.shadow,
+  },
+  editButton: {
+    backgroundColor: COLORS.surface,
+  },
+  deleteButton: {
+    backgroundColor: COLORS.surface,
   },
   emptyContainer: {
     flex: 1,

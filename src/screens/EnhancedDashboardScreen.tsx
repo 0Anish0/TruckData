@@ -7,6 +7,8 @@ import {
   RefreshControl,
   Animated,
   Dimensions,
+  Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -25,7 +27,7 @@ interface EnhancedDashboardScreenProps {
 }
 
 const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navigation }) => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -111,6 +113,31 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
     return truck?.name || 'Unknown Truck';
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+            } catch (error: unknown) {
+              const message = error instanceof Error ? error.message : 'Failed to logout';
+              Alert.alert('Error', message);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const StatCard: React.FC<{
     title: string;
     value: string;
@@ -168,8 +195,17 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
             <Text style={styles.greeting}>Good morning,</Text>
             <Text style={styles.userName}>{getDisplayName(user || {})}</Text>
           </View>
-          <View style={styles.headerIcon}>
-            <Ionicons name="car" size={32} color={COLORS.textInverse} />
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleLogout}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="log-out-outline" size={24} color={COLORS.textInverse} />
+            </TouchableOpacity>
+            <View style={styles.headerIcon}>
+              <Ionicons name="car" size={32} color={COLORS.textInverse} />
+            </View>
           </View>
         </View>
       </LinearGradient>
@@ -317,6 +353,20 @@ const styles = StyleSheet.create({
   },
   greetingContainer: {
     flex: 1,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SIZES.spacingMd,
+  },
+  logoutButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.glassLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...SIZES.shadowSubtle,
   },
   greeting: {
     fontSize: SIZES.fontSizeLg,

@@ -9,6 +9,7 @@ import {
   Alert,
   Animated,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,6 +32,8 @@ const EnhancedAuthScreen: React.FC = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const logoScaleAnim = useRef(new Animated.Value(0.8)).current;
+  const formSlideAnim = useRef(new Animated.Value(30)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     // Entrance animation
@@ -50,7 +53,31 @@ const EnhancedAuthScreen: React.FC = () => {
         useNativeDriver: true,
         ...ANIMATIONS.springBouncy,
       }),
+      Animated.timing(formSlideAnim, {
+        toValue: 0,
+        duration: ANIMATIONS.slow + 200,
+        useNativeDriver: true,
+      }),
     ]).start();
+
+    // Subtle pulse animation for logo
+    const pulseAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulseAnimation.start();
+
+    return () => pulseAnimation.stop();
   }, []);
 
   const validateForm = () => {
@@ -107,12 +134,19 @@ const EnhancedAuthScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       <LinearGradient
         colors={COLORS.primaryGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.background}
       >
+        {/* Background decorative elements */}
+        <View style={styles.backgroundDecorations}>
+          <View style={[styles.decorationCircle, styles.decorationCircle1]} />
+          <View style={[styles.decorationCircle, styles.decorationCircle2]} />
+          <View style={[styles.decorationCircle, styles.decorationCircle3]} />
+        </View>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardAvoidingView}
@@ -135,16 +169,25 @@ const EnhancedAuthScreen: React.FC = () => {
                 },
               ]}
             >
-              <View style={styles.logoContainer}>
+              <Animated.View 
+                style={[
+                  styles.logoContainer,
+                  {
+                    transform: [{ scale: pulseAnim }],
+                  },
+                ]}
+              >
                 <LinearGradient
                   colors={COLORS.secondaryGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.logoGradient}
                 >
-                  <Ionicons name="car" size={48} color={COLORS.textInverse} />
+                  <Ionicons name="car" size={52} color={COLORS.textInverse} />
                 </LinearGradient>
-              </View>
+                {/* Logo glow effect */}
+                <View style={styles.logoGlow} />
+              </Animated.View>
               <Text style={styles.appTitle}>Truck Fleet</Text>
               <Text style={styles.appSubtitle}>
                 Manage your fleet with ease
@@ -157,7 +200,7 @@ const EnhancedAuthScreen: React.FC = () => {
                 styles.formSection,
                 {
                   opacity: fadeAnim,
-                  transform: [{ translateY: slideAnim }],
+                  transform: [{ translateY: formSlideAnim }],
                 },
               ]}
             >
@@ -173,11 +216,20 @@ const EnhancedAuthScreen: React.FC = () => {
                 
                 {isLogin && (
                   <View style={styles.credentialsHint}>
-                    <Text style={styles.credentialsText}>
-                      Demo Credentials:{'\n'}
-                      Email: admin@truckdata.com{'\n'}
-                      Password: admin123
-                    </Text>
+                    <View style={styles.credentialsHeader}>
+                      <Ionicons name="key" size={20} color={COLORS.info} />
+                      <Text style={styles.credentialsTitle}>Demo Credentials</Text>
+                    </View>
+                    <View style={styles.credentialsContent}>
+                      <View style={styles.credentialRow}>
+                        <Text style={styles.credentialLabel}>Email:</Text>
+                        <Text style={styles.credentialValue}>admin@truckdata.com</Text>
+                      </View>
+                      <View style={styles.credentialRow}>
+                        <Text style={styles.credentialLabel}>Password:</Text>
+                        <Text style={styles.credentialValue}>admin123</Text>
+                      </View>
+                    </View>
                   </View>
                 )}
 
@@ -280,6 +332,39 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
+  backgroundDecorations: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  decorationCircle: {
+    position: 'absolute',
+    borderRadius: 9999,
+    opacity: 0.1,
+  },
+  decorationCircle1: {
+    width: 200,
+    height: 200,
+    backgroundColor: COLORS.textInverse,
+    top: -100,
+    right: -50,
+  },
+  decorationCircle2: {
+    width: 150,
+    height: 150,
+    backgroundColor: COLORS.textInverse,
+    bottom: -75,
+    left: -75,
+  },
+  decorationCircle3: {
+    width: 100,
+    height: 100,
+    backgroundColor: COLORS.textInverse,
+    top: '30%',
+    right: -25,
+  },
   keyboardAvoidingView: {
     flex: 1,
   },
@@ -295,14 +380,26 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     marginBottom: SIZES.spacingLg,
+    position: 'relative',
   },
   logoGradient: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
     alignItems: 'center',
     justifyContent: 'center',
     ...SIZES.shadowLarge,
+  },
+  logoGlow: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: COLORS.textInverse,
+    opacity: 0.2,
+    top: -5,
+    left: -5,
+    zIndex: -1,
   },
   appTitle: {
     fontSize: SIZES.fontSizeDisplay,
@@ -326,6 +423,8 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radiusXl,
     padding: SIZES.spacingXl,
     ...SIZES.shadowLarge,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   formTitle: {
     fontSize: SIZES.fontSizeXxl,
@@ -388,18 +487,43 @@ const styles = StyleSheet.create({
   },
   credentialsHint: {
     backgroundColor: COLORS.infoLight,
-    padding: SIZES.spacingMd,
-    borderRadius: SIZES.radiusMd,
+    padding: SIZES.spacingLg,
+    borderRadius: SIZES.radiusLg,
     marginBottom: SIZES.spacingLg,
     borderWidth: 1,
     borderColor: COLORS.info,
+    ...SIZES.shadowSubtle,
   },
-  credentialsText: {
+  credentialsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SIZES.spacingSm,
+  },
+  credentialsTitle: {
+    fontSize: SIZES.fontSizeMd,
+    color: COLORS.info,
+    fontWeight: '600' as const,
+    marginLeft: SIZES.spacingXs,
+  },
+  credentialsContent: {
+    gap: SIZES.spacingXs,
+  },
+  credentialRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  credentialLabel: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textSecondary,
+    fontWeight: '500' as const,
+  },
+  credentialValue: {
     fontSize: SIZES.fontSizeSm,
     color: COLORS.textPrimary,
-    textAlign: 'center',
-    fontWeight: '500' as const,
-    lineHeight: 20,
+    fontWeight: '600' as const,
+    fontFamily: 'monospace',
   },
 });
 

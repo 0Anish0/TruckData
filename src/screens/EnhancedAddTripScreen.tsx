@@ -10,15 +10,17 @@ import {
   Animated,
   TouchableOpacity,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { mockTripService, mockTruckService, mockDriverService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomInput from '../components/EnhancedCustomInput';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Truck, Driver, TripFormData } from '../types';
+import { Truck, Driver, TripFormData, AddTripScreenNavigationProp } from '../types';
 
 const EnhancedAddTripScreen: React.FC = () => {
+  const navigation = useNavigation<AddTripScreenNavigationProp>();
   const [formData, setFormData] = useState<TripFormData>({
     truck_id: '',
     source: '',
@@ -287,6 +289,13 @@ const EnhancedAddTripScreen: React.FC = () => {
         style={styles.header}
       >
         <View style={styles.headerContent}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="arrow-back" size={24} color={COLORS.textInverse} />
+          </TouchableOpacity>
           <View style={styles.headerText}>
             <Text style={styles.headerTitle}>Add New Trip</Text>
             <Text style={styles.headerSubtitle}>
@@ -565,8 +574,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.glassLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   headerText: {
     flex: 1,
+    marginLeft: SIZES.spacingMd,
   },
   headerTitle: {
     fontSize: SIZES.fontSizeXxl,

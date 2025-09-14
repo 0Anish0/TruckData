@@ -196,7 +196,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ navig
     <View style={styles.container}>
       {/* Header */}
       <LinearGradient
-        colors={COLORS.primaryGradient}
+        colors={COLORS.successGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
@@ -314,7 +314,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ navig
               title="Add Driver"
               onPress={handleSubmit}
               icon="person-add"
-              variant="primary"
+              variant="success"
               size="large"
               fullWidth
               loading={loading}

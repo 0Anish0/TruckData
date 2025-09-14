@@ -244,7 +244,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ navig
               label="License Number"
               value={formData.licenseNumber}
               onChangeText={(value) => handleInputChange('licenseNumber', value)}
-              placeholder="Enter license number (e.g., DL-1234567890)"
+              placeholder="DL-1234567890"
               leftIcon="card"
             />
 

@@ -159,10 +159,8 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
 
     if (error) {
       baseStyle.color = COLORS.error;
-    } else if (isFocused) {
-      baseStyle.color = COLORS.primary;
     } else {
-      baseStyle.color = COLORS.textSecondary;
+      baseStyle.color = COLORS.primary;
     }
 
     return baseStyle;
@@ -182,18 +180,9 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
   const animatedLabelStyle = {
     position: 'absolute' as const,
     left: leftIcon ? SIZES.spacingXl + SIZES.spacingMd : SIZES.spacingLg,
-    top: labelAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [size === 'large' ? 18 : size === 'small' ? 12 : 16, -8],
-    }),
-    fontSize: labelAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [SIZES.fontSizeMd, SIZES.fontSizeSm],
-    }),
-    color: labelAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [COLORS.textTertiary, error ? COLORS.error : COLORS.primary],
-    }),
+    top: -8,
+    fontSize: SIZES.fontSizeSm,
+    color: error ? COLORS.error : COLORS.primary,
     backgroundColor: COLORS.surface,
     paddingHorizontal: SIZES.spacingXs,
     zIndex: 1,
@@ -217,9 +206,9 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
       ]}
     >
       {label && (
-        <Animated.Text style={[getLabelStyle(), labelStyle, animatedLabelStyle]}>
+        <Text style={[getLabelStyle(), labelStyle, animatedLabelStyle]}>
           {label}
-        </Animated.Text>
+        </Text>
       )}
       
       <Animated.View

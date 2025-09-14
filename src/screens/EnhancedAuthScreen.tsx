@@ -170,6 +170,16 @@ const EnhancedAuthScreen: React.FC = () => {
                     ? 'Sign in to continue to your dashboard'
                     : 'Sign up to start managing your fleet'}
                 </Text>
+                
+                {isLogin && (
+                  <View style={styles.credentialsHint}>
+                    <Text style={styles.credentialsText}>
+                      Demo Credentials:{'\n'}
+                      Email: admin@truckdata.com{'\n'}
+                      Password: admin123
+                    </Text>
+                  </View>
+                )}
 
                 <View style={styles.inputContainer}>
                   {!isLogin && (
@@ -375,6 +385,21 @@ const styles = StyleSheet.create({
     fontWeight: '500' as const,
     textAlign: 'center',
     flex: 1,
+  },
+  credentialsHint: {
+    backgroundColor: COLORS.infoLight,
+    padding: SIZES.spacingMd,
+    borderRadius: SIZES.radiusMd,
+    marginBottom: SIZES.spacingLg,
+    borderWidth: 1,
+    borderColor: COLORS.info,
+  },
+  credentialsText: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textPrimary,
+    textAlign: 'center',
+    fontWeight: '500' as const,
+    lineHeight: 20,
   },
 });
 

@@ -17,11 +17,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { tripService, truckService, driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/CustomInput';
-import EnhancedCustomButton from '../components/CustomButton';
+import CustomInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
 import { Truck, Driver, TripFormData, AddTripScreenNavigationProp, FastTagEventFormData, McdEventFormData, GreenTaxEventFormData, TripWithRelations } from '../types';
 
-interface EnhancedAddTripScreenProps {
+interface AddTripScreenProps {
   route?: {
     params?: {
       trip?: TripWithRelations;
@@ -29,7 +29,7 @@ interface EnhancedAddTripScreenProps {
   };
 }
 
-const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) => {
+const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
   const navigation = useNavigation<AddTripScreenNavigationProp>();
   const tripToEdit = route?.params?.trip;
   const isEditMode = !!tripToEdit;
@@ -274,7 +274,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
       </View>
 
       {costs.map((cost, index) => (
-        <EnhancedCustomInput
+        <CustomInput
           key={index}
           label={`${title} ${index + 1}`}
           value={cost.toString()}
@@ -289,7 +289,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
         />
       ))}
 
-      <EnhancedCustomButton
+      <CustomButton
         title={`Add ${title}`}
         onPress={() => onUpdate([...costs, 0])}
         variant="outline"
@@ -330,7 +330,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             </TouchableOpacity>
           </View>
 
-          <EnhancedCustomInput
+          <CustomInput
             label="State"
             value={cost.state}
             onChangeText={(text) => {
@@ -342,7 +342,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             placeholder="Enter state"
           />
 
-          <EnhancedCustomInput
+          <CustomInput
             label="Checkpoint (Optional)"
             value={cost.checkpoint || ''}
             onChangeText={(text) => {
@@ -354,7 +354,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             placeholder="Enter checkpoint"
           />
 
-          <EnhancedCustomInput
+          <CustomInput
             label="Part/Defect"
             value={cost.part_or_defect}
             onChangeText={(text) => {
@@ -366,7 +366,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             placeholder="Enter part or defect description"
           />
 
-          <EnhancedCustomInput
+          <CustomInput
             label="Amount"
             value={cost.amount.toString()}
             onChangeText={(text) => {
@@ -379,7 +379,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             placeholder="Enter amount"
           />
 
-          <EnhancedCustomInput
+          <CustomInput
             label="Notes (Optional)"
             value={cost.notes || ''}
             onChangeText={(text) => {
@@ -394,7 +394,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
         </View>
       ))}
 
-      <EnhancedCustomButton
+      <CustomButton
         title={`Add ${title}`}
         onPress={() => onUpdate([...costs, { state: '', checkpoint: '', part_or_defect: '', amount: 0, notes: '' }])}
         variant="outline"
@@ -435,7 +435,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             </TouchableOpacity>
           </View>
 
-          <EnhancedCustomInput
+          <CustomInput
             label="State"
             value={cost.state}
             onChangeText={(text) => {
@@ -447,7 +447,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             placeholder="Enter state"
           />
 
-          <EnhancedCustomInput
+          <CustomInput
             label="Checkpoint (Optional)"
             value={cost.checkpoint || ''}
             onChangeText={(text) => {
@@ -459,7 +459,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             placeholder="Enter checkpoint"
           />
 
-          <EnhancedCustomInput
+          <CustomInput
             label="Amount"
             value={cost.amount.toString()}
             onChangeText={(text) => {
@@ -472,7 +472,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             placeholder="Enter amount"
           />
 
-          <EnhancedCustomInput
+          <CustomInput
             label="Notes (Optional)"
             value={cost.notes || ''}
             onChangeText={(text) => {
@@ -487,7 +487,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
         </View>
       ))}
 
-      <EnhancedCustomButton
+      <CustomButton
         title={`Add ${title}`}
         onPress={() => onUpdate([...costs, { state: '', checkpoint: '', amount: 0, notes: '' }])}
         variant="outline"
@@ -549,7 +549,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Basic Information</Text>
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Source"
                 value={formData.source}
                 onChangeText={(text) => setFormData(prev => ({ ...prev, source: text }))}
@@ -558,7 +558,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                 placeholder="Enter source location"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Destination"
                 value={formData.destination}
                 onChangeText={(text) => setFormData(prev => ({ ...prev, destination: text }))}
@@ -687,7 +687,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     </TouchableOpacity>
                   </View>
 
-                  <EnhancedCustomInput
+                  <CustomInput
                     label="State"
                     value={purchase.state}
                     onChangeText={(text) => updateDieselPurchase(index, 'state', text)}
@@ -696,7 +696,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     error={errors[`diesel_state_${index}`]}
                   />
 
-                  <EnhancedCustomInput
+                  <CustomInput
                     label="City"
                     value={purchase.city}
                     onChangeText={(text) => updateDieselPurchase(index, 'city', text)}
@@ -705,7 +705,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     error={errors[`diesel_city_${index}`]}
                   />
 
-                  <EnhancedCustomInput
+                  <CustomInput
                     label="Quantity (L)"
                     value={purchase.diesel_quantity > 0 ? purchase.diesel_quantity.toString() : ''}
                     onChangeText={(text) => {
@@ -718,7 +718,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     error={errors[`diesel_quantity_${index}`]}
                   />
 
-                  <EnhancedCustomInput
+                  <CustomInput
                     label="Price/Liter (₹)"
                     value={purchase.diesel_price_per_liter > 0 ? purchase.diesel_price_per_liter.toString() : ''}
                     onChangeText={(text) => {
@@ -784,7 +784,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                 </View>
               ))}
 
-              <EnhancedCustomButton
+              <CustomButton
                 title="Add Purchase"
                 onPress={addDieselPurchase}
                 variant="outline"
@@ -861,7 +861,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             />
 
             {/* Submit Button */}
-            <EnhancedCustomButton
+            <CustomButton
               title={isEditMode ? "Edit Trip" : "Create Trip"}
               onPress={handleSubmit}
               loading={loading}
@@ -1264,4 +1264,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedAddTripScreen;
+export default AddTripScreen;

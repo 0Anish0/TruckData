@@ -11,52 +11,52 @@ import {
   RootStackParamList
 } from '../types/navigation';
 
-// Enhanced Screens
-import EnhancedAuthScreen from '../screens/AuthScreen';
-import EnhancedDashboardScreen from '../screens/DashboardScreen';
-import EnhancedTripsScreen from '../screens/TripsScreen';
-import EnhancedTrucksScreen from '../screens/TrucksScreen';
-import EnhancedDriversScreen from '../screens/DriversScreen';
-import EnhancedAddTripScreen from '../screens/AddTripScreen';
-import EnhancedAddTruckScreen from '../screens/AddTruckScreen';
-import EnhancedAddDriverScreen from '../screens/AddDriverScreen';
-import EnhancedTruckTripsScreen from '../screens/TruckTripsScreen';
+// Screens
+import AuthScreen from '../screens/AuthScreen';
+import DashboardScreen from '../screens/DashboardScreen';
+import TripsScreen from '../screens/TripsScreen';
+import TrucksScreen from '../screens/TrucksScreen';
+import DriversScreen from '../screens/DriversScreen';
+import AddTripScreen from '../screens/AddTripScreen';
+import AddTruckScreen from '../screens/AddTruckScreen';
+import AddDriverScreen from '../screens/AddDriverScreen';
+import TruckTripsScreen from '../screens/TruckTripsScreen';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createStackNavigator();
 
 const DashboardStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="DashboardMain" component={EnhancedDashboardScreen} />
-    <Stack.Screen name="AddTrip" component={EnhancedAddTripScreen} />
-    <Stack.Screen name="AddTruck" component={EnhancedAddTruckScreen} />
-    <Stack.Screen name="TruckTrips" component={EnhancedTruckTripsScreen as React.ComponentType} />
-    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
-    <Stack.Screen name="EditTruck" component={EnhancedAddTruckScreen} />
+    <Stack.Screen name="DashboardMain" component={DashboardScreen} />
+    <Stack.Screen name="AddTrip" component={AddTripScreen} />
+    <Stack.Screen name="AddTruck" component={AddTruckScreen} />
+    <Stack.Screen name="TruckTrips" component={TruckTripsScreen as React.ComponentType} />
+    <Stack.Screen name="EditTrip" component={AddTripScreen} />
+    <Stack.Screen name="EditTruck" component={AddTruckScreen} />
   </Stack.Navigator>
 );
 
 const TripsStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="TripsMain" component={EnhancedTripsScreen} />
-    <Stack.Screen name="AddTrip" component={EnhancedAddTripScreen} />
-    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
+    <Stack.Screen name="TripsMain" component={TripsScreen} />
+    <Stack.Screen name="AddTrip" component={AddTripScreen} />
+    <Stack.Screen name="EditTrip" component={AddTripScreen} />
   </Stack.Navigator>
 );
 
 const TrucksStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="TrucksMain" component={EnhancedTrucksScreen} />
-    <Stack.Screen name="AddTruck" component={EnhancedAddTruckScreen} />
-    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
-    <Stack.Screen name="EditTruck" component={EnhancedAddTruckScreen} />
+    <Stack.Screen name="TrucksMain" component={TrucksScreen} />
+    <Stack.Screen name="AddTruck" component={AddTruckScreen} />
+    <Stack.Screen name="EditTrip" component={AddTripScreen} />
+    <Stack.Screen name="EditTruck" component={AddTruckScreen} />
   </Stack.Navigator>
 );
 
 const DriversStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="DriversMain" component={EnhancedDriversScreen} />
-    <Stack.Screen name="AddDriver" component={EnhancedAddDriverScreen} />
+    <Stack.Screen name="DriversMain" component={DriversScreen} />
+    <Stack.Screen name="AddDriver" component={AddDriverScreen} />
   </Stack.Navigator>
 );
 
@@ -76,7 +76,7 @@ const AppNavigator = () => {
     return (
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Auth" component={EnhancedAuthScreen} />
+          <Stack.Screen name="Auth" component={AuthScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     );

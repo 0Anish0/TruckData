@@ -12,9 +12,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import { EnhancedCustomButtonProps } from '../types';
+import { CustomButtonProps } from '../types';
 
-const EnhancedCustomButton: React.FC<EnhancedCustomButtonProps> = ({
+const CustomButton: React.FC<CustomButtonProps> = ({
   title,
   onPress,
   variant = 'primary',
@@ -285,4 +285,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedCustomButton;
+export default CustomButton;

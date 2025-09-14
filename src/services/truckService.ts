@@ -8,7 +8,7 @@ export class TruckService extends SupabaseService {
       const { data, error } = await supabase
         .from('trucks')
         .select('*')
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -27,7 +27,7 @@ export class TruckService extends SupabaseService {
         .from('trucks')
         .select('*')
         .eq('id', id)
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .single();
 
       if (error) {
@@ -49,7 +49,7 @@ export class TruckService extends SupabaseService {
         .from('trucks')
         .insert({
           ...truckData,
-          user_id: this.getUserId(),
+          user_id: await this.getUserId(),
         })
         .select()
         .single();
@@ -73,7 +73,7 @@ export class TruckService extends SupabaseService {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .select()
         .single();
 
@@ -93,7 +93,7 @@ export class TruckService extends SupabaseService {
         .from('trucks')
         .delete()
         .eq('id', id)
-        .eq('user_id', this.getUserId());
+        .eq('user_id', await this.getUserId());
 
       if (error) {
         throw error;
@@ -110,7 +110,7 @@ export class TruckService extends SupabaseService {
         .from('trips')
         .select('total_cost')
         .eq('truck_id', truckId)
-        .eq('user_id', this.getUserId());
+        .eq('user_id', await this.getUserId());
 
       if (tripsError) {
         throw tripsError;

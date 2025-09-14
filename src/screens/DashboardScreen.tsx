@@ -16,17 +16,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { tripService, truckService, driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTripCard from '../components/TripCard';
-import EnhancedCustomButton from '../components/CustomButton';
+import TripCard from '../components/TripCard';
+import CustomButton from '../components/CustomButton';
 import { Trip, Truck, Driver, DashboardStats, DashboardScreenNavigationProp, TripWithRelations } from '../types';
 
 const { width } = Dimensions.get('window');
 
-interface EnhancedDashboardScreenProps {
+interface DashboardScreenProps {
   navigation: DashboardScreenNavigationProp;
 }
 
-const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navigation }) => {
+const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const { user, signOut } = useAuth();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [trucks, setTrucks] = useState<Truck[]>([]);
@@ -253,7 +253,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         <View style={styles.quickActionsContainer}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.quickActions}>
-            <EnhancedCustomButton
+            <CustomButton
               title="Add Trip"
               onPress={() => navigation.navigate('AddTrip', {})}
               icon="add-circle"
@@ -261,7 +261,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
               size="medium"
               style={styles.quickActionButton}
             />
-            <EnhancedCustomButton
+            <CustomButton
               title="Add Truck"
               onPress={() => navigation.navigate('AddTruck', {})}
               icon="car-sport"
@@ -276,7 +276,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         <View style={styles.recentTripsContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Trips</Text>
-            <EnhancedCustomButton
+            <CustomButton
               title="View All"
               onPress={() => navigation.navigate('Trips')}
               variant="ghost"
@@ -287,7 +287,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
           </View>
 
           {trips.slice(0, 3).map((trip, index) => (
-            <EnhancedTripCard
+            <TripCard
               key={trip.id}
               trip={trip}
               truckName={getTruckName(trip.truck_id)}
@@ -465,4 +465,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedDashboardScreen;
+export default DashboardScreen;

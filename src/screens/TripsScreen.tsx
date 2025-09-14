@@ -14,16 +14,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { tripService, truckService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTripCard from '../components/TripCard';
-import EnhancedCustomButton from '../components/CustomButton';
+import TripCard from '../components/TripCard';
+import CustomButton from '../components/CustomButton';
 import { Trip, Truck, TripsScreenNavigationProp, TripWithRelations } from '../types';
 const { width } = Dimensions.get('window');
 
-interface EnhancedTripsScreenProps {
+interface TripsScreenProps {
   navigation: TripsScreenNavigationProp;
 }
 
-const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation }) => {
+const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [loading, setLoading] = useState(true);
@@ -152,7 +152,7 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
   );
 
   const renderTripItem = ({ item, index }: { item: Trip; index: number }) => (
-    <EnhancedTripCard
+    <TripCard
       trip={item}
       truckName={getTruckName(item.truck_id)}
       onPress={() => { }}
@@ -273,7 +273,7 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
 
             {/* Add Trip Button */}
             <View style={styles.addButtonContainer}>
-              <EnhancedCustomButton
+              <CustomButton
                 title="Add New Trip"
                 onPress={() => navigation.navigate('AddTrip')}
                 icon="add-circle"
@@ -293,7 +293,7 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
                 ? 'Start by adding your first trip'
                 : `No trips found for ${getTruckName(selectedTruckId)}`}
             </Text>
-            <EnhancedCustomButton
+            <CustomButton
               title="Add Trip"
               onPress={() => navigation.navigate('AddTrip')}
               icon="add-circle"
@@ -477,4 +477,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedTripsScreen;
+export default TripsScreen;

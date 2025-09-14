@@ -389,7 +389,7 @@ export interface LabelStyle extends TextStyle {
 }
 
 // Component Prop Interfaces
-export interface EnhancedCustomInputProps extends TextInputProps {
+export interface CustomInputProps extends TextInputProps {
   label?: string;
   error?: string;
   leftIcon?: keyof typeof Ionicons.glyphMap;
@@ -403,7 +403,7 @@ export interface EnhancedCustomInputProps extends TextInputProps {
   size?: 'small' | 'medium' | 'large';
 }
 
-export interface EnhancedTripCardProps {
+export interface TripCardProps {
   trip: Trip | TripWithRelations;
   truckName: string;
   onPress: () => void;
@@ -412,7 +412,7 @@ export interface EnhancedTripCardProps {
   index?: number;
 }
 
-export interface EnhancedTruckCardProps {
+export interface TruckCardProps {
   truck: Truck;
   onPress: () => void;
   onEdit?: () => void;
@@ -422,7 +422,7 @@ export interface EnhancedTruckCardProps {
   totalCost?: number;
 }
 
-export interface EnhancedCustomButtonProps {
+export interface CustomButtonProps {
   title: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success';
@@ -437,7 +437,7 @@ export interface EnhancedCustomButtonProps {
 }
 
 // Screen Prop Interfaces
-export interface EnhancedTruckTripsScreenProps {
+export interface TruckTripsScreenProps {
   route: {
     params: {
       truck: Truck;
@@ -446,7 +446,7 @@ export interface EnhancedTruckTripsScreenProps {
   navigation: NavigationProp<RootStackParamList>;
 }
 
-export interface EnhancedEditTruckScreenProps {
+export interface EditTruckScreenProps {
   route: {
     params: {
       truck: Truck;
@@ -455,7 +455,7 @@ export interface EnhancedEditTruckScreenProps {
   navigation: NavigationProp<RootStackParamList>;
 }
 
-export interface EnhancedEditTripScreenProps {
+export interface EditTripScreenProps {
   route: {
     params: {
       trip: Trip;
@@ -488,6 +488,8 @@ export interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => Promise<void>;
+  clearSession: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 export interface AuthProviderProps {

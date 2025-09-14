@@ -3,15 +3,6 @@ import {
   Trip, 
   TripWithRelations, 
   TripFormData, 
-  DieselPurchase,
-  FastTagEvent,
-  McdEvent,
-  GreenTaxEvent,
-  RtoEvent,
-  DtoEvent,
-  MunicipalitiesEvent,
-  BorderEvent,
-  RepairItem,
   DashboardStats
 } from '../types';
 import { SupabaseService } from './supabaseService';
@@ -34,7 +25,7 @@ export class TripService extends SupabaseService {
             name
           )
         `)
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -65,7 +56,7 @@ export class TripService extends SupabaseService {
           )
         `)
         .eq('id', id)
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .single();
 
       if (error) {
@@ -99,7 +90,7 @@ export class TripService extends SupabaseService {
           )
         `)
         .eq('truck_id', truckId)
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -129,7 +120,7 @@ export class TripService extends SupabaseService {
           end_date: tripData.end_date,
           trip_date: tripData.start_date, // Use start_date as trip_date
           ...calculatedCosts,
-          user_id: this.getUserId(),
+          user_id: await this.getUserId(),
         })
         .select()
         .single();
@@ -176,7 +167,7 @@ export class TripService extends SupabaseService {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .select()
         .single();
 
@@ -199,7 +190,7 @@ export class TripService extends SupabaseService {
         .from('trips')
         .delete()
         .eq('id', id)
-        .eq('user_id', this.getUserId());
+        .eq('user_id', await this.getUserId());
 
       if (error) {
         throw error;
@@ -214,7 +205,7 @@ export class TripService extends SupabaseService {
       const { data: trips, error } = await supabase
         .from('trips')
         .select('total_cost')
-        .eq('user_id', this.getUserId());
+        .eq('user_id', await this.getUserId());
 
       if (error) {
         throw error;
@@ -223,7 +214,7 @@ export class TripService extends SupabaseService {
       const { data: dieselData, error: dieselError } = await supabase
         .from('diesel_purchases')
         .select('diesel_quantity')
-        .eq('user_id', this.getUserId());
+        .eq('user_id', await this.getUserId());
 
       if (dieselError) {
         console.error('Error fetching diesel data:', dieselError);
@@ -251,7 +242,7 @@ export class TripService extends SupabaseService {
         .from('trips')
         .select('total_cost')
         .eq('truck_id', truckId)
-        .eq('user_id', this.getUserId());
+        .eq('user_id', await this.getUserId());
 
       if (error) {
         throw error;

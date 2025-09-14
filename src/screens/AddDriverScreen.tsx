@@ -16,12 +16,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/CustomInput';
-import EnhancedCustomButton from '../components/CustomButton';
+import CustomInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
 import { driverService } from '../services';
 import { AddDriverScreenNavigationProp, Driver } from '../types';
 
-interface EnhancedAddDriverScreenProps {
+interface AddDriverScreenProps {
   route?: {
     params?: {
       driver?: Driver;
@@ -30,7 +30,7 @@ interface EnhancedAddDriverScreenProps {
   navigation: AddDriverScreenNavigationProp;
 }
 
-const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route, navigation }) => {
+const AddDriverScreen: React.FC<AddDriverScreenProps> = ({ route, navigation }) => {
   const driverToEdit = route?.params?.driver;
   const isEditMode = !!driverToEdit;
   const [formData, setFormData] = useState(() => {
@@ -279,7 +279,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Driver Information</Text>
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Full Name"
                 value={formData.name}
                 onChangeText={(value) => handleInputChange('name', value)}
@@ -287,7 +287,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
                 leftIcon="person"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="License Number"
                 value={formData.licenseNumber}
                 onChangeText={(value) => handleInputChange('licenseNumber', value)}
@@ -295,7 +295,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
                 leftIcon="card"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Phone Number"
                 value={formData.phone}
                 onChangeText={(value) => handleInputChange('phone', value)}
@@ -304,7 +304,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
                 keyboardType="phone-pad"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Age"
                 value={formData.age}
                 onChangeText={(value) => handleInputChange('age', value)}
@@ -346,7 +346,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
 
             {/* Submit Button */}
             <View style={styles.submitContainer}>
-              <EnhancedCustomButton
+              <CustomButton
                 title={isEditMode ? "Edit Driver" : "Add Driver"}
                 onPress={handleSubmit}
                 icon="person-add"
@@ -513,4 +513,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedAddDriverScreen;
+export default AddDriverScreen;

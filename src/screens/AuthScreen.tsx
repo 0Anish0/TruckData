@@ -15,12 +15,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/CustomInput';
-import EnhancedCustomButton from '../components/CustomButton';
+import CustomInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
 
 const { width } = Dimensions.get('window');
 
-const EnhancedAuthScreen: React.FC = () => {
+const AuthScreen: React.FC = () => {
   const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -107,18 +107,32 @@ const EnhancedAuthScreen: React.FC = () => {
     if (!validateForm()) return;
 
     setLoading(true);
+    setErrors({}); // Clear previous errors
+
     try {
       if (isLogin) {
         await signIn(email, password);
+        // If sign in is successful, the auth state change will handle navigation
       } else {
         await signUp(email, password, name);
+        // After signup, clear the form and show success message
+        setEmail('');
+        setPassword('');
+        setName('');
+        // Don't switch to login mode automatically - let user choose
       }
     } catch (error: unknown) {
-      Alert.alert(
-        'Error',
-        (error as Error).message || 'An error occurred. Please try again.',
-        [{ text: 'OK' }]
-      );
+      console.error('Auth error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred. Please try again.';
+
+      // Set specific field errors if possible
+      if (errorMessage.includes('email')) {
+        setErrors({ email: errorMessage });
+      } else if (errorMessage.includes('password')) {
+        setErrors({ password: errorMessage });
+      } else {
+        setErrors({ general: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -223,10 +237,18 @@ const EnhancedAuthScreen: React.FC = () => {
                   </View>
                 )}
 
+                {errors.general && (
+                  <View style={styles.generalErrorContainer}>
+                    <Ionicons name="alert-circle" size={16} color={COLORS.error} />
+                    <Text style={styles.generalErrorText}>
+                      {errors.general}
+                    </Text>
+                  </View>
+                )}
 
                 <View style={styles.inputContainer}>
                   {!isLogin && (
-                    <EnhancedCustomInput
+                    <CustomInput
                       label="Full Name"
                       value={name}
                       onChangeText={setName}
@@ -238,7 +260,7 @@ const EnhancedAuthScreen: React.FC = () => {
                     />
                   )}
 
-                  <EnhancedCustomInput
+                  <CustomInput
                     label="Email"
                     value={email}
                     onChangeText={setEmail}
@@ -250,7 +272,7 @@ const EnhancedAuthScreen: React.FC = () => {
                     textContentType="emailAddress"
                   />
 
-                  <EnhancedCustomInput
+                  <CustomInput
                     label="Password"
                     value={password}
                     onChangeText={setPassword}
@@ -261,7 +283,7 @@ const EnhancedAuthScreen: React.FC = () => {
                     textContentType={isLogin ? 'password' : 'newPassword'}
                   />
 
-                  <EnhancedCustomButton
+                  <CustomButton
                     title={isLogin ? 'Sign In' : 'Create Account'}
                     onPress={handleSubmit}
                     loading={loading}
@@ -278,7 +300,7 @@ const EnhancedAuthScreen: React.FC = () => {
                     <View style={styles.dividerLine} />
                   </View>
 
-                  <EnhancedCustomButton
+                  <CustomButton
                     title={isLogin ? 'Create Account' : 'Already have an account?'}
                     onPress={toggleMode}
                     variant="ghost"
@@ -430,6 +452,24 @@ const styles = StyleSheet.create({
     marginLeft: SIZES.spacingXs,
     textAlign: 'center',
   },
+  generalErrorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FEF2F2',
+    padding: SIZES.spacingSm,
+    borderRadius: SIZES.radiusMd,
+    marginBottom: SIZES.spacingLg,
+    borderWidth: 1,
+    borderColor: COLORS.error,
+  },
+  generalErrorText: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.error,
+    marginLeft: SIZES.spacingXs,
+    textAlign: 'center',
+    fontWeight: '500' as const,
+  },
   inputContainer: {
     gap: SIZES.spacingXs,
   },
@@ -477,4 +517,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedAuthScreen;
+export default AuthScreen;

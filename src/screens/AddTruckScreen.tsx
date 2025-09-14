@@ -13,12 +13,12 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/CustomInput';
-import EnhancedCustomButton from '../components/CustomButton';
+import CustomInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
 import { truckService } from '../services';
 import { AddTruckScreenNavigationProp, Truck } from '../types';
 
-interface EnhancedAddTruckScreenProps {
+interface AddTruckScreenProps {
   route?: {
     params?: {
       truck?: Truck;
@@ -27,7 +27,7 @@ interface EnhancedAddTruckScreenProps {
   navigation: AddTruckScreenNavigationProp;
 }
 
-const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, navigation }) => {
+const AddTruckScreen: React.FC<AddTruckScreenProps> = ({ route, navigation }) => {
   const truckToEdit = route?.params?.truck;
   const isEditMode = !!truckToEdit;
   const [formData, setFormData] = useState(() => {
@@ -205,7 +205,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Basic Information</Text>
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Truck Name"
                 value={formData.name}
                 onChangeText={(value) => handleInputChange('name', value)}
@@ -213,7 +213,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
                 leftIcon="car-sport"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Registration Number"
                 value={formData.truckNumber}
                 onChangeText={(value) => handleInputChange('truckNumber', value)}
@@ -221,7 +221,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
                 leftIcon="card"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Model"
                 value={formData.model}
                 onChangeText={(value) => handleInputChange('model', value)}
@@ -229,7 +229,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
                 leftIcon="construct"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Manufacturing Year"
                 value={formData.year}
                 onChangeText={(value) => handleInputChange('year', value)}
@@ -243,7 +243,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Specifications</Text>
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Capacity"
                 value={formData.capacity}
                 onChangeText={(value) => handleInputChange('capacity', value)}
@@ -251,7 +251,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
                 leftIcon="cube"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Fuel Type"
                 value={formData.fuelType}
                 onChangeText={(value) => handleInputChange('fuelType', value)}
@@ -259,7 +259,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
                 leftIcon="flash"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Color"
                 value={formData.color}
                 onChangeText={(value) => handleInputChange('color', value)}
@@ -270,7 +270,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
 
             {/* Submit Button */}
             <View style={styles.submitContainer}>
-              <EnhancedCustomButton
+              <CustomButton
                 title={isEditMode ? "Edit Truck" : "Add Truck"}
                 onPress={handleSubmit}
                 icon="car-sport"
@@ -374,4 +374,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedAddTruckScreen;
+export default AddTruckScreen;

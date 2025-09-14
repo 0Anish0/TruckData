@@ -8,7 +8,7 @@ export class DriverService extends SupabaseService {
       const { data, error } = await supabase
         .from('drivers')
         .select('*')
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -27,7 +27,7 @@ export class DriverService extends SupabaseService {
         .from('drivers')
         .select('*')
         .eq('id', id)
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .single();
 
       if (error) {
@@ -61,7 +61,7 @@ export class DriverService extends SupabaseService {
         .insert({
           ...driverData,
           license_image_url: licenseImageBase64,
-          user_id: this.getUserId(),
+          user_id: await this.getUserId(),
         })
         .select()
         .single();
@@ -97,7 +97,7 @@ export class DriverService extends SupabaseService {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('user_id', this.getUserId())
+        .eq('user_id', await this.getUserId())
         .select()
         .single();
 
@@ -117,7 +117,7 @@ export class DriverService extends SupabaseService {
         .from('drivers')
         .delete()
         .eq('id', id)
-        .eq('user_id', this.getUserId());
+        .eq('user_id', await this.getUserId());
 
       if (error) {
         throw error;
@@ -134,7 +134,7 @@ export class DriverService extends SupabaseService {
         .from('trips')
         .select('total_cost')
         .eq('driver_id', driverId)
-        .eq('user_id', this.getUserId());
+        .eq('user_id', await this.getUserId());
 
       if (tripsError) {
         throw tripsError;

@@ -12,14 +12,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomButton from '../components/CustomButton';
+import CustomButton from '../components/CustomButton';
 import { Driver, DriversScreenNavigationProp } from '../types';
 
-interface EnhancedDriversScreenProps {
+interface DriversScreenProps {
   navigation: DriversScreenNavigationProp;
 }
 
-const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigation }) => {
+const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -305,7 +305,7 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
 
             {/* Add Driver Button */}
             <View style={styles.addButtonContainer}>
-              <EnhancedCustomButton
+              <CustomButton
                 title="Add New Driver"
                 onPress={() => navigation.navigate('AddDriver')}
                 icon="person-add"
@@ -323,7 +323,7 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
             <Text style={styles.emptySubtitle}>
               Start by adding your first driver to the team
             </Text>
-            <EnhancedCustomButton
+            <CustomButton
               title="Add Driver"
               onPress={() => navigation.navigate('AddDriver')}
               icon="person-add"
@@ -599,4 +599,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedDriversScreen;
+export default DriversScreen;

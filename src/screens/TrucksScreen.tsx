@@ -13,16 +13,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { truckService, tripService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTruckCard from '../components/TruckCard';
-import EnhancedCustomButton from '../components/CustomButton';
+import TruckCard from '../components/TruckCard';
+import CustomButton from '../components/CustomButton';
 import { Truck, Trip, TrucksScreenNavigationProp } from '../types';
 const { width } = Dimensions.get('window');
 
-interface EnhancedTrucksScreenProps {
+interface TrucksScreenProps {
   navigation: TrucksScreenNavigationProp;
 }
 
-const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation }) => {
+const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,7 +156,7 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
   );
 
   const renderTruckItem = ({ item, index }: { item: Truck & { totalTrips: number; totalCost: number }; index: number }) => (
-    <EnhancedTruckCard
+    <TruckCard
       truck={item}
       onPress={() => { }}
       onEdit={() => navigation.navigate('AddTruck', { truck: item })}
@@ -240,7 +240,7 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
 
             {/* Add Truck Button */}
             <View style={styles.addButtonContainer}>
-              <EnhancedCustomButton
+              <CustomButton
                 title="Add New Truck"
                 onPress={() => navigation.navigate('AddTruck')}
                 icon="add-circle"
@@ -258,7 +258,7 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
             <Text style={styles.emptySubtitle}>
               Start by adding your first truck to the fleet
             </Text>
-            <EnhancedCustomButton
+            <CustomButton
               title="Add Truck"
               onPress={() => navigation.navigate('AddTruck')}
               icon="add-circle"
@@ -430,4 +430,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedTrucksScreen;
+export default TrucksScreen;

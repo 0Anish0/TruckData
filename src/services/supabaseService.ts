@@ -2,39 +2,93 @@ import { supabase } from '../config/supabase';
 import { AuthUser } from '../types';
 
 export class SupabaseService {
-  protected user: AuthUser | null = null;
-
-  constructor() {
-    // Get current user from auth context
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        this.user = {
-          id: session.user.id,
-          email: session.user.email || '',
-          name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-          user_metadata: {
-            full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name,
-          },
-        };
+  /**
+   * Get the current authenticated user from Supabase session
+   * Throws error if user is not authenticated or email not verified
+   */
+  protected async getCurrentUser(): Promise<AuthUser> {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Error getting session:', error);
+        throw new Error('Failed to get current session');
       }
-    });
-  }
-
-  protected setUser(user: AuthUser | null) {
-    this.user = user;
-  }
-
-  protected getUserId(): string {
-    if (!this.user?.id) {
-      throw new Error('User not authenticated');
+      
+      if (!session) {
+        throw new Error('No active session found');
+      }
+      
+      if (!session.user) {
+        throw new Error('No user found in session');
+      }
+      
+      if (!session.user.email_confirmed_at) {
+        throw new Error('Email not verified. Please check your email and verify your account.');
+      }
+      
+      console.log('Service authenticated user:', {
+        userId: session.user.id,
+        email: session.user.email,
+        emailConfirmed: !!session.user.email_confirmed_at
+      });
+      
+      return {
+        id: session.user.id,
+        email: session.user.email || '',
+        name: session.user.user_metadata?.full_name || 
+              session.user.user_metadata?.name || 
+              session.user.email?.split('@')[0] || 
+              'User',
+        user_metadata: {
+          full_name: session.user.user_metadata?.full_name || 
+                     session.user.user_metadata?.name,
+        },
+      };
+    } catch (error) {
+      console.error('getCurrentUser error:', error);
+      throw error;
     }
-    return this.user.id;
   }
 
+  /**
+   * Get the current user ID
+   * Throws error if user is not authenticated
+   */
+  protected async getUserId(): Promise<string> {
+    const user = await this.getCurrentUser();
+    return user.id;
+  }
+
+  /**
+   * Handle errors consistently across all services
+   */
   protected async handleError(error: unknown, operation: string): Promise<never> {
     console.error(`${operation} error:`, error);
-    const message = error instanceof Error ? error.message : `${operation} failed`;
-    throw new Error(message);
+    
+    if (error instanceof Error) {
+      // Check if it's an authentication error
+      if (error.message.includes('not authenticated') || 
+          error.message.includes('Email not verified') ||
+          error.message.includes('No active session')) {
+        throw new Error('Authentication required. Please sign in again.');
+      }
+      throw error;
+    }
+    
+    throw new Error(`${operation} failed`);
+  }
+
+  /**
+   * Check if user is authenticated without throwing error
+   */
+  protected async isAuthenticated(): Promise<boolean> {
+    try {
+      await this.getCurrentUser();
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

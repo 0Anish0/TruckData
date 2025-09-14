@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import { ContainerStyle, LabelStyle, EnhancedCustomInputProps } from '../types';
+import { ContainerStyle, LabelStyle, CustomInputProps } from '../types';
 
-const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
+const CustomInput: React.FC<CustomInputProps> = ({
   label,
   error,
   leftIcon,
@@ -292,4 +292,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedCustomInput;
+export default CustomInput;

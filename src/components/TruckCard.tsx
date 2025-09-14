@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import { EnhancedTruckCardProps } from '../types';
+import { TruckCardProps } from '../types';
 
-const EnhancedTruckCard: React.FC<EnhancedTruckCardProps> = ({
+const TruckCard: React.FC<TruckCardProps> = ({
   truck,
   onPress,
   onEdit,
@@ -357,4 +357,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedTruckCard;
+export default TruckCard;

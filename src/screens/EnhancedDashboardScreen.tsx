@@ -12,11 +12,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/MockAuthContext';
-import { mockTripService, mockTruckService } from '../services/mockService';
+import { mockTripService, mockTruckService, mockDriverService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTripCard from '../components/EnhancedTripCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Trip, Truck, DashboardStats, DashboardScreenNavigationProp, TripWithRelations } from '../types';
+import { Trip, Truck, Driver, DashboardStats, DashboardScreenNavigationProp, TripWithRelations } from '../types';
 
 const { width } = Dimensions.get('window');
 
@@ -28,6 +28,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
   const { user } = useAuth();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [trucks, setTrucks] = useState<Truck[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalTrips: 0,
     totalCost: 0,
@@ -64,14 +65,16 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
     try {
       setLoading(true);
       
-      const [tripsData, trucksData, statsData] = await Promise.all([
+      const [tripsData, trucksData, driversData, statsData] = await Promise.all([
         mockTripService.getTrips(),
         mockTruckService.getTrucks(),
+        mockDriverService.getDrivers(),
         mockTripService.getTripStats(),
       ]);
 
       setTrips(tripsData);
       setTrucks(trucksData);
+      setDrivers(driversData);
       setStats(statsData);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -131,13 +134,11 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         style={styles.statCardGradient}
       >
         <View style={styles.statCardContent}>
-          <View style={styles.statIconContainer}>
-            <Ionicons name={icon} size={24} color={COLORS.textInverse} />
+          <View style={styles.statIcon}>
+            <Ionicons name={icon} size={20} color={COLORS.textInverse} />
           </View>
-          <View style={styles.statTextContainer}>
-            <Text style={styles.statValue}>{value}</Text>
-            <Text style={styles.statTitle}>{title}</Text>
-          </View>
+          <Text style={styles.statValue}>{value}</Text>
+          <Text style={styles.statTitle}>{title}</Text>
         </View>
       </LinearGradient>
     </Animated.View>
@@ -190,33 +191,26 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
           <StatCard
-            title="Total Trips"
+            title="Total Trip"
             value={stats.totalTrips.toString()}
             icon="trending-up"
             color={COLORS.info}
             gradient={COLORS.infoGradient}
           />
           <StatCard
-            title="Total Cost"
-            value={formatCurrency(stats.totalCost)}
-            icon="wallet"
-            color={COLORS.success}
-            gradient={COLORS.successGradient}
+            title="Total Truck"
+            value={trucks.length.toString()}
+            icon="car-sport"
+            color={COLORS.secondary}
+            gradient={COLORS.secondaryGradient}
           />
           <StatCard
-            title="Diesel Used"
-            value={`${stats.totalDiesel}L`}
-            icon="car"
-            color={COLORS.fuel}
-            gradient={COLORS.fuelGradient}
-          />
-          <StatCard
-            title="Avg. Cost"
-            value={formatCurrency(stats.avgCost)}
-            icon="analytics"
-            color={COLORS.warning}
-            gradient={COLORS.warningGradient}
-          />
+            title="Total Driver"
+            value={drivers.length.toString()}
+            icon="people"
+            color={COLORS.accent}
+            gradient={COLORS.accentGradient}
+          />          
         </View>
 
         {/* Quick Actions */}
@@ -378,18 +372,16 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
     justifyContent: 'space-between',
     gap: SIZES.spacingMd,
   },
   statCard: {
-    width: (width - SIZES.spacingLg * 2 - SIZES.spacingMd) / 2,
-    marginBottom: SIZES.spacingMd,
+    flex: 1,
+    aspectRatio: 1,
     borderRadius: SIZES.radiusLg,
     ...SIZES.shadowMedium,
-    minHeight: 130,
   },
   statCardGradient: {
     padding: SIZES.spacingLg,
@@ -398,41 +390,30 @@ const styles = StyleSheet.create({
   },
   statCardContent: {
     flexDirection: 'column',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
-  statIconContainer: {
+  statIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: COLORS.glassLight,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: SIZES.spacingMd,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statTextContainer: {
-    flex: 1,
-    width: '100%',
+    marginBottom: SIZES.spacingSm,
   },
   statValue: {
-    fontSize: SIZES.fontSizeXl,
+    fontSize: SIZES.fontSizeLg,
     fontWeight: '800' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
-    lineHeight: SIZES.fontSizeXl * 1.1,
   },
   statTitle: {
-    fontSize: SIZES.fontSizeSm,
+    fontSize: SIZES.fontSizeXs * 0.9,
     color: COLORS.textInverse,
-    opacity: 0.9,
     fontWeight: '600' as const,
-    lineHeight: SIZES.fontSizeSm * 1.2,
+    textAlign: 'center',
   },
   quickActionsContainer: {
     marginBottom: SIZES.spacingXl,

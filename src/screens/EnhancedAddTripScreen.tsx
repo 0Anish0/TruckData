@@ -10,6 +10,8 @@ import {
   Animated,
   TouchableOpacity,
 } from 'react-native';
+// @ts-ignore
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,6 +43,7 @@ const EnhancedAddTripScreen: React.FC = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showDatePicker, setShowDatePicker] = useState<{ [key: string]: boolean }>({});
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -142,6 +145,19 @@ const EnhancedAddTripScreen: React.FC = () => {
         i === index ? { ...purchase, [field]: value } : purchase
       )
     }));
+  };
+
+  const handleDateChange = (event: unknown, selectedDate: Date | undefined, index: number) => {
+    setShowDatePicker(prev => ({ ...prev, [`purchase_${index}`]: false }));
+    if (selectedDate) {
+      updateDieselPurchase(index, 'purchase_date', selectedDate.toISOString().split('T')[0]);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
   };
 
   const CostSection: React.FC<{
@@ -462,6 +478,23 @@ const EnhancedAddTripScreen: React.FC = () => {
                       style={styles.dieselInput}
                     />
                   </View>
+                  
+                  <View style={styles.dieselPurchaseRow}>
+                    <TouchableOpacity
+                      style={styles.datePickerButton}
+                      onPress={() => setShowDatePicker(prev => ({ ...prev, [`purchase_${index}`]: true }))}
+                    >
+                      <View style={styles.datePickerContent}>
+                        <Ionicons name="calendar" size={20} color={COLORS.primary} style={styles.datePickerIcon} />
+                        <View style={styles.datePickerText}>
+                          <Text style={styles.datePickerLabel}>Purchase Date</Text>
+                          <Text style={styles.datePickerValue}>
+                            {purchase.purchase_date ? formatDate(purchase.purchase_date) : 'Select date'}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ))}
             </View>
@@ -550,6 +583,21 @@ const EnhancedAddTripScreen: React.FC = () => {
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
+      
+      {/* Date Picker Modal */}
+      {Object.entries(showDatePicker).map(([key, show]) => {
+        if (!show) return null;
+        const index = parseInt(key.split('_')[1]);
+        return (
+          <DateTimePicker
+            key={key}
+            value={formData.diesel_purchases[index]?.purchase_date ? new Date(formData.diesel_purchases[index].purchase_date) : new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(event, selectedDate) => handleDateChange(event, selectedDate, index)}
+          />
+        );
+      })}
     </View>
   );
 };
@@ -713,6 +761,35 @@ const styles = StyleSheet.create({
   dieselInput: {
     flex: 1,
     marginBottom: SIZES.spacingSm,
+  },
+  datePickerButton: {
+    flex: 1,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: SIZES.radiusMd,
+    padding: SIZES.spacingMd,
+    marginBottom: SIZES.spacingSm,
+  },
+  datePickerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  datePickerIcon: {
+    marginRight: SIZES.spacingSm,
+  },
+  datePickerText: {
+    flex: 1,
+  },
+  datePickerLabel: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textSecondary,
+    marginBottom: SIZES.spacingXs,
+  },
+  datePickerValue: {
+    fontSize: SIZES.fontSizeMd,
+    color: COLORS.textPrimary,
+    fontWeight: '500' as const,
   },
   costSection: {
     backgroundColor: COLORS.surface,

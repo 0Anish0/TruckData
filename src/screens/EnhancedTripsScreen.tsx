@@ -16,7 +16,7 @@ import { mockTripService, mockTruckService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTripCard from '../components/EnhancedTripCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Trip, Truck, TripsScreenNavigationProp } from '../types';
+import { Trip, Truck, TripsScreenNavigationProp, TripWithRelations } from '../types';
 const { width } = Dimensions.get('window');
 
 interface EnhancedTripsScreenProps {
@@ -156,7 +156,7 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
       trip={item}
       truckName={getTruckName(item.truck_id)}
       onPress={() => {}}
-      onEdit={() => {}}
+      onEdit={() => navigation.navigate('AddTrip', { trip: item as TripWithRelations })}
       onDelete={() => {}}
       index={index}
     />

@@ -219,7 +219,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
           <View style={styles.quickActions}>
             <EnhancedCustomButton
               title="Add Trip"
-              onPress={() => navigation.navigate('AddTrip')}
+              onPress={() => navigation.navigate('AddTrip', {})}
               icon="add-circle"
               variant="primary"
               size="medium"
@@ -227,7 +227,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
             />
             <EnhancedCustomButton
               title="Add Truck"
-              onPress={() => navigation.navigate('AddTruck')}
+              onPress={() => navigation.navigate('AddTruck', {})}
               icon="car-sport"
               variant="secondary"
               size="medium"
@@ -256,7 +256,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
               trip={trip}
               truckName={getTruckName(trip.truck_id)}
               onPress={() => navigation.navigate('EditTrip', { trip: trip as TripWithRelations })}
-              onEdit={() => navigation.navigate('EditTrip', { trip: trip as TripWithRelations })}
+              onEdit={() => navigation.navigate('AddTrip', { trip: trip as TripWithRelations })}
               onDelete={() => {
                 // TODO: Implement delete functionality
                 console.log('Delete trip:', trip.id);

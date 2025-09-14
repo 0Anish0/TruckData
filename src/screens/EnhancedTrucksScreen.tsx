@@ -159,7 +159,7 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
     <EnhancedTruckCard
       truck={item}
       onPress={() => {}}
-      onEdit={() => {}}
+      onEdit={() => navigation.navigate('AddTruck', { truck: item })}
       onDelete={() => {}}
       index={index}
       tripCount={item.totalTrips}

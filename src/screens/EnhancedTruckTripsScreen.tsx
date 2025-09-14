@@ -14,9 +14,12 @@ import { mockTripService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTripCard from '../components/EnhancedTripCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Trip, Truck, EnhancedTruckTripsScreenProps } from '../types';
+import { Trip, Truck, EnhancedTruckTripsScreenProps, TripWithRelations } from '../types';
+import { useNavigation } from '@react-navigation/native';
+import { AddTripScreenNavigationProp } from '../types/navigation';
 
 const EnhancedTruckTripsScreen: React.FC<EnhancedTruckTripsScreenProps> = ({ route }) => {
+  const navigation = useNavigation<AddTripScreenNavigationProp>();
   const { truck } = route.params;
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -150,7 +153,7 @@ const EnhancedTruckTripsScreen: React.FC<EnhancedTruckTripsScreenProps> = ({ rou
       trip={item}
       truckName={truck.name}
       onPress={() => {}}
-      onEdit={() => {}}
+      onEdit={() => navigation.navigate('AddTrip', { trip: item as TripWithRelations })}
       onDelete={() => {}}
       index={index}
     />

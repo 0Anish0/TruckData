@@ -1,7 +1,7 @@
 import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { Truck, TripWithRelations } from './index';
+import { Truck, TripWithRelations, Driver } from './index';
 
 // Root tab navigator parameter types
 export type RootStackParamList = {

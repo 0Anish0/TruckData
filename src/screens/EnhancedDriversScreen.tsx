@@ -190,7 +190,11 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
             </View>
           </View>
           <View style={styles.driverActions}>
-            <TouchableOpacity style={[styles.actionButton, styles.editButton]} activeOpacity={0.7}>
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.editButton]} 
+              onPress={() => navigation.navigate('AddDriver', { driver: driver })}
+              activeOpacity={0.7}
+            >
               <Ionicons name="pencil" size={18} color={COLORS.primary} />
             </TouchableOpacity>
             <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} activeOpacity={0.7}>

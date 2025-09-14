@@ -95,6 +95,25 @@ const EnhancedAddTripScreen: React.FC = () => {
       newErrors.driver_id = 'Please select a driver';
     }
 
+    // Validate diesel purchases
+    formData.diesel_purchases.forEach((purchase, index) => {
+      if (!purchase.state.trim()) {
+        newErrors[`diesel_state_${index}`] = 'State is required';
+      }
+      if (!purchase.city.trim()) {
+        newErrors[`diesel_city_${index}`] = 'City is required';
+      }
+      if (purchase.diesel_quantity <= 0) {
+        newErrors[`diesel_quantity_${index}`] = 'Quantity must be greater than 0';
+      }
+      if (purchase.diesel_price_per_liter <= 0) {
+        newErrors[`diesel_price_${index}`] = 'Price must be greater than 0';
+      }
+      if (!purchase.purchase_date) {
+        newErrors[`diesel_date_${index}`] = 'Purchase date is required';
+      }
+    });
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -443,58 +462,100 @@ const EnhancedAddTripScreen: React.FC = () => {
                     </TouchableOpacity>
                   </View>
                   
-                  <View style={styles.dieselPurchaseRow}>
-                    <EnhancedCustomInput
-                      label="State"
-                      value={purchase.state}
-                      onChangeText={(text) => updateDieselPurchase(index, 'state', text)}
-                      placeholder="Enter state"
-                      style={styles.dieselInput}
-                    />
-                    <EnhancedCustomInput
-                      label="City"
-                      value={purchase.city}
-                      onChangeText={(text) => updateDieselPurchase(index, 'city', text)}
-                      placeholder="Enter city"
-                      style={styles.dieselInput}
-                    />
-                  </View>
+                  <EnhancedCustomInput
+                    label="State"
+                    value={purchase.state}
+                    onChangeText={(text) => updateDieselPurchase(index, 'state', text)}
+                    placeholder="Enter state"
+                    leftIcon="location"
+                    error={errors[`diesel_state_${index}`]}
+                  />
                   
-                  <View style={styles.dieselPurchaseRow}>
-                    <EnhancedCustomInput
-                      label="Quantity (L)"
-                      value={purchase.diesel_quantity.toString()}
-                      onChangeText={(text) => updateDieselPurchase(index, 'diesel_quantity', parseFloat(text) || 0)}
-                      keyboardType="numeric"
-                      placeholder="Enter quantity"
-                      style={styles.dieselInput}
-                    />
-                    <EnhancedCustomInput
-                      label="Price/Liter"
-                      value={purchase.diesel_price_per_liter.toString()}
-                      onChangeText={(text) => updateDieselPurchase(index, 'diesel_price_per_liter', parseFloat(text) || 0)}
-                      keyboardType="numeric"
-                      placeholder="Enter price"
-                      style={styles.dieselInput}
-                    />
-                  </View>
+                  <EnhancedCustomInput
+                    label="City"
+                    value={purchase.city}
+                    onChangeText={(text) => updateDieselPurchase(index, 'city', text)}
+                    placeholder="Enter city"
+                    leftIcon="business"
+                    error={errors[`diesel_city_${index}`]}
+                  />
                   
-                  <View style={styles.dieselPurchaseRow}>
-                    <TouchableOpacity
-                      style={styles.datePickerButton}
-                      onPress={() => setShowDatePicker(prev => ({ ...prev, [`purchase_${index}`]: true }))}
-                    >
-                      <View style={styles.datePickerContent}>
-                        <Ionicons name="calendar" size={20} color={COLORS.primary} style={styles.datePickerIcon} />
-                        <View style={styles.datePickerText}>
-                          <Text style={styles.datePickerLabel}>Purchase Date</Text>
-                          <Text style={styles.datePickerValue}>
-                            {purchase.purchase_date ? formatDate(purchase.purchase_date) : 'Select date'}
-                          </Text>
-                        </View>
+                  <EnhancedCustomInput
+                    label="Quantity (L)"
+                    value={purchase.diesel_quantity > 0 ? purchase.diesel_quantity.toString() : ''}
+                    onChangeText={(text) => {
+                      const value = parseFloat(text) || 0;
+                      updateDieselPurchase(index, 'diesel_quantity', value);
+                    }}
+                    keyboardType="numeric"
+                    placeholder="Enter quantity in liters"
+                    leftIcon="water"
+                    error={errors[`diesel_quantity_${index}`]}
+                  />
+                  
+                  <EnhancedCustomInput
+                    label="Price/Liter (₹)"
+                    value={purchase.diesel_price_per_liter > 0 ? purchase.diesel_price_per_liter.toString() : ''}
+                    onChangeText={(text) => {
+                      const value = parseFloat(text) || 0;
+                      updateDieselPurchase(index, 'diesel_price_per_liter', value);
+                    }}
+                    keyboardType="numeric"
+                    placeholder="Enter price per liter"
+                    leftIcon="cash"
+                    error={errors[`diesel_price_${index}`]}
+                  />
+                  
+                  <TouchableOpacity
+                    style={[
+                      styles.datePickerButton,
+                      errors[`diesel_date_${index}`] && styles.datePickerButtonError
+                    ]}
+                    onPress={() => setShowDatePicker(prev => ({ ...prev, [`purchase_${index}`]: true }))}
+                  >
+                    <View style={styles.datePickerContent}>
+                      <Ionicons 
+                        name="calendar" 
+                        size={20} 
+                        color={errors[`diesel_date_${index}`] ? COLORS.error : COLORS.primary} 
+                        style={styles.datePickerIcon} 
+                      />
+                      <View style={styles.datePickerText}>
+                        <Text style={[
+                          styles.datePickerLabel,
+                          errors[`diesel_date_${index}`] && styles.datePickerLabelError
+                        ]}>
+                          Purchase Date
+                        </Text>
+                        <Text style={[
+                          styles.datePickerValue,
+                          errors[`diesel_date_${index}`] && styles.datePickerValueError
+                        ]}>
+                          {purchase.purchase_date ? formatDate(purchase.purchase_date) : 'Select date'}
+                        </Text>
                       </View>
-                    </TouchableOpacity>
-                  </View>
+                    </View>
+                  </TouchableOpacity>
+                  {errors[`diesel_date_${index}`] && (
+                    <Text style={styles.datePickerErrorText}>{errors[`diesel_date_${index}`]}</Text>
+                  )}
+                  
+                  {/* Total Calculation Display */}
+                  {purchase.diesel_quantity > 0 && purchase.diesel_price_per_liter > 0 && (
+                    <View style={styles.totalCalculationContainer}>
+                      <View style={styles.totalCalculationRow}>
+                        <Text style={styles.totalCalculationLabel}>Total Amount:</Text>
+                        <Text style={styles.totalCalculationValue}>
+                          ₹{(purchase.diesel_quantity * purchase.diesel_price_per_liter).toFixed(2)}
+                        </Text>
+                      </View>
+                      <View style={styles.totalCalculationRow}>
+                        <Text style={styles.totalCalculationSubLabel}>
+                          {purchase.diesel_quantity}L × ₹{purchase.diesel_price_per_liter}/L
+                        </Text>
+                      </View>
+                    </View>
+                  )}
                 </View>
               ))}
             </View>
@@ -733,6 +794,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     ...SIZES.shadow,
+    position: 'relative',
   },
   dieselPurchaseHeader: {
     flexDirection: 'row',
@@ -753,23 +815,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dieselPurchaseRow: {
-    flexDirection: 'row',
-    gap: SIZES.spacingMd,
-    marginBottom: SIZES.spacingMd,
-  },
-  dieselInput: {
-    flex: 1,
-    marginBottom: SIZES.spacingSm,
-  },
   datePickerButton: {
-    flex: 1,
     backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: SIZES.radiusMd,
     padding: SIZES.spacingMd,
     marginBottom: SIZES.spacingSm,
+  },
+  datePickerButtonError: {
+    borderColor: COLORS.error,
+    backgroundColor: COLORS.error + '10',
   },
   datePickerContent: {
     flexDirection: 'row',
@@ -790,6 +846,47 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeMd,
     color: COLORS.textPrimary,
     fontWeight: '500' as const,
+  },
+  datePickerLabelError: {
+    color: COLORS.error,
+  },
+  datePickerValueError: {
+    color: COLORS.error,
+  },
+  datePickerErrorText: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.error,
+    marginTop: SIZES.spacingXs,
+    marginLeft: SIZES.spacingSm,
+  },
+  totalCalculationContainer: {
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: SIZES.radiusMd,
+    padding: SIZES.spacingMd,
+    marginTop: SIZES.spacingSm,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.primary,
+  },
+  totalCalculationRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SIZES.spacingXs,
+  },
+  totalCalculationLabel: {
+    fontSize: SIZES.fontSizeMd,
+    fontWeight: '600' as const,
+    color: COLORS.textPrimary,
+  },
+  totalCalculationValue: {
+    fontSize: SIZES.fontSizeLg,
+    fontWeight: '700' as const,
+    color: COLORS.primary,
+  },
+  totalCalculationSubLabel: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.textSecondary,
+    fontStyle: 'italic',
   },
   costSection: {
     backgroundColor: COLORS.surface,

@@ -228,9 +228,9 @@ export interface TripFormData {
   destination: string;
   diesel_purchases: DieselPurchaseFormData[];
   repair_items?: RepairItemFormData[];
-  fast_tag_costs: number[]; 
-  mcd_costs: number[]; 
-  green_tax_costs: number[]; 
+  fast_tag_costs: FastTagEventFormData[]; 
+  mcd_costs: McdEventFormData[]; 
+  green_tax_costs: GreenTaxEventFormData[]; 
   rto_costs: RtoEventFormData[];
   dto_costs: DtoEventFormData[];
   municipalities_costs: MunicipalitiesEventFormData[];
@@ -273,18 +273,24 @@ export interface RepairItemFormData {
 }
 
 export interface FastTagEventFormData {
+  state: string;
+  checkpoint?: string;
   amount: number;
   notes?: string;
   event_time?: string; // ISO
 }
 
 export interface McdEventFormData {
+  state: string;
+  checkpoint?: string;
   amount: number;
   notes?: string;
   event_time?: string; // ISO
 }
 
 export interface GreenTaxEventFormData {
+  state: string;
+  checkpoint?: string;
   amount: number;
   notes?: string;
   event_time?: string; // ISO

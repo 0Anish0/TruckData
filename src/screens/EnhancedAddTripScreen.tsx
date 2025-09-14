@@ -19,7 +19,7 @@ import { mockTripService, mockTruckService, mockDriverService } from '../service
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomInput from '../components/EnhancedCustomInput';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Truck, Driver, TripFormData, AddTripScreenNavigationProp } from '../types';
+import { Truck, Driver, TripFormData, AddTripScreenNavigationProp, FastTagEventFormData, McdEventFormData, GreenTaxEventFormData } from '../types';
 
 const EnhancedAddTripScreen: React.FC = () => {
   const navigation = useNavigation<AddTripScreenNavigationProp>();
@@ -29,9 +29,9 @@ const EnhancedAddTripScreen: React.FC = () => {
     destination: '',
     driver_id: '',
     diesel_purchases: [],
-    fast_tag_costs: [0],
-    mcd_costs: [0],
-    green_tax_costs: [0],
+    fast_tag_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+    mcd_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+    green_tax_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
     rto_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
     dto_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
     municipalities_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
@@ -561,7 +561,7 @@ const EnhancedAddTripScreen: React.FC = () => {
             </View>
 
             {/* Cost Sections */}
-            <CostSection
+            <ComplexCostSection
               title="Fast Tag"
               icon="card"
               color={COLORS.info}
@@ -569,7 +569,7 @@ const EnhancedAddTripScreen: React.FC = () => {
               onUpdate={(costs) => setFormData(prev => ({ ...prev, fast_tag_costs: costs }))}
             />
 
-            <CostSection
+            <ComplexCostSection
               title="MCD"
               icon="business"
               color={COLORS.warning}
@@ -577,7 +577,7 @@ const EnhancedAddTripScreen: React.FC = () => {
               onUpdate={(costs) => setFormData(prev => ({ ...prev, mcd_costs: costs }))}
             />
 
-            <CostSection
+            <ComplexCostSection
               title="Green Tax"
               icon="leaf"
               color={COLORS.success}

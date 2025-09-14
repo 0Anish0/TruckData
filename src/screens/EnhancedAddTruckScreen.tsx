@@ -1,37 +1,41 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
   Animated,
+  TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { mockTruckService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomInput from '../components/EnhancedCustomInput';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Truck } from '../types';
+import { AddTruckScreenNavigationProp } from '../types';
 
-const EnhancedAddTruckScreen: React.FC = () => {
-  const [formData, setFormData] = useState<Omit<Truck, 'id' | 'created_at' | 'updated_at' | 'user_id'>>({
+interface EnhancedAddTruckScreenProps {
+  navigation: AddTruckScreenNavigationProp;
+}
+
+const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ navigation }) => {
+  const [formData, setFormData] = useState({
     name: '',
-    truck_number: '',
+    truckNumber: '',
     model: '',
+    capacity: '',
+    fuelType: '',
+    year: '',
+    color: '',
   });
-  
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
-  useEffect(() => {
-    // Entrance animation
+  React.useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -46,23 +50,35 @@ const EnhancedAddTruckScreen: React.FC = () => {
     ]).start();
   }, []);
 
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
+  const validateForm = (): boolean => {
     if (!formData.name.trim()) {
-      newErrors.name = 'Truck name is required';
+      Alert.alert('Validation Error', 'Please enter truck name.');
+      return false;
     }
-    if (!formData.truck_number.trim()) {
-      newErrors.truck_number = 'Truck number is required';
-    } else if (!/^[A-Z]{2}-\d{2}-[A-Z]{2}-\d{4}$/.test(formData.truck_number)) {
-      newErrors.truck_number = 'Invalid format. Use: XX-XX-XX-XXXX';
+    if (!formData.truckNumber.trim()) {
+      Alert.alert('Validation Error', 'Please enter truck number.');
+      return false;
     }
     if (!formData.model.trim()) {
-      newErrors.model = 'Truck model is required';
+      Alert.alert('Validation Error', 'Please enter truck model.');
+      return false;
     }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!formData.capacity.trim()) {
+      Alert.alert('Validation Error', 'Please enter truck capacity.');
+      return false;
+    }
+    if (!formData.year.trim()) {
+      Alert.alert('Validation Error', 'Please enter manufacturing year.');
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async () => {
@@ -70,199 +86,150 @@ const EnhancedAddTruckScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await mockTruckService.createTruck({
-        ...formData,
-        user_id: 'user-1', // Mock user ID
-      });
+      // TODO: Implement actual truck creation
+      console.log('Truck data:', formData);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       Alert.alert(
         'Success',
         'Truck added successfully!',
-        [{ text: 'OK', onPress: () => {} }]
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ]
       );
-      
-      // Reset form
-      setFormData({
-        name: '',
-        truck_number: '',
-        model: '',
-      });
-    } catch (error: unknown) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'Failed to add truck. Please try again.',
-        [{ text: 'OK' }]
-      );
+    } catch (error) {
+      console.error('Error adding truck:', error);
+      Alert.alert('Error', 'Failed to add truck. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleReset = () => {
-    setFormData({
-      name: '',
-      truck_number: '',
-      model: '',
-    });
-    setErrors({});
-  };
-
   return (
     <View style={styles.container}>
+      {/* Header */}
       <LinearGradient
         colors={COLORS.secondaryGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
       >
-        <View style={styles.headerContent}>
-          <View style={styles.headerText}>
+        <SafeAreaView style={styles.headerContent}>
+          <View style={styles.headerTop}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="arrow-back" size={24} color={COLORS.textInverse} />
+            </TouchableOpacity>
             <Text style={styles.headerTitle}>Add New Truck</Text>
-            <Text style={styles.headerSubtitle}>
-              Add a new truck to your fleet
-            </Text>
+            <View style={styles.placeholder} />
           </View>
-          <View style={styles.headerIcon}>
-            <Ionicons name="car-sport" size={28} color={COLORS.textInverse} />
-          </View>
-        </View>
+        </SafeAreaView>
       </LinearGradient>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoidingView}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
+        <Animated.View
+          style={[
+            styles.formContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
         >
-          <Animated.View
-            style={[
-              styles.formContainer,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
-          >
-            {/* Truck Information */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <View style={styles.sectionIcon}>
-                  <Ionicons name="car-sport" size={24} color={COLORS.secondary} />
-                </View>
-                <Text style={styles.sectionTitle}>Truck Information</Text>
-              </View>
-              
-              <EnhancedCustomInput
-                label="Truck Name"
-                value={formData.name}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
-                leftIcon="car"
-                error={errors.name}
-                placeholder="Enter truck name (e.g., Mahindra Bolero)"
-                autoCapitalize="words"
-              />
+          {/* Basic Information */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Basic Information</Text>
+            
+            <EnhancedCustomInput
+              label="Truck Name"
+              value={formData.name}
+              onChangeText={(value) => handleInputChange('name', value)}
+              placeholder="Enter truck name (e.g., Ashok Leyland Dost)"
+              leftIcon="car-sport"
+            />
 
-              <EnhancedCustomInput
-                label="Truck Number"
-                value={formData.truck_number}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, truck_number: text.toUpperCase() }))}
-                leftIcon="card"
-                error={errors.truck_number}
-                placeholder="Enter truck number (e.g., MH-12-AB-1234)"
-                autoCapitalize="characters"
-                maxLength={13}
-              />
+            <EnhancedCustomInput
+              label="Registration Number"
+              value={formData.truckNumber}
+              onChangeText={(value) => handleInputChange('truckNumber', value)}
+              placeholder="Enter registration number (e.g., KA-05-EF-9012)"
+              leftIcon="card"
+            />
 
-              <EnhancedCustomInput
-                label="Model"
-                value={formData.model}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, model: text }))}
-                leftIcon="construct"
-                error={errors.model}
-                placeholder="Enter truck model (e.g., Bolero Pickup)"
-                autoCapitalize="words"
-              />
-            </View>
+            <EnhancedCustomInput
+              label="Model"
+              value={formData.model}
+              onChangeText={(value) => handleInputChange('model', value)}
+              placeholder="Enter truck model (e.g., Dost Plus)"
+              leftIcon="construct"
+            />
 
-            {/* Preview Card */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Preview</Text>
-              <View style={styles.previewCard}>
-                <LinearGradient
-                  colors={COLORS.secondaryGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.previewHeader}
-                >
-                  <View style={styles.previewIcon}>
-                    <Ionicons name="car-sport" size={24} color={COLORS.textInverse} />
-                  </View>
-                  <View style={styles.previewInfo}>
-                    <Text style={styles.previewName}>
-                      {formData.name || 'Truck Name'}
-                    </Text>
-                    <Text style={styles.previewNumber}>
-                      {formData.truck_number || 'XX-XX-XX-XXXX'}
-                    </Text>
-                  </View>
-                </LinearGradient>
-                
-                <View style={styles.previewContent}>
-                  <View style={styles.previewDetail}>
-                    <Ionicons name="construct" size={16} color={COLORS.textSecondary} />
-                    <Text style={styles.previewLabel}>Model:</Text>
-                    <Text style={styles.previewValue}>
-                      {formData.model || 'Truck Model'}
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.previewDetail}>
-                    <Ionicons name="time" size={16} color={COLORS.textSecondary} />
-                    <Text style={styles.previewLabel}>Status:</Text>
-                    <Text style={styles.previewValue}>Ready to Add</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
+            <EnhancedCustomInput
+              label="Manufacturing Year"
+              value={formData.year}
+              onChangeText={(value) => handleInputChange('year', value)}
+              placeholder="Enter year (e.g., 2020)"
+              leftIcon="calendar"
+              keyboardType="numeric"
+            />
+          </View>
 
-            {/* Action Buttons */}
-            <View style={styles.actionsContainer}>
-              <EnhancedCustomButton
-                title="Reset Form"
-                onPress={handleReset}
-                variant="outline"
-                size="large"
-                icon="refresh"
-                style={styles.resetButton}
-              />
-              
-              <EnhancedCustomButton
-                title="Add Truck"
-                onPress={handleSubmit}
-                loading={loading}
-                variant="secondary"
-                size="large"
-                fullWidth
-                icon="checkmark-circle"
-                style={styles.submitButton}
-              />
-            </View>
+          {/* Specifications */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Specifications</Text>
+            
+            <EnhancedCustomInput
+              label="Capacity"
+              value={formData.capacity}
+              onChangeText={(value) => handleInputChange('capacity', value)}
+              placeholder="Enter capacity (e.g., 1000 kg)"
+              leftIcon="cube"
+            />
 
-            {/* Help Text */}
-            <View style={styles.helpContainer}>
-              <View style={styles.helpIcon}>
-                <Ionicons name="information-circle" size={20} color={COLORS.info} />
-              </View>
-              <Text style={styles.helpText}>
-                Make sure to enter accurate information as it will be used for trip tracking and reporting.
-              </Text>
-            </View>
-          </Animated.View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+            <EnhancedCustomInput
+              label="Fuel Type"
+              value={formData.fuelType}
+              onChangeText={(value) => handleInputChange('fuelType', value)}
+              placeholder="Enter fuel type (e.g., Diesel)"
+              leftIcon="flash"
+            />
+
+            <EnhancedCustomInput
+              label="Color"
+              value={formData.color}
+              onChangeText={(value) => handleInputChange('color', value)}
+              placeholder="Enter truck color (e.g., White)"
+              leftIcon="color-palette"
+            />
+          </View>
+
+          {/* Submit Button */}
+          <View style={styles.submitContainer}>
+            <EnhancedCustomButton
+              title="Add Truck"
+              onPress={handleSubmit}
+              icon="car-sport"
+              variant="primary"
+              size="large"
+              fullWidth
+              loading={loading}
+              disabled={loading}
+            />
+          </View>
+        </Animated.View>
+      </ScrollView>
     </View>
   );
 };
@@ -274,172 +241,54 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,
-    paddingTop: SIZES.spacingXl + 20, // Add extra padding for status bar/notch
     paddingBottom: SIZES.spacingLg,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
   },
   headerContent: {
+    paddingTop: SIZES.spacingSm,
+  },
+  headerTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  headerText: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: SIZES.fontSizeXxl,
-    fontWeight: '700' as const,
-    color: COLORS.textInverse,
-    marginBottom: SIZES.spacingXs,
-  },
-  headerSubtitle: {
-    fontSize: SIZES.fontSizeMd,
-    color: COLORS.textInverse,
-    opacity: 0.9,
-    fontWeight: '500' as const,
-  },
-  headerIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: COLORS.glassLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  keyboardAvoidingView: {
-    flex: 1,
-    marginTop: 140, // Add margin to account for sticky header height
+  headerTitle: {
+    fontSize: SIZES.fontSizeXl,
+    fontWeight: '700' as const,
+    color: COLORS.textInverse,
+  },
+  placeholder: {
+    width: 40,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: SIZES.spacingLg,
+    padding: SIZES.spacingLg,
     paddingBottom: SIZES.spacingXl,
-    paddingTop: SIZES.spacingSm,
   },
   formContainer: {
-    marginTop: SIZES.spacingLg,
+    flex: 1,
   },
   section: {
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radiusLg,
-    padding: SIZES.spacingLg,
-    marginBottom: SIZES.spacingLg,
-    ...SIZES.shadow,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SIZES.spacingLg,
-  },
-  sectionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.secondaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SIZES.spacingMd,
+    marginBottom: SIZES.spacingXl,
   },
   sectionTitle: {
     fontSize: SIZES.fontSizeLg,
     fontWeight: '700' as const,
     color: COLORS.textPrimary,
+    marginBottom: SIZES.spacingMd,
   },
-  previewCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radiusLg,
-    overflow: 'hidden',
-    ...SIZES.shadowMedium,
-  },
-  previewHeader: {
-    padding: SIZES.spacingLg,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  previewIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: COLORS.glassLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: SIZES.spacingMd,
-  },
-  previewInfo: {
-    flex: 1,
-  },
-  previewName: {
-    fontSize: SIZES.fontSizeLg,
-    fontWeight: '700' as const,
-    color: COLORS.textInverse,
-    marginBottom: SIZES.spacingXs,
-  },
-  previewNumber: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textInverse,
-    opacity: 0.9,
-    fontWeight: '500' as const,
-  },
-  previewContent: {
-    padding: SIZES.spacingLg,
-  },
-  previewDetail: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SIZES.spacingSm,
-  },
-  previewLabel: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textSecondary,
-    fontWeight: '600' as const,
-    marginLeft: SIZES.spacingSm,
-    marginRight: SIZES.spacingSm,
-    minWidth: 60,
-  },
-  previewValue: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textPrimary,
-    fontWeight: '600' as const,
-    flex: 1,
-  },
-  actionsContainer: {
-    flexDirection: 'row',
-    gap: SIZES.spacingMd,
-    marginBottom: SIZES.spacingLg,
-    paddingHorizontal: SIZES.spacingXs,
-  },
-  resetButton: {
-    flex: 1,
-    minHeight: 48,
-  },
-  submitButton: {
-    flex: 1,
-    minHeight: 48,
-  },
-  helpContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: COLORS.infoLight,
-    padding: SIZES.spacingLg,
-    borderRadius: SIZES.radiusLg,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.info,
-  },
-  helpIcon: {
-    marginRight: SIZES.spacingMd,
-    marginTop: 2,
-  },
-  helpText: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
-    flex: 1,
+  submitContainer: {
+    marginTop: SIZES.spacingLg,
+    marginBottom: SIZES.spacingXl,
   },
 });
 

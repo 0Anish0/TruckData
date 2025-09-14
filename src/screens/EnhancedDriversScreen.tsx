@@ -13,9 +13,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { mockDriverService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Driver } from '../types';
+import { Driver, DriversScreenNavigationProp } from '../types';
 
-const EnhancedDriversScreen: React.FC = () => {
+interface EnhancedDriversScreenProps {
+  navigation: DriversScreenNavigationProp;
+}
+
+const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigation }) => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -299,9 +303,9 @@ const EnhancedDriversScreen: React.FC = () => {
             <View style={styles.addButtonContainer}>
               <EnhancedCustomButton
                 title="Add New Driver"
-                onPress={() => {}}
+                onPress={() => navigation.navigate('AddDriver')}
                 icon="person-add"
-                variant="primary"
+                variant="success"
                 size="large"
                 fullWidth
               />
@@ -317,7 +321,7 @@ const EnhancedDriversScreen: React.FC = () => {
             </Text>
             <EnhancedCustomButton
               title="Add Driver"
-              onPress={() => {}}
+              onPress={() => navigation.navigate('AddDriver')}
               icon="person-add"
               variant="outline"
               size="medium"

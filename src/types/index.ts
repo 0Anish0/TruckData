@@ -410,7 +410,7 @@ export interface EnhancedTruckCardProps {
 export interface EnhancedCustomButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success';
   size?: 'small' | 'medium' | 'large';
   loading?: boolean;
   disabled?: boolean;

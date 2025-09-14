@@ -82,8 +82,16 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ navigat
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    console.log('Add Truck button pressed!');
+    console.log('Form data:', formData);
+    
+    
+    if (!validateForm()) {
+      console.log('Form validation failed');
+      return;
+    }
 
+    console.log('Form validation passed, starting submit...');
     setLoading(true);
     try {
       // TODO: Implement actual truck creation

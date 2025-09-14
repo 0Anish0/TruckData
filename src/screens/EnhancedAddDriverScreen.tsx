@@ -152,8 +152,17 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ navig
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    console.log('Add Driver button pressed!');
+    console.log('Form data:', formData);
+    console.log('License image:', licenseImage);
+    
+    
+    if (!validateForm()) {
+      console.log('Form validation failed');
+      return;
+    }
 
+    console.log('Form validation passed, starting submit...');
     setLoading(true);
     try {
       // TODO: Implement actual driver creation with license image upload

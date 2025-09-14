@@ -145,6 +145,7 @@ const EnhancedCustomButton: React.FC<EnhancedCustomButtonProps> = ({
       case 'primary':
       case 'secondary':
       case 'danger':
+      case 'success':
         return COLORS.textInverse;
       case 'outline':
       case 'ghost':
@@ -205,10 +206,11 @@ const EnhancedCustomButton: React.FC<EnhancedCustomButtonProps> = ({
   const renderButton = () => {
     const buttonStyle = getButtonStyle();
 
-    if (variant === 'primary' || variant === 'secondary' || variant === 'danger') {
+    if (variant === 'primary' || variant === 'secondary' || variant === 'danger' || variant === 'success') {
       const gradientColors = 
         variant === 'primary' ? COLORS.primaryGradient :
         variant === 'secondary' ? COLORS.secondaryGradient :
+        variant === 'success' ? COLORS.successGradient :
         COLORS.errorGradient;
 
       return (

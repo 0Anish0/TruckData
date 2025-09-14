@@ -15,10 +15,14 @@ import { mockTruckService, mockTripService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedTruckCard from '../components/EnhancedTruckCard';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Truck, Trip } from '../types';
+import { Truck, Trip, TrucksScreenNavigationProp } from '../types';
 const { width } = Dimensions.get('window');
 
-const EnhancedTrucksScreen: React.FC = () => {
+interface EnhancedTrucksScreenProps {
+  navigation: TrucksScreenNavigationProp;
+}
+
+const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation }) => {
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
@@ -238,7 +242,7 @@ const EnhancedTrucksScreen: React.FC = () => {
             <View style={styles.addButtonContainer}>
               <EnhancedCustomButton
                 title="Add New Truck"
-                onPress={() => {}}
+                onPress={() => navigation.navigate('AddTruck')}
                 icon="add-circle"
                 variant="secondary"
                 size="large"
@@ -256,7 +260,7 @@ const EnhancedTrucksScreen: React.FC = () => {
             </Text>
             <EnhancedCustomButton
               title="Add Truck"
-              onPress={() => {}}
+              onPress={() => navigation.navigate('AddTruck')}
               icon="add-circle"
               variant="outline"
               size="medium"

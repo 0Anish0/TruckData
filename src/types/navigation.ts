@@ -14,7 +14,7 @@ export type RootStackParamList = {
 // Dashboard stack navigator parameter types
 export type DashboardStackParamList = {
   DashboardMain: undefined;
-  AddTrip: undefined;
+  AddTrip: { trip?: TripWithRelations };
   AddTruck: undefined;
   TruckTrips: { truck: Truck };
   EditTrip: { trip: TripWithRelations };
@@ -24,7 +24,7 @@ export type DashboardStackParamList = {
 // Trips stack navigator parameter types
 export type TripsStackParamList = {
   TripsMain: undefined;
-  AddTrip: undefined;
+  AddTrip: { trip?: TripWithRelations };
   EditTrip: { trip: TripWithRelations };
 };
 

@@ -20,7 +20,6 @@ import EnhancedDriversScreen from '../screens/EnhancedDriversScreen';
 import EnhancedAddTripScreen from '../screens/EnhancedAddTripScreen';
 import EnhancedAddTruckScreen from '../screens/EnhancedAddTruckScreen';
 import EnhancedAddDriverScreen from '../screens/EnhancedAddDriverScreen';
-import EnhancedEditTripScreen from '../screens/EnhancedEditTripScreen';
 import EnhancedEditTruckScreen from '../screens/EnhancedEditTruckScreen';
 import EnhancedTruckTripsScreen from '../screens/EnhancedTruckTripsScreen';
 
@@ -33,7 +32,7 @@ const DashboardStack = () => (
     <Stack.Screen name="AddTrip" component={EnhancedAddTripScreen} />
     <Stack.Screen name="AddTruck" component={EnhancedAddTruckScreen} />
     <Stack.Screen name="TruckTrips" component={EnhancedTruckTripsScreen as React.ComponentType} />
-    <Stack.Screen name="EditTrip" component={EnhancedEditTripScreen as React.ComponentType} />
+    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
     <Stack.Screen name="EditTruck" component={EnhancedEditTruckScreen as React.ComponentType} />
   </Stack.Navigator>
 );
@@ -42,7 +41,7 @@ const TripsStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TripsMain" component={EnhancedTripsScreen} />
     <Stack.Screen name="AddTrip" component={EnhancedAddTripScreen} />
-    <Stack.Screen name="EditTrip" component={EnhancedEditTripScreen as React.ComponentType} />
+    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
   </Stack.Navigator>
 );
 
@@ -50,7 +49,7 @@ const TrucksStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="TrucksMain" component={EnhancedTrucksScreen} />
     <Stack.Screen name="AddTruck" component={EnhancedAddTruckScreen} />
-    <Stack.Screen name="EditTrip" component={EnhancedEditTripScreen as React.ComponentType} />
+    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
     <Stack.Screen name="EditTruck" component={EnhancedEditTruckScreen as React.ComponentType} />
   </Stack.Navigator>
 );

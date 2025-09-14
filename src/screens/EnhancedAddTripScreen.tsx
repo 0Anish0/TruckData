@@ -19,24 +19,62 @@ import { mockTripService, mockTruckService, mockDriverService } from '../service
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomInput from '../components/EnhancedCustomInput';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Truck, Driver, TripFormData, AddTripScreenNavigationProp, FastTagEventFormData, McdEventFormData, GreenTaxEventFormData } from '../types';
+import { Truck, Driver, TripFormData, AddTripScreenNavigationProp, FastTagEventFormData, McdEventFormData, GreenTaxEventFormData, TripWithRelations } from '../types';
 
-const EnhancedAddTripScreen: React.FC = () => {
+interface EnhancedAddTripScreenProps {
+  route?: {
+    params?: {
+      trip?: TripWithRelations;
+    };
+  };
+}
+
+const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) => {
   const navigation = useNavigation<AddTripScreenNavigationProp>();
-  const [formData, setFormData] = useState<TripFormData>({
-    truck_id: '',
-    source: '',
-    destination: '',
-    driver_id: '',
-    diesel_purchases: [],
-    fast_tag_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
-    mcd_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
-    green_tax_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
-    rto_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
-    dto_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
-    municipalities_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
-    border_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
-    repair_items: [{ state: '', checkpoint: '', part_or_defect: '', amount: 0, notes: '' }],
+  const tripToEdit = route?.params?.trip;
+  const isEditMode = !!tripToEdit;
+  const [formData, setFormData] = useState<TripFormData>(() => {
+    if (isEditMode && tripToEdit) {
+      // Pre-fill form data for edit mode
+      return {
+        truck_id: tripToEdit.truck_id,
+        source: tripToEdit.source,
+        destination: tripToEdit.destination,
+        driver_id: tripToEdit.driver_id || '',
+        diesel_purchases: (tripToEdit.diesel_purchases || []).map(purchase => ({
+          state: purchase.state,
+          city: purchase.city || '',
+          diesel_quantity: purchase.diesel_quantity,
+          diesel_price_per_liter: purchase.diesel_price_per_liter,
+          purchase_date: purchase.purchase_date,
+        })),
+        fast_tag_costs: [{ state: '', checkpoint: '', amount: tripToEdit.fast_tag_cost || 0, notes: '' }],
+        mcd_costs: [{ state: '', checkpoint: '', amount: tripToEdit.mcd_cost || 0, notes: '' }],
+        green_tax_costs: [{ state: '', checkpoint: '', amount: tripToEdit.green_tax_cost || 0, notes: '' }],
+        rto_costs: [{ state: '', checkpoint: '', amount: tripToEdit.rto_cost || 0, notes: '' }],
+        dto_costs: [{ state: '', checkpoint: '', amount: tripToEdit.dto_cost || 0, notes: '' }],
+        municipalities_costs: [{ state: '', checkpoint: '', amount: tripToEdit.municipalities_cost || 0, notes: '' }],
+        border_costs: [{ state: '', checkpoint: '', amount: tripToEdit.border_cost || 0, notes: '' }],
+        repair_items: [{ state: '', checkpoint: '', part_or_defect: '', amount: tripToEdit.repair_cost || 0, notes: '' }],
+      };
+    } else {
+      // Default empty form for add mode
+      return {
+        truck_id: '',
+        source: '',
+        destination: '',
+        driver_id: '',
+        diesel_purchases: [],
+        fast_tag_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        mcd_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        green_tax_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        rto_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        dto_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        municipalities_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        border_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        repair_items: [{ state: '', checkpoint: '', part_or_defect: '', amount: 0, notes: '' }],
+      };
+    }
   });
   
   const [trucks, setTrucks] = useState<Truck[]>([]);
@@ -123,16 +161,41 @@ const EnhancedAddTripScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await mockTripService.createTrip(formData);
-      Alert.alert(
-        'Success',
-        'Trip created successfully!',
-        [{ text: 'OK', onPress: () => {} }]
-      );
+      if (isEditMode && tripToEdit) {
+        // Convert form data to trip data for update
+        const tripUpdateData = {
+          truck_id: formData.truck_id,
+          source: formData.source,
+          destination: formData.destination,
+          driver_id: formData.driver_id || null,
+          fast_tag_cost: formData.fast_tag_costs.reduce((sum, cost) => sum + cost.amount, 0),
+          mcd_cost: formData.mcd_costs.reduce((sum, cost) => sum + cost.amount, 0),
+          green_tax_cost: formData.green_tax_costs.reduce((sum, cost) => sum + cost.amount, 0),
+          rto_cost: formData.rto_costs.reduce((sum, cost) => sum + cost.amount, 0),
+          dto_cost: formData.dto_costs.reduce((sum, cost) => sum + cost.amount, 0),
+          municipalities_cost: formData.municipalities_costs.reduce((sum, cost) => sum + cost.amount, 0),
+          border_cost: formData.border_costs.reduce((sum, cost) => sum + cost.amount, 0),
+          repair_cost: formData.repair_items.reduce((sum, item) => sum + item.amount, 0),
+        };
+        
+        await mockTripService.updateTrip(tripToEdit.id, tripUpdateData);
+        Alert.alert(
+          'Success',
+          'Trip updated successfully!',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      } else {
+        await mockTripService.createTrip(formData);
+        Alert.alert(
+          'Success',
+          'Trip created successfully!',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      }
     } catch (error: unknown) {
       Alert.alert(
         'Error',
-        error instanceof Error ? error.message : 'Failed to create trip. Please try again.',
+        error instanceof Error ? error.message : `Failed to ${isEditMode ? 'update' : 'create'} trip. Please try again.`,
         [{ text: 'OK' }]
       );
     } finally {
@@ -738,7 +801,7 @@ const EnhancedAddTripScreen: React.FC = () => {
 
             {/* Submit Button */}
             <EnhancedCustomButton
-              title="Create Trip"
+              title={isEditMode ? "Edit Trip" : "Create Trip"}
               onPress={handleSubmit}
               loading={loading}
               variant="primary"

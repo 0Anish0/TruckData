@@ -4,6 +4,8 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
   Alert,
   Animated,
   TouchableOpacity,
@@ -127,26 +129,35 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ navigat
         end={{ x: 1, y: 0 }}
         style={styles.header}
       >
-        <SafeAreaView style={styles.headerContent}>
-          <View style={styles.headerTop}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="arrow-back" size={24} color={COLORS.textInverse} />
-            </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="arrow-back" size={24} color={COLORS.textInverse} />
+          </TouchableOpacity>
+          <View style={styles.headerText}>
             <Text style={styles.headerTitle}>Add New Truck</Text>
-            <View style={styles.placeholder} />
+            <Text style={styles.headerSubtitle}>
+              Add a new truck to your fleet
+            </Text>
           </View>
-        </SafeAreaView>
+          <View style={styles.headerIcon}>
+            <Ionicons name="car-sport" size={28} color={COLORS.textInverse} />
+          </View>
+        </View>
       </LinearGradient>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
       >
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
         <Animated.View
           style={[
             styles.formContainer,
@@ -237,7 +248,8 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ navigat
             />
           </View>
         </Animated.View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -249,15 +261,19 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,
-    paddingBottom: SIZES.spacingLg,
+    paddingTop: SIZES.spacingXl + 20, // Align with other screens' header top padding
+    paddingBottom: SIZES.spacingLg, // Align with other screens' header bottom padding
+    height: 140, // Match other screens' header height
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
   },
   headerContent: {
-    paddingTop: SIZES.spacingSm,
-  },
-  headerTop: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   backButton: {
     width: 40,
@@ -267,36 +283,60 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  headerText: {
+    flex: 1,
+    marginLeft: SIZES.spacingMd,
+  },
   headerTitle: {
-    fontSize: SIZES.fontSizeXl,
+    fontSize: SIZES.fontSizeXxl,
     fontWeight: '700' as const,
     color: COLORS.textInverse,
+    marginBottom: SIZES.spacingXs,
   },
-  placeholder: {
-    width: 40,
+  headerSubtitle: {
+    fontSize: SIZES.fontSizeMd,
+    color: COLORS.textInverse,
+    opacity: 0.9,
+    fontWeight: '500' as const,
+  },
+  headerIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: COLORS.glassLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+    marginTop: 140, // Add margin to account for sticky header height
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: SIZES.spacingLg,
+    paddingHorizontal: SIZES.spacingLg,
     paddingBottom: SIZES.spacingXl,
+    paddingTop: SIZES.spacingSm,
   },
   formContainer: {
-    flex: 1,
+    marginTop: SIZES.spacingLg,
   },
   section: {
-    marginBottom: SIZES.spacingXl,
+    backgroundColor: COLORS.surface,
+    borderRadius: SIZES.radiusLg,
+    padding: SIZES.spacingLg,
+    marginBottom: SIZES.spacingLg,
+    ...SIZES.shadow,
   },
   sectionTitle: {
     fontSize: SIZES.fontSizeLg,
     fontWeight: '700' as const,
     color: COLORS.textPrimary,
-    marginBottom: SIZES.spacingMd,
+    marginBottom: SIZES.spacingLg,
   },
   submitContainer: {
     marginTop: SIZES.spacingLg,
-    marginBottom: SIZES.spacingXl,
   },
 });
 

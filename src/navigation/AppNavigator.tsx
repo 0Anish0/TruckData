@@ -12,15 +12,15 @@ import {
 } from '../types/navigation';
 
 // Enhanced Screens
-import EnhancedAuthScreen from '../screens/EnhancedAuthScreen';
-import EnhancedDashboardScreen from '../screens/EnhancedDashboardScreen';
-import EnhancedTripsScreen from '../screens/EnhancedTripsScreen';
-import EnhancedTrucksScreen from '../screens/EnhancedTrucksScreen';
-import EnhancedDriversScreen from '../screens/EnhancedDriversScreen';
-import EnhancedAddTripScreen from '../screens/EnhancedAddTripScreen';
-import EnhancedAddTruckScreen from '../screens/EnhancedAddTruckScreen';
-import EnhancedAddDriverScreen from '../screens/EnhancedAddDriverScreen';
-import EnhancedTruckTripsScreen from '../screens/EnhancedTruckTripsScreen';
+import EnhancedAuthScreen from '../screens/AuthScreen';
+import EnhancedDashboardScreen from '../screens/DashboardScreen';
+import EnhancedTripsScreen from '../screens/TripsScreen';
+import EnhancedTrucksScreen from '../screens/TrucksScreen';
+import EnhancedDriversScreen from '../screens/DriversScreen';
+import EnhancedAddTripScreen from '../screens/AddTripScreen';
+import EnhancedAddTruckScreen from '../screens/AddTruckScreen';
+import EnhancedAddDriverScreen from '../screens/AddDriverScreen';
+import EnhancedTruckTripsScreen from '../screens/TruckTripsScreen';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createStackNavigator();

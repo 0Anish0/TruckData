@@ -18,20 +18,43 @@ import * as ImagePicker from 'expo-image-picker';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomInput from '../components/EnhancedCustomInput';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { AddDriverScreenNavigationProp } from '../types';
+import { mockDriverService } from '../services/mockService';
+import { AddDriverScreenNavigationProp, Driver } from '../types';
 
 interface EnhancedAddDriverScreenProps {
+  route?: {
+    params?: {
+      driver?: Driver;
+    };
+  };
   navigation: AddDriverScreenNavigationProp;
 }
 
-const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ navigation }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    licenseNumber: '',
-    phone: '',
-    age: '',
+const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route, navigation }) => {
+  const driverToEdit = route?.params?.driver;
+  const isEditMode = !!driverToEdit;
+  const [formData, setFormData] = useState(() => {
+    if (isEditMode && driverToEdit) {
+      // Pre-fill form data for edit mode
+      return {
+        name: driverToEdit.name,
+        licenseNumber: driverToEdit.license_number || '',
+        phone: driverToEdit.phone || '',
+        age: driverToEdit.age?.toString() || '',
+      };
+    } else {
+      // Default empty form for add mode
+      return {
+        name: '',
+        licenseNumber: '',
+        phone: '',
+        age: '',
+      };
+    }
   });
-  const [licenseImage, setLicenseImage] = useState<string | null>(null);
+  const [licenseImage, setLicenseImage] = useState<string | null>(
+    isEditMode && driverToEdit ? driverToEdit.license_image_url || null : null
+  );
   const [loading, setLoading] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -154,39 +177,52 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ navig
   };
 
   const handleSubmit = async () => {
-    console.log('Add Driver button pressed!');
-    console.log('Form data:', formData);
-    console.log('License image:', licenseImage);
-    
-    
     if (!validateForm()) {
-      console.log('Form validation failed');
       return;
     }
 
-    console.log('Form validation passed, starting submit...');
     setLoading(true);
     try {
-      // TODO: Implement actual driver creation with license image upload
-      console.log('Driver data:', formData);
-      console.log('License image:', licenseImage);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      if (isEditMode && driverToEdit) {
+        // Update existing driver
+        const driverUpdateData = {
+          name: formData.name,
+          license_number: formData.licenseNumber,
+          phone: formData.phone,
+          age: parseInt(formData.age, 10),
+          license_image_url: licenseImage || undefined,
+        };
+        
+        await mockDriverService.updateDriver(driverToEdit.id, driverUpdateData);
+        Alert.alert(
+          'Success',
+          'Driver updated successfully!',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      } else {
+        // Create new driver
+        const driverCreateData = {
+          name: formData.name,
+          license_number: formData.licenseNumber,
+          phone: formData.phone,
+          age: parseInt(formData.age, 10),
+          license_image_url: licenseImage || undefined,
+          user_id: 'user-1', // TODO: Get from auth context
+        };
+        
+        await mockDriverService.createDriver(driverCreateData);
+        Alert.alert(
+          'Success',
+          'Driver added successfully!',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      }
+    } catch (error: unknown) {
+      console.error(`Error ${isEditMode ? 'updating' : 'adding'} driver:`, error);
       Alert.alert(
-        'Success',
-        'Driver added successfully!',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]
+        'Error', 
+        `Failed to ${isEditMode ? 'update' : 'add'} driver. Please try again.`
       );
-    } catch (error) {
-      console.error('Error adding driver:', error);
-      Alert.alert('Error', 'Failed to add driver. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -311,7 +347,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ navig
           {/* Submit Button */}
           <View style={styles.submitContainer}>
             <EnhancedCustomButton
-              title="Add Driver"
+              title={isEditMode ? "Edit Driver" : "Add Driver"}
               onPress={handleSubmit}
               icon="person-add"
               variant="success"

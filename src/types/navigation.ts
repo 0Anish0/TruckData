@@ -15,7 +15,7 @@ export type RootStackParamList = {
 export type DashboardStackParamList = {
   DashboardMain: undefined;
   AddTrip: { trip?: TripWithRelations };
-  AddTruck: undefined;
+  AddTruck: { truck?: Truck };
   TruckTrips: { truck: Truck };
   EditTrip: { trip: TripWithRelations };
   EditTruck: { truck: Truck };
@@ -31,7 +31,7 @@ export type TripsStackParamList = {
 // Trucks stack navigator parameter types
 export type TrucksStackParamList = {
   TrucksMain: undefined;
-  AddTruck: undefined;
+  AddTruck: { truck?: Truck };
   EditTrip: { trip: TripWithRelations };
   EditTruck: { truck: Truck };
 };
@@ -39,7 +39,7 @@ export type TrucksStackParamList = {
 // Drivers stack navigator parameter types
 export type DriversStackParamList = {
   DriversMain: undefined;
-  AddDriver: undefined;
+  AddDriver: { driver?: Driver };
 };
 
 // Auth stack navigator parameter types

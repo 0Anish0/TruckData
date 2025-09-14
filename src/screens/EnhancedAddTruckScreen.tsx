@@ -10,27 +10,50 @@ import {
   Animated,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import EnhancedCustomInput from '../components/EnhancedCustomInput';
 import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { AddTruckScreenNavigationProp } from '../types';
+import { mockTruckService } from '../services/mockService';
+import { AddTruckScreenNavigationProp, Truck } from '../types';
 
 interface EnhancedAddTruckScreenProps {
+  route?: {
+    params?: {
+      truck?: Truck;
+    };
+  };
   navigation: AddTruckScreenNavigationProp;
 }
 
-const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ navigation }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    truckNumber: '',
-    model: '',
-    capacity: '',
-    fuelType: '',
-    year: '',
-    color: '',
+const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, navigation }) => {
+  const truckToEdit = route?.params?.truck;
+  const isEditMode = !!truckToEdit;
+  const [formData, setFormData] = useState(() => {
+    if (isEditMode && truckToEdit) {
+      // Pre-fill form data for edit mode
+      return {
+        name: truckToEdit.name,
+        truckNumber: truckToEdit.truck_number,
+        model: truckToEdit.model,
+        capacity: '',
+        fuelType: '',
+        year: '',
+        color: '',
+      };
+    } else {
+      // Default empty form for add mode
+      return {
+        name: '',
+        truckNumber: '',
+        model: '',
+        capacity: '',
+        fuelType: '',
+        year: '',
+        color: '',
+      };
+    }
   });
   const [loading, setLoading] = useState(false);
 
@@ -84,37 +107,48 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ navigat
   };
 
   const handleSubmit = async () => {
-    console.log('Add Truck button pressed!');
-    console.log('Form data:', formData);
-    
-    
     if (!validateForm()) {
-      console.log('Form validation failed');
       return;
     }
 
-    console.log('Form validation passed, starting submit...');
     setLoading(true);
     try {
-      // TODO: Implement actual truck creation
-      console.log('Truck data:', formData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      if (isEditMode && truckToEdit) {
+        // Update existing truck
+        const truckUpdateData = {
+          name: formData.name,
+          truck_number: formData.truckNumber,
+          model: formData.model,
+        };
+        
+        await mockTruckService.updateTruck(truckToEdit.id, truckUpdateData);
+        Alert.alert(
+          'Success',
+          'Truck updated successfully!',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      } else {
+        // Create new truck
+        const truckCreateData = {
+          name: formData.name,
+          truck_number: formData.truckNumber,
+          model: formData.model,
+          user_id: 'user-1', // TODO: Get from auth context
+        };
+        
+        await mockTruckService.createTruck(truckCreateData);
+        Alert.alert(
+          'Success',
+          'Truck added successfully!',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      }
+    } catch (error: unknown) {
+      console.error(`Error ${isEditMode ? 'updating' : 'adding'} truck:`, error);
       Alert.alert(
-        'Success',
-        'Truck added successfully!',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]
+        'Error', 
+        `Failed to ${isEditMode ? 'update' : 'add'} truck. Please try again.`
       );
-    } catch (error) {
-      console.error('Error adding truck:', error);
-      Alert.alert('Error', 'Failed to add truck. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -237,7 +271,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ navigat
           {/* Submit Button */}
           <View style={styles.submitContainer}>
             <EnhancedCustomButton
-              title="Add Truck"
+              title={isEditMode ? "Edit Truck" : "Add Truck"}
               onPress={handleSubmit}
               icon="car-sport"
               variant="primary"

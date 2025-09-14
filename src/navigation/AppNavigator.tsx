@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SIZES } from '../constants/theme';
 import { useAuth } from '../contexts/MockAuthContext';
@@ -20,7 +20,6 @@ import EnhancedDriversScreen from '../screens/EnhancedDriversScreen';
 import EnhancedAddTripScreen from '../screens/EnhancedAddTripScreen';
 import EnhancedAddTruckScreen from '../screens/EnhancedAddTruckScreen';
 import EnhancedAddDriverScreen from '../screens/EnhancedAddDriverScreen';
-import EnhancedEditTruckScreen from '../screens/EnhancedEditTruckScreen';
 import EnhancedTruckTripsScreen from '../screens/EnhancedTruckTripsScreen';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
@@ -33,7 +32,7 @@ const DashboardStack = () => (
     <Stack.Screen name="AddTruck" component={EnhancedAddTruckScreen} />
     <Stack.Screen name="TruckTrips" component={EnhancedTruckTripsScreen as React.ComponentType} />
     <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
-    <Stack.Screen name="EditTruck" component={EnhancedEditTruckScreen as React.ComponentType} />
+    <Stack.Screen name="EditTruck" component={EnhancedAddTruckScreen} />
   </Stack.Navigator>
 );
 
@@ -50,7 +49,7 @@ const TrucksStack = () => (
     <Stack.Screen name="TrucksMain" component={EnhancedTrucksScreen} />
     <Stack.Screen name="AddTruck" component={EnhancedAddTruckScreen} />
     <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
-    <Stack.Screen name="EditTruck" component={EnhancedEditTruckScreen as React.ComponentType} />
+    <Stack.Screen name="EditTruck" component={EnhancedAddTruckScreen} />
   </Stack.Navigator>
 );
 

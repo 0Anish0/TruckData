@@ -136,6 +136,8 @@ export interface Trip {
   repair_cost?: number;
   total_cost: number;
   trip_date: string;
+  start_date: string;
+  end_date: string;
   created_at: string;
   updated_at: string;
   user_id: string;
@@ -176,6 +178,8 @@ export interface TripWithRelations {
   repair_cost: number;
   total_cost: number;
   trip_date: string;
+  start_date: string;
+  end_date: string;
   created_at: string;
   updated_at: string;
   user_id: string;
@@ -226,6 +230,8 @@ export interface TripFormData {
   driver_id?: string;
   source: string;
   destination: string;
+  start_date: string;
+  end_date: string;
   diesel_purchases: DieselPurchaseFormData[];
   fast_tag_costs: FastTagEventFormData[]; 
   mcd_costs: McdEventFormData[]; 
@@ -242,6 +248,8 @@ export interface TripFormErrors {
   driver_id?: string;
   source?: string;
   destination?: string;
+  start_date?: string;
+  end_date?: string;
   diesel_purchases?: string;
   fast_tag_costs?: string;
   mcd_costs?: string;

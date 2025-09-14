@@ -160,6 +160,14 @@ const EnhancedTripCard: React.FC<EnhancedTripCardProps> = ({
               <Ionicons name="calendar" size={16} color={COLORS.textInverse} />
               <Text style={styles.dateText}>{formatDate(getTripDate())}</Text>
             </View>
+            {trip.start_date && trip.end_date && (
+              <View style={styles.durationContainer}>
+                <Ionicons name="time" size={14} color={COLORS.textInverse} />
+                <Text style={styles.durationText}>
+                  {Math.max(1, Math.ceil((new Date(trip.end_date).getTime() - new Date(trip.start_date).getTime()) / (1000 * 60 * 60 * 24)))} days
+                </Text>
+              </View>
+            )}
           </View>
         </LinearGradient>
 
@@ -428,6 +436,22 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     backgroundColor: COLORS.surface,
+  },
+  durationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: SIZES.spacingSm,
+    paddingVertical: SIZES.spacingXs,
+    borderRadius: SIZES.radius,
+    marginTop: SIZES.spacingXs,
+    alignSelf: 'flex-start',
+  },
+  durationText: {
+    fontSize: SIZES.fontSizeXs,
+    color: COLORS.textInverse,
+    marginLeft: SIZES.spacingXs,
+    fontWeight: '600' as const,
   },
 });
 

@@ -132,6 +132,8 @@ export const mockTripService = {
       repair_cost: tripData.repair_cost ?? 0,
       total_cost: 0, 
       trip_date: new Date().toISOString(),
+      start_date: tripData.start_date,
+      end_date: tripData.end_date,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       user_id: 'user-1',

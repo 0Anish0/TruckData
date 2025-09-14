@@ -41,6 +41,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
         source: tripToEdit.source,
         destination: tripToEdit.destination,
         driver_id: tripToEdit.driver_id || '',
+        start_date: tripToEdit.start_date || new Date().toISOString().split('T')[0],
+        end_date: tripToEdit.end_date || new Date().toISOString().split('T')[0],
         diesel_purchases: (tripToEdit.diesel_purchases || []).map(purchase => ({
           state: purchase.state,
           city: purchase.city || '',
@@ -59,11 +61,14 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
       };
     } else {
       // Default empty form for add mode
+      const today = new Date().toISOString().split('T')[0];
       return {
         truck_id: '',
         source: '',
         destination: '',
         driver_id: '',
+        start_date: today,
+        end_date: today,
         diesel_purchases: [],
         fast_tag_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
         mcd_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
@@ -129,6 +134,15 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
     if (!formData.destination.trim()) {
       newErrors.destination = 'Destination is required';
     }
+    if (!formData.start_date) {
+      newErrors.start_date = 'Start date is required';
+    }
+    if (!formData.end_date) {
+      newErrors.end_date = 'End date is required';
+    }
+    if (formData.start_date && formData.end_date && new Date(formData.start_date) > new Date(formData.end_date)) {
+      newErrors.end_date = 'End date must be after start date';
+    }
     if (!formData.driver_id) {
       newErrors.driver_id = 'Please select a driver';
     }
@@ -168,6 +182,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
           source: formData.source,
           destination: formData.destination,
           driver_id: formData.driver_id || null,
+          start_date: formData.start_date,
+          end_date: formData.end_date,
           fast_tag_cost: formData.fast_tag_costs.reduce((sum, cost) => sum + cost.amount, 0),
           mcd_cost: formData.mcd_costs.reduce((sum, cost) => sum + cost.amount, 0),
           green_tax_cost: formData.green_tax_costs.reduce((sum, cost) => sum + cost.amount, 0),
@@ -550,6 +566,51 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                 error={errors.destination}
                 placeholder="Enter destination location"
               />
+
+              {/* Trip Dates */}
+              <View style={styles.dateRow}>
+                <TouchableOpacity
+                  style={styles.dateInput}
+                  onPress={() => setShowDatePicker(prev => ({ ...prev, start_date: true }))}
+                >
+                  <View style={styles.dateInputContent}>
+                    <Ionicons name="calendar" size={20} color={COLORS.primary} />
+                    <View style={styles.dateInputText}>
+                      <Text style={styles.dateLabel}>Start Date</Text>
+                      <Text style={styles.dateValue}>
+                        {formData.start_date ? new Date(formData.start_date).toLocaleDateString('en-IN') : 'Select start date'}
+                      </Text>
+                    </View>
+                  </View>
+                  <Ionicons name="chevron-down" size={20} color={COLORS.textSecondary} />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.dateInput}
+                  onPress={() => setShowDatePicker(prev => ({ ...prev, end_date: true }))}
+                >
+                  <View style={styles.dateInputContent}>
+                    <Ionicons name="calendar" size={20} color={COLORS.primary} />
+                    <View style={styles.dateInputText}>
+                      <Text style={styles.dateLabel}>End Date</Text>
+                      <Text style={styles.dateValue}>
+                        {formData.end_date ? new Date(formData.end_date).toLocaleDateString('en-IN') : 'Select end date'}
+                      </Text>
+                    </View>
+                  </View>
+                  <Ionicons name="chevron-down" size={20} color={COLORS.textSecondary} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Trip Duration Display */}
+              {formData.start_date && formData.end_date && (
+                <View style={styles.durationContainer}>
+                  <Ionicons name="time" size={16} color={COLORS.info} />
+                  <Text style={styles.durationText}>
+                    Trip Duration: {Math.max(1, Math.ceil((new Date(formData.end_date).getTime() - new Date(formData.start_date).getTime()) / (1000 * 60 * 60 * 24)))} days
+                  </Text>
+                </View>
+              )}
             </View>
 
             {/* Vehicle & Driver Selection */}
@@ -817,6 +878,43 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
       {/* Date Picker Modal */}
       {Object.entries(showDatePicker).map(([key, show]) => {
         if (!show) return null;
+        
+        // Handle trip start/end date pickers
+        if (key === 'start_date') {
+          return (
+            <DateTimePicker
+              key={key}
+              value={formData.start_date ? new Date(formData.start_date) : new Date()}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={(event, selectedDate) => {
+                if (selectedDate) {
+                  setFormData(prev => ({ ...prev, start_date: selectedDate.toISOString().split('T')[0] }));
+                }
+                setShowDatePicker(prev => ({ ...prev, start_date: false }));
+              }}
+            />
+          );
+        }
+        
+        if (key === 'end_date') {
+          return (
+            <DateTimePicker
+              key={key}
+              value={formData.end_date ? new Date(formData.end_date) : new Date()}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={(event, selectedDate) => {
+                if (selectedDate) {
+                  setFormData(prev => ({ ...prev, end_date: selectedDate.toISOString().split('T')[0] }));
+                }
+                setShowDatePicker(prev => ({ ...prev, end_date: false }));
+              }}
+            />
+          );
+        }
+        
+        // Handle diesel purchase date pickers (existing logic)
         const index = parseInt(key.split('_')[1]);
         return (
           <DateTimePicker
@@ -1113,6 +1211,56 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: SIZES.spacingLg,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    gap: SIZES.spacingMd,
+    marginTop: SIZES.spacingMd,
+  },
+  dateInput: {
+    flex: 1,
+    backgroundColor: COLORS.surface,
+    borderRadius: SIZES.radiusMd,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SIZES.spacingMd,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dateInputContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  dateInputText: {
+    marginLeft: SIZES.spacingSm,
+    flex: 1,
+  },
+  dateLabel: {
+    fontSize: SIZES.fontSizeSm,
+    fontWeight: '600' as const,
+    color: COLORS.textSecondary,
+    marginBottom: SIZES.spacingXs,
+  },
+  dateValue: {
+    fontSize: SIZES.fontSizeMd,
+    fontWeight: '500' as const,
+    color: COLORS.textPrimary,
+  },
+  durationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.infoLight,
+    padding: SIZES.spacingMd,
+    borderRadius: SIZES.radiusMd,
+    marginTop: SIZES.spacingMd,
+  },
+  durationText: {
+    fontSize: SIZES.fontSizeSm,
+    fontWeight: '600' as const,
+    color: COLORS.info,
+    marginLeft: SIZES.spacingSm,
   },
 });
 

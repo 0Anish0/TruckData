@@ -409,7 +409,7 @@ const EnhancedAddTripScreen: React.FC = () => {
                 <EnhancedCustomButton
                   title="Add Purchase"
                   onPress={addDieselPurchase}
-                  variant="outline"
+                  variant="primary"
                   size="small"
                   icon="add"
                 />
@@ -423,7 +423,7 @@ const EnhancedAddTripScreen: React.FC = () => {
                       onPress={() => removeDieselPurchase(index)}
                       style={styles.removeButton}
                     >
-                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                      <Ionicons name="close" size={16} color={COLORS.error} />
                     </TouchableOpacity>
                   </View>
                   
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeLg,
     fontWeight: '700' as const,
     color: COLORS.textPrimary,
-    marginBottom: SIZES.spacingLg,
+    marginBottom: SIZES.spacingMd,
   },
   pickerContainer: {
     marginBottom: SIZES.spacingLg,
@@ -678,10 +678,13 @@ const styles = StyleSheet.create({
     marginTop: SIZES.spacingXs,
   },
   dieselPurchaseCard: {
-    backgroundColor: COLORS.backgroundSecondary,
-    borderRadius: SIZES.radiusMd,
+    backgroundColor: COLORS.surface,
+    borderRadius: SIZES.radiusLg,
     padding: SIZES.spacingLg,
     marginBottom: SIZES.spacingMd,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SIZES.shadow,
   },
   dieselPurchaseHeader: {
     flexDirection: 'row',
@@ -690,19 +693,26 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacingMd,
   },
   dieselPurchaseTitle: {
-    fontSize: SIZES.fontSizeMd,
-    fontWeight: '600' as const,
+    fontSize: SIZES.fontSizeLg,
+    fontWeight: '700' as const,
     color: COLORS.textPrimary,
   },
   removeButton: {
-    padding: SIZES.spacingXs,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.error + '20',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   dieselPurchaseRow: {
     flexDirection: 'row',
     gap: SIZES.spacingMd,
+    marginBottom: SIZES.spacingMd,
   },
   dieselInput: {
     flex: 1,
+    marginBottom: SIZES.spacingSm,
   },
   costSection: {
     backgroundColor: COLORS.surface,
@@ -728,9 +738,14 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeLg,
     fontWeight: '700' as const,
     color: COLORS.textPrimary,
+    marginLeft: SIZES.spacingMd,
   },
   addCostButton: {
     marginTop: SIZES.spacingMd,
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.primaryLight,
+    borderColor: COLORS.primary,
+    borderWidth: 1,
   },
   complexCostCard: {
     backgroundColor: COLORS.surface,

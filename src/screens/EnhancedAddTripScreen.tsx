@@ -36,7 +36,7 @@ const EnhancedAddTripScreen: React.FC = () => {
     dto_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
     municipalities_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
     border_costs: [{ state: '', checkpoint: '', amount: 0, notes: '' }],
-    repair_cost: 0,
+    repair_items: [{ state: '', checkpoint: '', part_or_defect: '', amount: 0, notes: '' }],
   });
   
   const [trucks, setTrucks] = useState<Truck[]>([]);
@@ -213,6 +213,111 @@ const EnhancedAddTripScreen: React.FC = () => {
       <EnhancedCustomButton
         title={`Add ${title}`}
         onPress={() => onUpdate([...costs, 0])}
+        variant="outline"
+        size="small"
+        icon="add"
+        style={styles.addCostButton}
+      />
+    </View>
+  );
+
+  const RepairCostSection: React.FC<{
+    title: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    color: string;
+    costs: Array<{ state: string; checkpoint?: string; part_or_defect: string; amount: number; notes?: string; event_time?: string }>;
+    onUpdate: (costs: Array<{ state: string; checkpoint?: string; part_or_defect: string; amount: number; notes?: string; event_time?: string }>) => void;
+  }> = ({ title, icon, color, costs, onUpdate }) => (
+    <View style={styles.costSection}>
+      <View style={styles.costSectionHeader}>
+        <View style={[styles.costIcon, { backgroundColor: color + '20' }]}>
+          <Ionicons name={icon} size={20} color={color} />
+        </View>
+        <Text style={styles.costSectionTitle}>{title} Costs</Text>
+      </View>
+      
+      {costs.map((cost, index) => (
+        <View key={index} style={styles.complexCostCard}>
+          <View style={styles.complexCostHeader}>
+            <Text style={styles.complexCostTitle}>{title} Cost {index + 1}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                const newCosts = costs.filter((_, i) => i !== index);
+                onUpdate(newCosts);
+              }}
+              style={styles.removeCostButton}
+            >
+              <Ionicons name="close-circle" size={20} color={COLORS.error} />
+            </TouchableOpacity>
+          </View>
+          
+          <EnhancedCustomInput
+            label="State"
+            value={cost.state}
+            onChangeText={(text) => {
+              const newCosts = [...costs];
+              newCosts[index] = { ...newCosts[index], state: text };
+              onUpdate(newCosts);
+            }}
+            leftIcon="location"
+            placeholder="Enter state"
+          />
+          
+          <EnhancedCustomInput
+            label="Checkpoint (Optional)"
+            value={cost.checkpoint || ''}
+            onChangeText={(text) => {
+              const newCosts = [...costs];
+              newCosts[index] = { ...newCosts[index], checkpoint: text };
+              onUpdate(newCosts);
+            }}
+            leftIcon="flag"
+            placeholder="Enter checkpoint"
+          />
+          
+          <EnhancedCustomInput
+            label="Part/Defect"
+            value={cost.part_or_defect}
+            onChangeText={(text) => {
+              const newCosts = [...costs];
+              newCosts[index] = { ...newCosts[index], part_or_defect: text };
+              onUpdate(newCosts);
+            }}
+            leftIcon="construct"
+            placeholder="Enter part or defect description"
+          />
+          
+          <EnhancedCustomInput
+            label="Amount"
+            value={cost.amount.toString()}
+            onChangeText={(text) => {
+              const newCosts = [...costs];
+              newCosts[index] = { ...newCosts[index], amount: parseFloat(text) || 0 };
+              onUpdate(newCosts);
+            }}
+            leftIcon="cash"
+            keyboardType="numeric"
+            placeholder="Enter amount"
+          />
+          
+          <EnhancedCustomInput
+            label="Notes (Optional)"
+            value={cost.notes || ''}
+            onChangeText={(text) => {
+              const newCosts = [...costs];
+              newCosts[index] = { ...newCosts[index], notes: text };
+              onUpdate(newCosts);
+            }}
+            leftIcon="document-text"
+            placeholder="Enter notes"
+            multiline
+          />
+        </View>
+      ))}
+      
+      <EnhancedCustomButton
+        title={`Add ${title}`}
+        onPress={() => onUpdate([...costs, { state: '', checkpoint: '', part_or_defect: '', amount: 0, notes: '' }])}
         variant="outline"
         size="small"
         icon="add"
@@ -617,18 +722,14 @@ const EnhancedAddTripScreen: React.FC = () => {
               onUpdate={(costs) => setFormData(prev => ({ ...prev, municipalities_costs: costs }))}
             />
 
-            {/* Repair Cost */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Additional Costs</Text>
-              <EnhancedCustomInput
-                label="Repair Cost"
-                value={(formData.repair_cost || 0).toString()}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, repair_cost: parseFloat(text) || 0 }))}
-                leftIcon="construct"
-                keyboardType="numeric"
-                placeholder="Enter repair cost"
-              />
-            </View>
+            {/* Repair Costs */}
+            <RepairCostSection
+              title="Repair"
+              icon="construct"
+              color={COLORS.warning}
+              costs={formData.repair_items}
+              onUpdate={(costs) => setFormData(prev => ({ ...prev, repair_items: costs }))}
+            />
 
             {/* Submit Button */}
             <EnhancedCustomButton

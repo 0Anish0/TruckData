@@ -227,7 +227,6 @@ export interface TripFormData {
   source: string;
   destination: string;
   diesel_purchases: DieselPurchaseFormData[];
-  repair_items?: RepairItemFormData[];
   fast_tag_costs: FastTagEventFormData[]; 
   mcd_costs: McdEventFormData[]; 
   green_tax_costs: GreenTaxEventFormData[]; 
@@ -235,7 +234,7 @@ export interface TripFormData {
   dto_costs: DtoEventFormData[];
   municipalities_costs: MunicipalitiesEventFormData[];
   border_costs: BorderEventFormData[];
-  repair_cost?: number;
+  repair_items: RepairItemFormData[];
 }
 
 export interface TripFormErrors {
@@ -251,7 +250,7 @@ export interface TripFormErrors {
   dto_costs?: string;
   municipalities_costs?: string;
   border_costs?: string;
-  repair_cost?: string;
+  repair_items?: string;
 }
 
 export type AuthorityType = 'RTO' | 'DTO' | 'State Border' | 'Municipalities' | 'Other';
@@ -266,6 +265,8 @@ export interface CommissionItemFormData {
 }
 
 export interface RepairItemFormData {
+  state: string;
+  checkpoint?: string;
   part_or_defect: string;
   amount: number;
   notes?: string;

@@ -543,27 +543,23 @@ const EnhancedAddTripScreen: React.FC = () => {
             </View>
 
             {/* Diesel Purchases */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Diesel Purchases</Text>
-                <EnhancedCustomButton
-                  title="Add Purchase"
-                  onPress={addDieselPurchase}
-                  variant="primary"
-                  size="small"
-                  icon="add"
-                />
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.primary + '20' }]}>
+                  <Ionicons name="water" size={20} color={COLORS.primary} />
+                </View>
+                <Text style={styles.costSectionTitle}>Diesel Purchases</Text>
               </View>
               
               {formData.diesel_purchases.map((purchase, index) => (
-                <View key={index} style={styles.dieselPurchaseCard}>
-                  <View style={styles.dieselPurchaseHeader}>
-                    <Text style={styles.dieselPurchaseTitle}>Purchase {index + 1}</Text>
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>Purchase {index + 1}</Text>
                     <TouchableOpacity
                       onPress={() => removeDieselPurchase(index)}
-                      style={styles.removeButton}
+                      style={styles.removeCostButton}
                     >
-                      <Ionicons name="close" size={16} color={COLORS.error} />
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
                     </TouchableOpacity>
                   </View>
                   
@@ -663,6 +659,15 @@ const EnhancedAddTripScreen: React.FC = () => {
                   )}
                 </View>
               ))}
+              
+              <EnhancedCustomButton
+                title="Add Purchase"
+                onPress={addDieselPurchase}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
             </View>
 
             {/* Cost Sections */}

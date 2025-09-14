@@ -1,16 +1,16 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { MockAuthProvider } from './src/contexts/MockAuthContext';
+import { AuthProvider } from './src/contexts/AuthContext';
 import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <MockAuthProvider>
+      <AuthProvider>
         <AppNavigator />
         <StatusBar style="auto" />
-      </MockAuthProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

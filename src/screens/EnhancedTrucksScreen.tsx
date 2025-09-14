@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { mockTruckService, mockTripService } from '../services/mockService';
+import { truckService, tripService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTruckCard from '../components/EnhancedTruckCard';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import EnhancedTruckCard from '../components/TruckCard';
+import EnhancedCustomButton from '../components/CustomButton';
 import { Truck, Trip, TrucksScreenNavigationProp } from '../types';
 const { width } = Dimensions.get('window');
 
@@ -54,10 +54,10 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       const [trucksData, tripsData] = await Promise.all([
-        mockTruckService.getTrucks(),
-        mockTripService.getTrips(),
+        truckService.getTrucks(),
+        tripService.getTrips(),
       ]);
 
       setTrucks(trucksData);
@@ -79,7 +79,7 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
     const truckTrips = trips.filter(trip => trip.truck_id === truckId);
     const totalTrips = truckTrips.length;
     const totalCost = truckTrips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
-    
+
     return { totalTrips, totalCost };
   };
 
@@ -158,9 +158,9 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
   const renderTruckItem = ({ item, index }: { item: Truck & { totalTrips: number; totalCost: number }; index: number }) => (
     <EnhancedTruckCard
       truck={item}
-      onPress={() => {}}
+      onPress={() => { }}
       onEdit={() => navigation.navigate('AddTruck', { truck: item })}
-      onDelete={() => {}}
+      onDelete={() => { }}
       index={index}
       tripCount={item.totalTrips}
       totalCost={item.totalCost}

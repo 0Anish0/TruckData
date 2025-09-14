@@ -13,10 +13,10 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/EnhancedCustomInput';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import EnhancedCustomInput from '../components/CustomInput';
+import EnhancedCustomButton from '../components/CustomButton';
 
 const { width } = Dimensions.get('window');
 
@@ -169,7 +169,7 @@ const EnhancedAuthScreen: React.FC = () => {
                 },
               ]}
             >
-              <Animated.View 
+              <Animated.View
                 style={[
                   styles.logoContainer,
                   {
@@ -213,25 +213,16 @@ const EnhancedAuthScreen: React.FC = () => {
                     ? 'Sign in to continue to your dashboard'
                     : 'Sign up to start managing your fleet'}
                 </Text>
-                
-                {isLogin && (
-                  <View style={styles.credentialsHint}>
-                    <View style={styles.credentialsHeader}>
-                      <Ionicons name="key" size={20} color={COLORS.info} />
-                      <Text style={styles.credentialsTitle}>Demo Credentials</Text>
-                    </View>
-                    <View style={styles.credentialsContent}>
-                      <View style={styles.credentialRow}>
-                        <Text style={styles.credentialLabel}>Email:</Text>
-                        <Text style={styles.credentialValue}>admin@truckdata.com</Text>
-                      </View>
-                      <View style={styles.credentialRow}>
-                        <Text style={styles.credentialLabel}>Password:</Text>
-                        <Text style={styles.credentialValue}>admin123</Text>
-                      </View>
-                    </View>
+
+                {!isLogin && (
+                  <View style={styles.verificationHint}>
+                    <Ionicons name="mail" size={16} color={COLORS.info} />
+                    <Text style={styles.verificationText}>
+                      You'll receive a verification email after signing up
+                    </Text>
                   </View>
                 )}
+
 
                 <View style={styles.inputContainer}>
                   {!isLogin && (
@@ -298,24 +289,6 @@ const EnhancedAuthScreen: React.FC = () => {
                     style={styles.toggleButton}
                   />
                 </View>
-              </View>
-            </Animated.View>
-
-            {/* Demo Info */}
-            <Animated.View
-              style={[
-                styles.demoInfo,
-                {
-                  opacity: fadeAnim,
-                  transform: [{ translateY: slideAnim }],
-                },
-              ]}
-            >
-              <View style={styles.demoCard}>
-                <Ionicons name="information-circle" size={20} color={COLORS.info} />
-                <Text style={styles.demoText}>
-                  Demo Mode: Use any email and password to sign in
-                </Text>
               </View>
             </Animated.View>
           </ScrollView>
@@ -437,19 +410,36 @@ const styles = StyleSheet.create({
     fontSize: SIZES.fontSizeMd,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    marginBottom: SIZES.spacingXl,
+    marginBottom: SIZES.spacingMd,
     lineHeight: 22,
   },
+  verificationHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.infoLight,
+    padding: SIZES.spacingSm,
+    borderRadius: SIZES.radiusMd,
+    marginBottom: SIZES.spacingLg,
+    borderWidth: 1,
+    borderColor: COLORS.info,
+  },
+  verificationText: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.info,
+    marginLeft: SIZES.spacingXs,
+    textAlign: 'center',
+  },
   inputContainer: {
-    gap: SIZES.spacingLg,
+    gap: SIZES.spacingXs,
   },
   submitButton: {
-    marginTop: SIZES.spacingMd,
+    marginTop: SIZES.spacingXs,
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: SIZES.spacingLg,
+    marginVertical: SIZES.spacingXs,
   },
   dividerLine: {
     flex: 1,
@@ -484,46 +474,6 @@ const styles = StyleSheet.create({
     fontWeight: '500' as const,
     textAlign: 'center',
     flex: 1,
-  },
-  credentialsHint: {
-    backgroundColor: COLORS.infoLight,
-    padding: SIZES.spacingLg,
-    borderRadius: SIZES.radiusLg,
-    marginBottom: SIZES.spacingLg,
-    borderWidth: 1,
-    borderColor: COLORS.info,
-    ...SIZES.shadowSubtle,
-  },
-  credentialsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SIZES.spacingSm,
-  },
-  credentialsTitle: {
-    fontSize: SIZES.fontSizeMd,
-    color: COLORS.info,
-    fontWeight: '600' as const,
-    marginLeft: SIZES.spacingXs,
-  },
-  credentialsContent: {
-    gap: SIZES.spacingXs,
-  },
-  credentialRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  credentialLabel: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textSecondary,
-    fontWeight: '500' as const,
-  },
-  credentialValue: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textPrimary,
-    fontWeight: '600' as const,
-    fontFamily: 'monospace',
   },
 });
 

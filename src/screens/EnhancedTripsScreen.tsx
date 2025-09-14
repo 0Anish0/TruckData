@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { mockTripService, mockTruckService } from '../services/mockService';
+import { tripService, truckService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTripCard from '../components/EnhancedTripCard';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import EnhancedTripCard from '../components/TripCard';
+import EnhancedCustomButton from '../components/CustomButton';
 import { Trip, Truck, TripsScreenNavigationProp, TripWithRelations } from '../types';
 const { width } = Dimensions.get('window');
 
@@ -56,10 +56,10 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       const [tripsData, trucksData] = await Promise.all([
-        mockTripService.getTrips(),
-        mockTruckService.getTrucks(),
+        tripService.getTrips(),
+        truckService.getTrucks(),
       ]);
 
       setTrips(tripsData);
@@ -155,9 +155,9 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
     <EnhancedTripCard
       trip={item}
       truckName={getTruckName(item.truck_id)}
-      onPress={() => {}}
+      onPress={() => { }}
       onEdit={() => navigation.navigate('AddTrip', { trip: item as TripWithRelations })}
-      onDelete={() => {}}
+      onDelete={() => { }}
       index={index}
     />
   );
@@ -259,7 +259,7 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
                     All Trips
                   </Text>
                 </TouchableOpacity>
-                
+
                 {trucks.map((truck) => (
                   <TruckFilterButton
                     key={truck.id}

@@ -1,16 +1,11 @@
--- =====================================================
--- SIMPLIFIED SUPABASE SCHEMA FOR TRUCK FLEET MANAGEMENT
--- Cost calculations handled in application code
--- =====================================================
-
 -- Enable the uuid-ossp extension for generating UUIDs
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =====================================================
--- 1. USERS TABLE
+-- 1. PROFILES TABLE (References auth.users)
 -- =====================================================
-CREATE TABLE public.users (
-    id UUID PRIMARY KEY,
+CREATE TABLE public.profiles (
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -22,7 +17,7 @@ CREATE TABLE public.users (
 -- =====================================================
 CREATE TABLE public.trucks (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     name TEXT NOT NULL,
     truck_number TEXT UNIQUE NOT NULL,
     model TEXT,
@@ -35,7 +30,7 @@ CREATE TABLE public.trucks (
 -- =====================================================
 CREATE TABLE public.drivers (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     name TEXT NOT NULL,
     age INTEGER,
     phone TEXT,
@@ -50,7 +45,7 @@ CREATE TABLE public.drivers (
 -- =====================================================
 CREATE TABLE public.trips (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     truck_id UUID REFERENCES public.trucks(id) ON DELETE CASCADE NOT NULL,
     driver_id UUID REFERENCES public.drivers(id) ON DELETE SET NULL,
     source TEXT NOT NULL,
@@ -195,8 +190,8 @@ CREATE TABLE public.repair_items (
 -- 7. INDEXES FOR PERFORMANCE
 -- =====================================================
 
--- User indexes
-CREATE INDEX idx_users_email ON public.users(email);
+-- Profile indexes
+CREATE INDEX idx_profiles_email ON public.profiles(email);
 
 -- Truck indexes
 CREATE INDEX idx_trucks_user_id ON public.trucks(user_id);
@@ -229,91 +224,24 @@ CREATE INDEX idx_border_events_trip_id ON public.border_events(trip_id);
 CREATE INDEX idx_repair_items_trip_id ON public.repair_items(trip_id);
 
 -- =====================================================
--- 8. VIEWS FOR COMMON QUERIES
+-- . FUNCTIONS AND TRIGGERS FOR PROFILE MANAGEMENT
 -- =====================================================
 
--- View for trip details with related data
-CREATE VIEW trip_details AS
-SELECT 
-    t.id,
-    t.source,
-    t.destination,
-    t.start_date,
-    t.end_date,
-    t.trip_date,
-    t.fast_tag_cost,
-    t.mcd_cost,
-    t.green_tax_cost,
-    t.rto_cost,
-    t.dto_cost,
-    t.municipalities_cost,
-    t.border_cost,
-    t.repair_cost,
-    t.total_cost,
-    t.created_at,
-    t.updated_at,
-    tr.name as truck_name,
-    tr.truck_number,
-    tr.model as truck_model,
-    d.name as driver_name,
-    d.license_number,
-    u.name as user_name,
-    u.email as user_email
-FROM trips t
-LEFT JOIN trucks tr ON t.truck_id = tr.id
-LEFT JOIN drivers d ON t.driver_id = d.id
-LEFT JOIN users u ON t.user_id = u.id;
+-- Function to handle new user signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', NEW.email)
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- View for trip statistics
-CREATE VIEW trip_statistics AS
-SELECT 
-    u.id as user_id,
-    u.name as user_name,
-    COUNT(t.id) as total_trips,
-    COALESCE(SUM(t.total_cost), 0) as total_cost,
-    COALESCE(AVG(t.total_cost), 0) as avg_cost_per_trip,
-    COALESCE(SUM(dp.diesel_quantity), 0) as total_diesel_liters,
-    COALESCE(SUM(dp.diesel_quantity * dp.diesel_price_per_liter), 0) as total_diesel_cost,
-    COUNT(DISTINCT t.truck_id) as total_trucks,
-    COUNT(DISTINCT t.driver_id) as total_drivers
-FROM users u
-LEFT JOIN trips t ON u.id = t.user_id
-LEFT JOIN diesel_purchases dp ON t.id = dp.trip_id
-GROUP BY u.id, u.name;
-
--- =====================================================
--- 9. SAMPLE DATA (Optional - for testing)
--- =====================================================
-
--- Insert sample user
-INSERT INTO users (id, email, name) VALUES 
-('550e8400-e29b-41d4-a716-446655440000', 'admin@truckdata.com', 'Admin User');
-
--- Insert sample trucks
-INSERT INTO trucks (id, name, truck_number, model, user_id) VALUES 
-('550e8400-e29b-41d4-a716-446655440001', 'Mahindra Bolero', 'MH-12-AB-1234', 'Bolero Pickup', '550e8400-e29b-41d4-a716-446655440000'),
-('550e8400-e29b-41d4-a716-446655440002', 'Tata Ace', 'DL-01-CD-5678', 'Ace Gold', '550e8400-e29b-41d4-a716-446655440000'),
-('550e8400-e29b-41d4-a716-446655440003', 'Ashok Leyland Dost', 'KA-05-EF-9012', 'Dost Plus', '550e8400-e29b-41d4-a716-446655440000');
-
--- Insert sample drivers
-INSERT INTO drivers (id, name, age, phone, license_number, user_id) VALUES 
-('550e8400-e29b-41d4-a716-446655440010', 'Rajesh Kumar', 35, '+91-9876543210', 'DL-1234567890', '550e8400-e29b-41d4-a716-446655440000'),
-('550e8400-e29b-41d4-a716-446655440011', 'Suresh Singh', 42, '+91-9876543211', 'DL-1234567891', '550e8400-e29b-41d4-a716-446655440000'),
-('550e8400-e29b-41d4-a716-446655440012', 'Amit Sharma', 28, '+91-9876543212', 'DL-1234567892', '550e8400-e29b-41d4-a716-446655440000');
-
--- =====================================================
--- SCHEMA COMPLETE
--- =====================================================
--- This simplified schema provides:
--- 1. Complete user management
--- 2. Truck and driver management
--- 3. Comprehensive trip tracking
--- 4. Detailed cost breakdown across multiple categories
--- 5. Performance-optimized indexes
--- 6. Data integrity constraints
--- 7. Useful views for common queries
--- 8. Sample data for testing
--- 
--- Note: Cost calculations are handled in the application code
--- The database only stores the raw data and calculated totals
--- =====================================================
+-- Trigger to automatically create profile on user signup
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

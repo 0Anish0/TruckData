@@ -13,11 +13,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/MockAuthContext';
-import { mockTripService, mockTruckService, mockDriverService } from '../services/mockService';
+import { useAuth } from '../contexts/AuthContext';
+import { tripService, truckService, driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTripCard from '../components/EnhancedTripCard';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import EnhancedTripCard from '../components/TripCard';
+import EnhancedCustomButton from '../components/CustomButton';
 import { Trip, Truck, Driver, DashboardStats, DashboardScreenNavigationProp, TripWithRelations } from '../types';
 
 const { width } = Dimensions.get('window');
@@ -66,12 +66,12 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       const [tripsData, trucksData, driversData, statsData] = await Promise.all([
-        mockTripService.getTrips(),
-        mockTruckService.getTrucks(),
-        mockDriverService.getDrivers(),
-        mockTripService.getTripStats(),
+        tripService.getTrips(),
+        truckService.getTrucks(),
+        driverService.getDrivers(),
+        tripService.getTripStats(),
       ]);
 
       setTrips(tripsData);
@@ -246,7 +246,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
             icon="people"
             color={COLORS.accent}
             gradient={COLORS.accentGradient}
-          />          
+          />
         </View>
 
         {/* Quick Actions */}
@@ -285,7 +285,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
               iconPosition="right"
             />
           </View>
-          
+
           {trips.slice(0, 3).map((trip, index) => (
             <EnhancedTripCard
               key={trip.id}

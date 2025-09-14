@@ -13,9 +13,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/EnhancedCustomInput';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { mockTruckService } from '../services/mockService';
+import EnhancedCustomInput from '../components/CustomInput';
+import EnhancedCustomButton from '../components/CustomButton';
+import { truckService } from '../services';
 import { AddTruckScreenNavigationProp, Truck } from '../types';
 
 interface EnhancedAddTruckScreenProps {
@@ -120,8 +120,8 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
           truck_number: formData.truckNumber,
           model: formData.model,
         };
-        
-        await mockTruckService.updateTruck(truckToEdit.id, truckUpdateData);
+
+        await truckService.updateTruck(truckToEdit.id, truckUpdateData);
         Alert.alert(
           'Success',
           'Truck updated successfully!',
@@ -135,8 +135,8 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
           model: formData.model,
           user_id: 'user-1', // TODO: Get from auth context
         };
-        
-        await mockTruckService.createTruck(truckCreateData);
+
+        await truckService.createTruck(truckCreateData);
         Alert.alert(
           'Success',
           'Truck added successfully!',
@@ -146,7 +146,7 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
     } catch (error: unknown) {
       console.error(`Error ${isEditMode ? 'updating' : 'adding'} truck:`, error);
       Alert.alert(
-        'Error', 
+        'Error',
         `Failed to ${isEditMode ? 'update' : 'add'} truck. Please try again.`
       );
     } finally {
@@ -192,96 +192,96 @@ const EnhancedAddTruckScreen: React.FC<EnhancedAddTruckScreenProps> = ({ route, 
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-        <Animated.View
-          style={[
-            styles.formContainer,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
-          {/* Basic Information */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Basic Information</Text>
-            
-            <EnhancedCustomInput
-              label="Truck Name"
-              value={formData.name}
-              onChangeText={(value) => handleInputChange('name', value)}
-              placeholder="Enter truck name (e.g., Ashok Leyland Dost)"
-              leftIcon="car-sport"
-            />
+          <Animated.View
+            style={[
+              styles.formContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            {/* Basic Information */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Basic Information</Text>
 
-            <EnhancedCustomInput
-              label="Registration Number"
-              value={formData.truckNumber}
-              onChangeText={(value) => handleInputChange('truckNumber', value)}
-              placeholder="Enter registration number (e.g., KA-05-EF-9012)"
-              leftIcon="card"
-            />
+              <EnhancedCustomInput
+                label="Truck Name"
+                value={formData.name}
+                onChangeText={(value) => handleInputChange('name', value)}
+                placeholder="Enter truck name (e.g., Ashok Leyland Dost)"
+                leftIcon="car-sport"
+              />
 
-            <EnhancedCustomInput
-              label="Model"
-              value={formData.model}
-              onChangeText={(value) => handleInputChange('model', value)}
-              placeholder="Enter truck model (e.g., Dost Plus)"
-              leftIcon="construct"
-            />
+              <EnhancedCustomInput
+                label="Registration Number"
+                value={formData.truckNumber}
+                onChangeText={(value) => handleInputChange('truckNumber', value)}
+                placeholder="Enter registration number (e.g., KA-05-EF-9012)"
+                leftIcon="card"
+              />
 
-            <EnhancedCustomInput
-              label="Manufacturing Year"
-              value={formData.year}
-              onChangeText={(value) => handleInputChange('year', value)}
-              placeholder="Enter year (e.g., 2020)"
-              leftIcon="calendar"
-              keyboardType="numeric"
-            />
-          </View>
+              <EnhancedCustomInput
+                label="Model"
+                value={formData.model}
+                onChangeText={(value) => handleInputChange('model', value)}
+                placeholder="Enter truck model (e.g., Dost Plus)"
+                leftIcon="construct"
+              />
 
-          {/* Specifications */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Specifications</Text>
-            
-            <EnhancedCustomInput
-              label="Capacity"
-              value={formData.capacity}
-              onChangeText={(value) => handleInputChange('capacity', value)}
-              placeholder="Enter capacity (e.g., 1000 kg)"
-              leftIcon="cube"
-            />
+              <EnhancedCustomInput
+                label="Manufacturing Year"
+                value={formData.year}
+                onChangeText={(value) => handleInputChange('year', value)}
+                placeholder="Enter year (e.g., 2020)"
+                leftIcon="calendar"
+                keyboardType="numeric"
+              />
+            </View>
 
-            <EnhancedCustomInput
-              label="Fuel Type"
-              value={formData.fuelType}
-              onChangeText={(value) => handleInputChange('fuelType', value)}
-              placeholder="Enter fuel type (e.g., Diesel)"
-              leftIcon="flash"
-            />
+            {/* Specifications */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Specifications</Text>
 
-            <EnhancedCustomInput
-              label="Color"
-              value={formData.color}
-              onChangeText={(value) => handleInputChange('color', value)}
-              placeholder="Enter truck color (e.g., White)"
-              leftIcon="color-palette"
-            />
-          </View>
+              <EnhancedCustomInput
+                label="Capacity"
+                value={formData.capacity}
+                onChangeText={(value) => handleInputChange('capacity', value)}
+                placeholder="Enter capacity (e.g., 1000 kg)"
+                leftIcon="cube"
+              />
 
-          {/* Submit Button */}
-          <View style={styles.submitContainer}>
-            <EnhancedCustomButton
-              title={isEditMode ? "Edit Truck" : "Add Truck"}
-              onPress={handleSubmit}
-              icon="car-sport"
-              variant="primary"
-              size="large"
-              fullWidth
-              loading={loading}
-              disabled={loading}
-            />
-          </View>
-        </Animated.View>
+              <EnhancedCustomInput
+                label="Fuel Type"
+                value={formData.fuelType}
+                onChangeText={(value) => handleInputChange('fuelType', value)}
+                placeholder="Enter fuel type (e.g., Diesel)"
+                leftIcon="flash"
+              />
+
+              <EnhancedCustomInput
+                label="Color"
+                value={formData.color}
+                onChangeText={(value) => handleInputChange('color', value)}
+                placeholder="Enter truck color (e.g., White)"
+                leftIcon="color-palette"
+              />
+            </View>
+
+            {/* Submit Button */}
+            <View style={styles.submitContainer}>
+              <EnhancedCustomButton
+                title={isEditMode ? "Edit Truck" : "Add Truck"}
+                onPress={handleSubmit}
+                icon="car-sport"
+                variant="primary"
+                size="large"
+                fullWidth
+                loading={loading}
+                disabled={loading}
+              />
+            </View>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

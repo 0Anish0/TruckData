@@ -12,8 +12,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { mockTripService } from '../services/mockService';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTripCard from '../components/EnhancedTripCard';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import EnhancedTripCard from '../components/TripCard';
+import EnhancedCustomButton from '../components/CustomButton';
 import { Trip, Truck, EnhancedTruckTripsScreenProps, TripWithRelations } from '../types';
 import { useNavigation } from '@react-navigation/native';
 import { AddTripScreenNavigationProp } from '../types/navigation';
@@ -53,7 +53,7 @@ const EnhancedTruckTripsScreen: React.FC<EnhancedTruckTripsScreenProps> = ({ rou
     try {
       setLoading(true);
       const tripsData = await mockTripService.getTripsByTruck(truck.id);
-        setTrips(tripsData as Trip[]);
+      setTrips(tripsData as Trip[]);
     } catch (error) {
       console.error('Error loading truck trips data:', error);
     } finally {
@@ -152,9 +152,9 @@ const EnhancedTruckTripsScreen: React.FC<EnhancedTruckTripsScreenProps> = ({ rou
     <EnhancedTripCard
       trip={item}
       truckName={truck.name}
-      onPress={() => {}}
+      onPress={() => { }}
       onEdit={() => navigation.navigate('AddTrip', { trip: item as TripWithRelations })}
-      onDelete={() => {}}
+      onDelete={() => { }}
       index={index}
     />
   );
@@ -249,7 +249,7 @@ const EnhancedTruckTripsScreen: React.FC<EnhancedTruckTripsScreenProps> = ({ rou
         <View style={styles.addButtonContainer}>
           <EnhancedCustomButton
             title="Add New Trip"
-            onPress={() => {}}
+            onPress={() => { }}
             icon="add-circle"
             variant="secondary"
             size="large"
@@ -283,7 +283,7 @@ const EnhancedTruckTripsScreen: React.FC<EnhancedTruckTripsScreenProps> = ({ rou
               </Text>
               <EnhancedCustomButton
                 title="Add Trip"
-                onPress={() => {}}
+                onPress={() => { }}
                 icon="add-circle"
                 variant="outline"
                 size="medium"

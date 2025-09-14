@@ -213,8 +213,11 @@ export class TripService extends SupabaseService {
 
       const { data: dieselData, error: dieselError } = await supabase
         .from('diesel_purchases')
-        .select('diesel_quantity')
-        .eq('user_id', await this.getUserId());
+        .select(`
+          diesel_quantity,
+          trips!inner(user_id)
+        `)
+        .eq('trips.user_id', await this.getUserId());
 
       if (dieselError) {
         console.error('Error fetching diesel data:', dieselError);

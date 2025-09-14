@@ -227,21 +227,21 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
           <StatCard
-            title="Total Trip"
+            title="All Trips"
             value={stats.totalTrips.toString()}
             icon="trending-up"
             color={COLORS.info}
             gradient={COLORS.infoGradient}
           />
           <StatCard
-            title="Total Truck"
+            title="All Trucks"
             value={trucks.length.toString()}
             icon="car-sport"
             color={COLORS.secondary}
             gradient={COLORS.secondaryGradient}
           />
           <StatCard
-            title="Total Driver"
+            title="All Drivers"
             value={drivers.length.toString()}
             icon="people"
             color={COLORS.accent}

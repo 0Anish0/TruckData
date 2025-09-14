@@ -8,6 +8,7 @@ import {
   Animated,
   TouchableOpacity,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,7 +28,7 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'recent' | 'high-cost'>('all');
+  const [selectedTruckId, setSelectedTruckId] = useState<string | null>(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -82,18 +83,10 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
   };
 
   const getFilteredTrips = () => {
-    switch (filter) {
-      case 'recent':
-        return trips
-          .sort((a, b) => new Date(b.trip_date).getTime() - new Date(a.trip_date).getTime())
-          .slice(0, 10);
-      case 'high-cost':
-        return trips
-          .sort((a, b) => (b.total_cost || 0) - (a.total_cost || 0))
-          .slice(0, 10);
-      default:
-        return trips;
+    if (!selectedTruckId) {
+      return trips;
     }
+    return trips.filter(trip => trip.truck_id === selectedTruckId);
   };
 
   const formatCurrency = (amount: number) => {
@@ -108,29 +101,29 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
     return { totalTrips, totalCost, avgCost };
   };
 
-  const FilterButton: React.FC<{
-    title: string;
+  const TruckFilterButton: React.FC<{
+    truck: Truck;
     isActive: boolean;
     onPress: () => void;
-    icon: keyof typeof Ionicons.glyphMap;
-  }> = ({ title, isActive, onPress, icon }) => (
+  }> = ({ truck, isActive, onPress }) => (
     <TouchableOpacity
-      style={[styles.filterButton, isActive && styles.filterButtonActive]}
+      style={[styles.truckFilterButton, isActive && styles.truckFilterButtonActive]}
       onPress={onPress}
       activeOpacity={0.7}
     >
       <Ionicons
-        name={icon}
+        name="car-sport"
         size={16}
         color={isActive ? COLORS.textInverse : COLORS.primary}
       />
       <Text
         style={[
-          styles.filterButtonText,
-          isActive && styles.filterButtonTextActive,
+          styles.truckFilterButtonText,
+          isActive && styles.truckFilterButtonTextActive,
         ]}
+        numberOfLines={1}
       >
-        {title}
+        {truck.name}
       </Text>
     </TouchableOpacity>
   );
@@ -239,26 +232,43 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
               />
             </View>
 
-            {/* Filter Buttons */}
+            {/* Truck Filter */}
             <View style={styles.filterContainer}>
-              <FilterButton
-                title="All Trips"
-                isActive={filter === 'all'}
-                onPress={() => setFilter('all')}
-                icon="list"
-              />
-              <FilterButton
-                title="Recent"
-                isActive={filter === 'recent'}
-                onPress={() => setFilter('recent')}
-                icon="time"
-              />
-              <FilterButton
-                title="High Cost"
-                isActive={filter === 'high-cost'}
-                onPress={() => setFilter('high-cost')}
-                icon="trending-up"
-              />
+              <Text style={styles.filterTitle}>Filter by Truck</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.truckFilterScrollContent}
+              >
+                <TouchableOpacity
+                  style={[styles.truckFilterButton, !selectedTruckId && styles.truckFilterButtonActive]}
+                  onPress={() => setSelectedTruckId(null)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons
+                    name="list"
+                    size={16}
+                    color={!selectedTruckId ? COLORS.textInverse : COLORS.primary}
+                  />
+                  <Text
+                    style={[
+                      styles.truckFilterButtonText,
+                      !selectedTruckId && styles.truckFilterButtonTextActive,
+                    ]}
+                  >
+                    All Trips
+                  </Text>
+                </TouchableOpacity>
+                
+                {trucks.map((truck) => (
+                  <TruckFilterButton
+                    key={truck.id}
+                    truck={truck}
+                    isActive={selectedTruckId === truck.id}
+                    onPress={() => setSelectedTruckId(truck.id)}
+                  />
+                ))}
+              </ScrollView>
             </View>
 
             {/* Add Trip Button */}
@@ -279,9 +289,9 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
             <Ionicons name="car-outline" size={64} color={COLORS.textTertiary} />
             <Text style={styles.emptyTitle}>No Trips Found</Text>
             <Text style={styles.emptySubtitle}>
-              {filter === 'all'
+              {!selectedTruckId
                 ? 'Start by adding your first trip'
-                : `No trips match the "${filter}" filter`}
+                : `No trips found for ${getTruckName(selectedTruckId)}`}
             </Text>
             <EnhancedCustomButton
               title="Add Trip"
@@ -395,12 +405,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   filterContainer: {
-    flexDirection: 'row',
     marginBottom: SIZES.spacingLg,
+  },
+  filterTitle: {
+    fontSize: SIZES.fontSizeMd,
+    fontWeight: '600' as const,
+    color: COLORS.textPrimary,
+    marginBottom: SIZES.spacingMd,
+  },
+  truckFilterScrollContent: {
+    paddingHorizontal: SIZES.spacingXs,
     gap: SIZES.spacingSm,
   },
-  filterButton: {
-    flex: 1,
+  truckFilterButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -410,17 +427,19 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.primary,
     backgroundColor: COLORS.surface,
+    minWidth: 120,
   },
-  filterButtonActive: {
+  truckFilterButtonActive: {
     backgroundColor: COLORS.primary,
   },
-  filterButtonText: {
+  truckFilterButtonText: {
     fontSize: SIZES.fontSizeSm,
     fontWeight: '600' as const,
     color: COLORS.primary,
     marginLeft: SIZES.spacingXs,
+    flexShrink: 1,
   },
-  filterButtonTextActive: {
+  truckFilterButtonTextActive: {
     color: COLORS.textInverse,
   },
   addButtonContainer: {

@@ -266,38 +266,6 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
           ))}
         </View>
 
-        {/* Fleet Overview */}
-        <View style={styles.fleetContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Fleet Overview</Text>
-            <EnhancedCustomButton
-              title="Manage"
-              onPress={() => navigation.navigate('Trucks')}
-              variant="ghost"
-              size="small"
-              icon="settings"
-              iconPosition="right"
-            />
-          </View>
-          
-          <View style={styles.fleetStats}>
-            <View style={styles.fleetStatItem}>
-              <Ionicons name="car-sport" size={24} color={COLORS.primary} />
-              <Text style={styles.fleetStatValue}>{trucks.length}</Text>
-              <Text style={styles.fleetStatLabel}>Active Trucks</Text>
-            </View>
-            <View style={styles.fleetStatItem}>
-              <Ionicons name="people" size={24} color={COLORS.secondary} />
-              <Text style={styles.fleetStatValue}>3</Text>
-              <Text style={styles.fleetStatLabel}>Drivers</Text>
-            </View>
-            <View style={styles.fleetStatItem}>
-              <Ionicons name="trending-up" size={24} color={COLORS.success} />
-              <Text style={styles.fleetStatValue}>95%</Text>
-              <Text style={styles.fleetStatLabel}>Efficiency</Text>
-            </View>
-          </View>
-        </View>
 
         {/* Bottom Spacing */}
         <View style={styles.bottomSpacing} />
@@ -416,7 +384,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   quickActionsContainer: {
-    marginBottom: SIZES.spacingXl,
+    marginBottom: SIZES.spacingLg,
   },
   sectionTitle: {
     fontSize: SIZES.fontSizeXl,
@@ -441,38 +409,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SIZES.spacingLg,
-  },
-  fleetContainer: {
-    marginBottom: SIZES.spacingLg,
-  },
-  fleetStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: COLORS.surface,
-    borderRadius: SIZES.radiusLg,
-    padding: SIZES.spacingLg,
-    ...SIZES.shadow,
-    minHeight: 100,
-  },
-  fleetStatItem: {
-    alignItems: 'center',
-    flex: 1,
-    paddingHorizontal: SIZES.spacingXs,
-  },
-  fleetStatValue: {
-    fontSize: SIZES.fontSizeXl,
-    fontWeight: '800',
-    color: COLORS.textPrimary,
-    marginTop: SIZES.spacingSm,
-    marginBottom: SIZES.spacingXs,
-    textAlign: 'center',
-  },
-  fleetStatLabel: {
-    fontSize: SIZES.fontSizeXs,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
-    textAlign: 'center',
-    lineHeight: SIZES.fontSizeXs * 1.3,
   },
   bottomSpacing: {
     height: SIZES.spacingXl,

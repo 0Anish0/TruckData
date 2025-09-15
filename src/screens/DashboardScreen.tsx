@@ -13,20 +13,20 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/MockAuthContext';
-import { mockTripService, mockTruckService, mockDriverService } from '../services/mockService';
+import { useAuth } from '../contexts/AuthContext';
+import { tripService, truckService, driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTripCard from '../components/EnhancedTripCard';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import TripCard from '../components/TripCard';
+import CustomButton from '../components/CustomButton';
 import { Trip, Truck, Driver, DashboardStats, DashboardScreenNavigationProp, TripWithRelations } from '../types';
 
 const { width } = Dimensions.get('window');
 
-interface EnhancedDashboardScreenProps {
+interface DashboardScreenProps {
   navigation: DashboardScreenNavigationProp;
 }
 
-const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navigation }) => {
+const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const { user, signOut } = useAuth();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [trucks, setTrucks] = useState<Truck[]>([]);
@@ -66,12 +66,12 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       const [tripsData, trucksData, driversData, statsData] = await Promise.all([
-        mockTripService.getTrips(),
-        mockTruckService.getTrucks(),
-        mockDriverService.getDrivers(),
-        mockTripService.getTripStats(),
+        tripService.getTrips(),
+        truckService.getTrucks(),
+        driverService.getDrivers(),
+        tripService.getTripStats(),
       ]);
 
       setTrips(tripsData);
@@ -227,33 +227,33 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
           <StatCard
-            title="Total Trip"
+            title="All Trips"
             value={stats.totalTrips.toString()}
             icon="trending-up"
             color={COLORS.info}
             gradient={COLORS.infoGradient}
           />
           <StatCard
-            title="Total Truck"
+            title="All Trucks"
             value={trucks.length.toString()}
             icon="car-sport"
             color={COLORS.secondary}
             gradient={COLORS.secondaryGradient}
           />
           <StatCard
-            title="Total Driver"
+            title="All Drivers"
             value={drivers.length.toString()}
             icon="people"
             color={COLORS.accent}
             gradient={COLORS.accentGradient}
-          />          
+          />
         </View>
 
         {/* Quick Actions */}
         <View style={styles.quickActionsContainer}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.quickActions}>
-            <EnhancedCustomButton
+            <CustomButton
               title="Add Trip"
               onPress={() => navigation.navigate('AddTrip', {})}
               icon="add-circle"
@@ -261,7 +261,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
               size="medium"
               style={styles.quickActionButton}
             />
-            <EnhancedCustomButton
+            <CustomButton
               title="Add Truck"
               onPress={() => navigation.navigate('AddTruck', {})}
               icon="car-sport"
@@ -276,7 +276,7 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
         <View style={styles.recentTripsContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Trips</Text>
-            <EnhancedCustomButton
+            <CustomButton
               title="View All"
               onPress={() => navigation.navigate('Trips')}
               variant="ghost"
@@ -285,9 +285,9 @@ const EnhancedDashboardScreen: React.FC<EnhancedDashboardScreenProps> = ({ navig
               iconPosition="right"
             />
           </View>
-          
+
           {trips.slice(0, 3).map((trip, index) => (
-            <EnhancedTripCard
+            <TripCard
               key={trip.id}
               trip={trip}
               truckName={getTruckName(trip.truck_id)}
@@ -465,4 +465,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedDashboardScreen;
+export default DashboardScreen;

@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import { EnhancedTripCardProps } from '../types';
+import { TripCardProps } from '../types';
 
-const EnhancedTripCard: React.FC<EnhancedTripCardProps> = ({
+const TripCard: React.FC<TripCardProps> = ({
   trip,
   truckName,
   onPress,
@@ -455,4 +455,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedTripCard;
+export default TripCard;

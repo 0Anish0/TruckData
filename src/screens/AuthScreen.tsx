@@ -6,21 +6,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
   Animated,
   Dimensions,
   StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/EnhancedCustomInput';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import CustomInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
 
 const { width } = Dimensions.get('window');
 
-const EnhancedAuthScreen: React.FC = () => {
+const AuthScreen: React.FC = () => {
   const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -107,18 +106,32 @@ const EnhancedAuthScreen: React.FC = () => {
     if (!validateForm()) return;
 
     setLoading(true);
+    setErrors({}); // Clear previous errors
+
     try {
       if (isLogin) {
         await signIn(email, password);
+        // If sign in is successful, the auth state change will handle navigation
       } else {
         await signUp(email, password, name);
+        // After signup, clear the form and show success message
+        setEmail('');
+        setPassword('');
+        setName('');
+        // Don't switch to login mode automatically - let user choose
       }
     } catch (error: unknown) {
-      Alert.alert(
-        'Error',
-        (error as Error).message || 'An error occurred. Please try again.',
-        [{ text: 'OK' }]
-      );
+      console.error('Auth error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred. Please try again.';
+
+      // Set specific field errors if possible
+      if (errorMessage.includes('email')) {
+        setErrors({ email: errorMessage });
+      } else if (errorMessage.includes('password')) {
+        setErrors({ password: errorMessage });
+      } else {
+        setErrors({ general: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -169,7 +182,7 @@ const EnhancedAuthScreen: React.FC = () => {
                 },
               ]}
             >
-              <Animated.View 
+              <Animated.View
                 style={[
                   styles.logoContainer,
                   {
@@ -188,7 +201,7 @@ const EnhancedAuthScreen: React.FC = () => {
                 {/* Logo glow effect */}
                 <View style={styles.logoGlow} />
               </Animated.View>
-              <Text style={styles.appTitle}>Truck Fleet</Text>
+              <Text style={styles.appTitle}>Trip Treker</Text>
               <Text style={styles.appSubtitle}>
                 Manage your fleet with ease
               </Text>
@@ -213,29 +226,18 @@ const EnhancedAuthScreen: React.FC = () => {
                     ? 'Sign in to continue to your dashboard'
                     : 'Sign up to start managing your fleet'}
                 </Text>
-                
-                {isLogin && (
-                  <View style={styles.credentialsHint}>
-                    <View style={styles.credentialsHeader}>
-                      <Ionicons name="key" size={20} color={COLORS.info} />
-                      <Text style={styles.credentialsTitle}>Demo Credentials</Text>
-                    </View>
-                    <View style={styles.credentialsContent}>
-                      <View style={styles.credentialRow}>
-                        <Text style={styles.credentialLabel}>Email:</Text>
-                        <Text style={styles.credentialValue}>admin@truckdata.com</Text>
-                      </View>
-                      <View style={styles.credentialRow}>
-                        <Text style={styles.credentialLabel}>Password:</Text>
-                        <Text style={styles.credentialValue}>admin123</Text>
-                      </View>
-                    </View>
+                {errors.general && (
+                  <View style={styles.generalErrorContainer}>
+                    <Ionicons name="alert-circle" size={16} color={COLORS.error} />
+                    <Text style={styles.generalErrorText}>
+                      {errors.general}
+                    </Text>
                   </View>
                 )}
 
                 <View style={styles.inputContainer}>
                   {!isLogin && (
-                    <EnhancedCustomInput
+                    <CustomInput
                       label="Full Name"
                       value={name}
                       onChangeText={setName}
@@ -247,7 +249,7 @@ const EnhancedAuthScreen: React.FC = () => {
                     />
                   )}
 
-                  <EnhancedCustomInput
+                  <CustomInput
                     label="Email"
                     value={email}
                     onChangeText={setEmail}
@@ -257,9 +259,10 @@ const EnhancedAuthScreen: React.FC = () => {
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
+                    size="small"
                   />
 
-                  <EnhancedCustomInput
+                  <CustomInput
                     label="Password"
                     value={password}
                     onChangeText={setPassword}
@@ -268,16 +271,19 @@ const EnhancedAuthScreen: React.FC = () => {
                     placeholder="Enter your password"
                     secureTextEntry
                     textContentType={isLogin ? 'password' : 'newPassword'}
+                    size="small"
                   />
 
-                  <EnhancedCustomButton
+                  <CustomButton
                     title={isLogin ? 'Sign In' : 'Create Account'}
                     onPress={handleSubmit}
                     loading={loading}
-                    variant="primary"
-                    size="large"
+                    variant="secondary"
+                    size="small"
                     fullWidth
                     icon={isLogin ? 'log-in' : 'person-add'}
+                    shape="pill"
+                    uppercase
                     style={styles.submitButton}
                   />
 
@@ -287,7 +293,7 @@ const EnhancedAuthScreen: React.FC = () => {
                     <View style={styles.dividerLine} />
                   </View>
 
-                  <EnhancedCustomButton
+                  <CustomButton
                     title={isLogin ? 'Create Account' : 'Already have an account?'}
                     onPress={toggleMode}
                     variant="ghost"
@@ -298,24 +304,6 @@ const EnhancedAuthScreen: React.FC = () => {
                     style={styles.toggleButton}
                   />
                 </View>
-              </View>
-            </Animated.View>
-
-            {/* Demo Info */}
-            <Animated.View
-              style={[
-                styles.demoInfo,
-                {
-                  opacity: fadeAnim,
-                  transform: [{ translateY: slideAnim }],
-                },
-              ]}
-            >
-              <View style={styles.demoCard}>
-                <Ionicons name="information-circle" size={20} color={COLORS.info} />
-                <Text style={styles.demoText}>
-                  Demo Mode: Use any email and password to sign in
-                </Text>
               </View>
             </Animated.View>
           </ScrollView>
@@ -371,7 +359,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: SIZES.spacingLg,
+    // Reduce horizontal padding so inputs and buttons are visually wider
+    paddingHorizontal: SIZES.spacingMd,
     paddingVertical: SIZES.spacingXl,
   },
   logoSection: {
@@ -419,46 +408,80 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacingXl,
   },
   formContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: 'transparent',
     borderRadius: SIZES.radiusXl,
     padding: SIZES.spacingXl,
-    ...SIZES.shadowLarge,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    borderWidth: 0,
   },
   formTitle: {
     fontSize: SIZES.fontSizeXxl,
     fontWeight: '700' as const,
-    color: COLORS.textPrimary,
+    color: COLORS.textInverse,
     textAlign: 'center',
     marginBottom: SIZES.spacingXs,
   },
   formSubtitle: {
     fontSize: SIZES.fontSizeMd,
-    color: COLORS.textSecondary,
+    color: COLORS.textInverse,
+    opacity: 0.9,
     textAlign: 'center',
-    marginBottom: SIZES.spacingXl,
+    marginBottom: SIZES.spacingMd,
     lineHeight: 22,
   },
+  verificationHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.infoLight,
+    padding: SIZES.spacingSm,
+    borderRadius: SIZES.radiusMd,
+    marginBottom: SIZES.spacingLg,
+    borderWidth: 1,
+    borderColor: COLORS.info,
+  },
+  verificationText: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.info,
+    marginLeft: SIZES.spacingXs,
+    textAlign: 'center',
+  },
+  generalErrorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FEF2F2',
+    padding: SIZES.spacingSm,
+    borderRadius: SIZES.radiusMd,
+    marginBottom: SIZES.spacingLg,
+    borderWidth: 1,
+    borderColor: COLORS.error,
+  },
+  generalErrorText: {
+    fontSize: SIZES.fontSizeSm,
+    color: COLORS.error,
+    marginLeft: SIZES.spacingXs,
+    textAlign: 'center',
+    fontWeight: '500' as const,
+  },
   inputContainer: {
-    gap: SIZES.spacingLg,
+    gap: SIZES.spacingXs,
   },
   submitButton: {
-    marginTop: SIZES.spacingMd,
+    marginTop: SIZES.spacingXs,
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: SIZES.spacingLg,
+    marginVertical: SIZES.spacingXs,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.glassLight,
   },
   dividerText: {
     fontSize: SIZES.fontSizeSm,
-    color: COLORS.textTertiary,
+    color: COLORS.textInverse,
     fontWeight: '600' as const,
     marginHorizontal: SIZES.spacingLg,
   },
@@ -485,46 +508,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1,
   },
-  credentialsHint: {
-    backgroundColor: COLORS.infoLight,
-    padding: SIZES.spacingLg,
-    borderRadius: SIZES.radiusLg,
-    marginBottom: SIZES.spacingLg,
-    borderWidth: 1,
-    borderColor: COLORS.info,
-    ...SIZES.shadowSubtle,
-  },
-  credentialsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SIZES.spacingSm,
-  },
-  credentialsTitle: {
-    fontSize: SIZES.fontSizeMd,
-    color: COLORS.info,
-    fontWeight: '600' as const,
-    marginLeft: SIZES.spacingXs,
-  },
-  credentialsContent: {
-    gap: SIZES.spacingXs,
-  },
-  credentialRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  credentialLabel: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textSecondary,
-    fontWeight: '500' as const,
-  },
-  credentialValue: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textPrimary,
-    fontWeight: '600' as const,
-    fontFamily: 'monospace',
-  },
 });
 
-export default EnhancedAuthScreen;
+export default AuthScreen;

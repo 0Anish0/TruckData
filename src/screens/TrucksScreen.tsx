@@ -8,27 +8,25 @@ import {
   Animated,
   TouchableOpacity,
   Dimensions,
-  ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { mockTripService, mockTruckService } from '../services/mockService';
+import { truckService, tripService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTripCard from '../components/EnhancedTripCard';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Trip, Truck, TripsScreenNavigationProp, TripWithRelations } from '../types';
+import TruckCard from '../components/TruckCard';
+import CustomButton from '../components/CustomButton';
+import { Truck, Trip, TrucksScreenNavigationProp } from '../types';
 const { width } = Dimensions.get('window');
 
-interface EnhancedTripsScreenProps {
-  navigation: TripsScreenNavigationProp;
+interface TrucksScreenProps {
+  navigation: TrucksScreenNavigationProp;
 }
 
-const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation }) => {
-  const [trips, setTrips] = useState<Trip[]>([]);
+const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
   const [trucks, setTrucks] = useState<Truck[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedTruckId, setSelectedTruckId] = useState<string | null>(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -56,16 +54,16 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
   const loadData = async () => {
     try {
       setLoading(true);
-      
-      const [tripsData, trucksData] = await Promise.all([
-        mockTripService.getTrips(),
-        mockTruckService.getTrucks(),
+
+      const [trucksData, tripsData] = await Promise.all([
+        truckService.getTrucks(),
+        tripService.getTrips(),
       ]);
 
-      setTrips(tripsData);
       setTrucks(trucksData);
+      setTrips(tripsData);
     } catch (error) {
-      console.error('Error loading trips data:', error);
+      console.error('Error loading trucks data:', error);
     } finally {
       setLoading(false);
     }
@@ -77,16 +75,21 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
     setRefreshing(false);
   };
 
-  const getTruckName = (truckId: string) => {
-    const truck = trucks.find(t => t.id === truckId);
-    return truck?.name || 'Unknown Truck';
+  const getTruckStats = (truckId: string) => {
+    const truckTrips = trips.filter(trip => trip.truck_id === truckId);
+    const totalTrips = truckTrips.length;
+    const totalCost = truckTrips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
+
+    return { totalTrips, totalCost };
   };
 
-  const getFilteredTrips = () => {
-    if (!selectedTruckId) {
-      return trips;
-    }
-    return trips.filter(trip => trip.truck_id === selectedTruckId);
+  const getSortedTrucks = () => {
+    const trucksWithStats = trucks.map(truck => ({
+      ...truck,
+      ...getTruckStats(truck.id),
+    }));
+    // Default sort by name
+    return trucksWithStats.sort((a, b) => a.name.localeCompare(b.name));
   };
 
   const formatCurrency = (amount: number) => {
@@ -94,36 +97,37 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
   };
 
   const getTotalStats = () => {
+    const totalTrucks = trucks.length;
     const totalTrips = trips.length;
     const totalCost = trips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
-    const avgCost = totalTrips > 0 ? totalCost / totalTrips : 0;
+    const avgCostPerTruck = totalTrucks > 0 ? totalCost / totalTrucks : 0;
 
-    return { totalTrips, totalCost, avgCost };
+    return { totalTrucks, totalTrips, totalCost, avgCostPerTruck };
   };
 
-  const TruckFilterButton: React.FC<{
-    truck: Truck;
+  const SortButton: React.FC<{
+    title: string;
     isActive: boolean;
     onPress: () => void;
-  }> = ({ truck, isActive, onPress }) => (
+    icon: keyof typeof Ionicons.glyphMap;
+  }> = ({ title, isActive, onPress, icon }) => (
     <TouchableOpacity
-      style={[styles.truckFilterButton, isActive && styles.truckFilterButtonActive]}
+      style={[styles.sortButton, isActive && styles.sortButtonActive]}
       onPress={onPress}
       activeOpacity={0.7}
     >
       <Ionicons
-        name="car-sport"
+        name={icon}
         size={16}
-        color={isActive ? COLORS.textInverse : COLORS.primary}
+        color={isActive ? COLORS.textInverse : COLORS.secondary}
       />
       <Text
         style={[
-          styles.truckFilterButtonText,
-          isActive && styles.truckFilterButtonTextActive,
+          styles.sortButtonText,
+          isActive && styles.sortButtonTextActive,
         ]}
-        numberOfLines={1}
       >
-        {truck.name}
+        {title}
       </Text>
     </TouchableOpacity>
   );
@@ -151,25 +155,26 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
     </Animated.View>
   );
 
-  const renderTripItem = ({ item, index }: { item: Trip; index: number }) => (
-    <EnhancedTripCard
-      trip={item}
-      truckName={getTruckName(item.truck_id)}
-      onPress={() => {}}
-      onEdit={() => navigation.navigate('AddTrip', { trip: item as TripWithRelations })}
-      onDelete={() => {}}
+  const renderTruckItem = ({ item, index }: { item: Truck & { totalTrips: number; totalCost: number }; index: number }) => (
+    <TruckCard
+      truck={item}
+      onPress={() => { }}
+      onEdit={() => navigation.navigate('AddTruck', { truck: item })}
+      onDelete={() => { }}
       index={index}
+      tripCount={item.totalTrips}
+      totalCost={item.totalCost}
     />
   );
 
   const stats = getTotalStats();
-  const filteredTrips = getFilteredTrips();
+  const sortedTrucks = getSortedTrucks();
 
   if (loading) {
     return (
       <View style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading Trips...</Text>
+          <Text style={styles.loadingText}>Loading Trucks...</Text>
         </View>
       </View>
     );
@@ -177,31 +182,30 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       {/* Sticky Header */}
       <LinearGradient
-        colors={COLORS.primaryGradient}
+        colors={COLORS.secondaryGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
       >
         <View style={styles.headerContent}>
           <View style={styles.headerText}>
-            <Text style={styles.headerTitle}>Trip Management</Text>
+            <Text style={styles.headerTitle}>Fleet Management</Text>
             <Text style={styles.headerSubtitle}>
-              Track and manage all your trips
+              Manage your truck fleet efficiently
             </Text>
           </View>
           <View style={styles.headerIcon}>
-            <Ionicons name="list" size={28} color={COLORS.textInverse} />
+            <Ionicons name="car-sport" size={28} color={COLORS.textInverse} />
           </View>
         </View>
       </LinearGradient>
 
       {/* Make entire screen scrollable using FlatList as root */}
       <FlatList
-        data={filteredTrips}
-        renderItem={renderTripItem}
+        data={sortedTrucks}
+        renderItem={renderTruckItem}
         keyExtractor={(item) => item.id}
         style={styles.content}
         contentContainerStyle={styles.listContainer}
@@ -210,8 +214,8 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={[COLORS.primary]}
-            tintColor={COLORS.primary}
+            colors={[COLORS.secondary]}
+            tintColor={COLORS.secondary}
           />
         }
         ListHeaderComponent={
@@ -219,65 +223,28 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
             {/* Stats Cards */}
             <View style={styles.statsContainer}>
               <StatCard
+                title="Total Trucks"
+                value={stats.totalTrucks.toString()}
+                icon="car-sport"
+                color={COLORS.secondary}
+              />
+              <StatCard
                 title="Total Trips"
                 value={stats.totalTrips.toString()}
                 icon="trending-up"
                 color={COLORS.info}
               />
-              <StatCard
-                title="Total Cost"
-                value={formatCurrency(stats.totalCost)}
-                icon="wallet"
-                color={COLORS.success}
-              />
             </View>
 
-            {/* Truck Filter */}
-            <View style={styles.filterContainer}>
-              <Text style={styles.filterTitle}>Filter by Truck</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.truckFilterScrollContent}
-              >
-                <TouchableOpacity
-                  style={[styles.truckFilterButton, !selectedTruckId && styles.truckFilterButtonActive]}
-                  onPress={() => setSelectedTruckId(null)}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons
-                    name="list"
-                    size={16}
-                    color={!selectedTruckId ? COLORS.textInverse : COLORS.primary}
-                  />
-                  <Text
-                    style={[
-                      styles.truckFilterButtonText,
-                      !selectedTruckId && styles.truckFilterButtonTextActive,
-                    ]}
-                  >
-                    All Trips
-                  </Text>
-                </TouchableOpacity>
-                
-                {trucks.map((truck) => (
-                  <TruckFilterButton
-                    key={truck.id}
-                    truck={truck}
-                    isActive={selectedTruckId === truck.id}
-                    onPress={() => setSelectedTruckId(truck.id)}
-                  />
-                ))}
-              </ScrollView>
-            </View>
+            {/* Sort controls removed as requested */}
 
-            {/* Add Trip Button */}
+            {/* Add Truck Button */}
             <View style={styles.addButtonContainer}>
-              <EnhancedCustomButton
-                title="Add New Trip"
-                onPress={() => navigation.navigate('AddTrip')}
+              <CustomButton
+                title="Add New Truck"
+                onPress={() => navigation.navigate('AddTruck')}
                 icon="add-circle"
-                variant="primary"
+                variant="secondary"
                 size="large"
                 fullWidth
               />
@@ -287,15 +254,13 @@ const EnhancedTripsScreen: React.FC<EnhancedTripsScreenProps> = ({ navigation })
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="car-outline" size={64} color={COLORS.textTertiary} />
-            <Text style={styles.emptyTitle}>No Trips Found</Text>
+            <Text style={styles.emptyTitle}>No Trucks Found</Text>
             <Text style={styles.emptySubtitle}>
-              {!selectedTruckId
-                ? 'Start by adding your first trip'
-                : `No trips found for ${getTruckName(selectedTruckId)}`}
+              Start by adding your first truck to the fleet
             </Text>
-            <EnhancedCustomButton
-              title="Add Trip"
-              onPress={() => navigation.navigate('AddTrip')}
+            <CustomButton
+              title="Add Truck"
+              onPress={() => navigation.navigate('AddTruck')}
               icon="add-circle"
               variant="outline"
               size="medium"
@@ -370,9 +335,9 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
+    justifyContent: 'space-between',
     gap: SIZES.spacingMd,
   },
   statCard: {
@@ -383,6 +348,7 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacingMd,
     alignItems: 'center',
     ...SIZES.shadow,
+    minHeight: 120,
   },
   statIcon: {
     width: 40,
@@ -404,20 +370,13 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     textAlign: 'center',
   },
-  filterContainer: {
+  sortContainer: {
+    flexDirection: 'row',
     marginBottom: SIZES.spacingLg,
-  },
-  filterTitle: {
-    fontSize: SIZES.fontSizeMd,
-    fontWeight: '600' as const,
-    color: COLORS.textPrimary,
-    marginBottom: SIZES.spacingMd,
-  },
-  truckFilterScrollContent: {
-    paddingHorizontal: SIZES.spacingXs,
     gap: SIZES.spacingSm,
   },
-  truckFilterButton: {
+  sortButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -425,32 +384,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.spacingLg,
     borderRadius: SIZES.radiusMd,
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.secondary,
     backgroundColor: COLORS.surface,
-    minWidth: 120,
   },
-  truckFilterButtonActive: {
-    backgroundColor: COLORS.primary,
+  sortButtonActive: {
+    backgroundColor: COLORS.secondary,
   },
-  truckFilterButtonText: {
+  sortButtonText: {
     fontSize: SIZES.fontSizeSm,
     fontWeight: '600' as const,
-    color: COLORS.primary,
+    color: COLORS.secondary,
     marginLeft: SIZES.spacingXs,
-    flexShrink: 1,
   },
-  truckFilterButtonTextActive: {
+  sortButtonTextActive: {
     color: COLORS.textInverse,
   },
   addButtonContainer: {
     marginBottom: SIZES.spacingLg,
   },
-  tripsList: {
-    flex: 1,
-  },
   listContainer: {
     paddingBottom: SIZES.spacingXl,
-    flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
@@ -477,4 +430,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedTripsScreen;
+export default TrucksScreen;

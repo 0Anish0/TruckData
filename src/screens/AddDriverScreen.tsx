@@ -16,12 +16,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/EnhancedCustomInput';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { mockDriverService } from '../services/mockService';
+import CustomInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
+import { driverService } from '../services';
 import { AddDriverScreenNavigationProp, Driver } from '../types';
 
-interface EnhancedAddDriverScreenProps {
+interface AddDriverScreenProps {
   route?: {
     params?: {
       driver?: Driver;
@@ -30,7 +30,7 @@ interface EnhancedAddDriverScreenProps {
   navigation: AddDriverScreenNavigationProp;
 }
 
-const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route, navigation }) => {
+const AddDriverScreen: React.FC<AddDriverScreenProps> = ({ route, navigation }) => {
   const driverToEdit = route?.params?.driver;
   const isEditMode = !!driverToEdit;
   const [formData, setFormData] = useState(() => {
@@ -192,8 +192,8 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
           age: parseInt(formData.age, 10),
           license_image_url: licenseImage || undefined,
         };
-        
-        await mockDriverService.updateDriver(driverToEdit.id, driverUpdateData);
+
+        await driverService.updateDriver(driverToEdit.id, driverUpdateData);
         Alert.alert(
           'Success',
           'Driver updated successfully!',
@@ -209,8 +209,8 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
           license_image_url: licenseImage || undefined,
           user_id: 'user-1', // TODO: Get from auth context
         };
-        
-        await mockDriverService.createDriver(driverCreateData);
+
+        await driverService.createDriver(driverCreateData);
         Alert.alert(
           'Success',
           'Driver added successfully!',
@@ -220,7 +220,7 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
     } catch (error: unknown) {
       console.error(`Error ${isEditMode ? 'updating' : 'adding'} driver:`, error);
       Alert.alert(
-        'Error', 
+        'Error',
         `Failed to ${isEditMode ? 'update' : 'add'} driver. Please try again.`
       );
     } finally {
@@ -266,98 +266,98 @@ const EnhancedAddDriverScreen: React.FC<EnhancedAddDriverScreenProps> = ({ route
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-        <Animated.View
-          style={[
-            styles.formContainer,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
-          {/* Driver Information */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Driver Information</Text>
-            
-            <EnhancedCustomInput
-              label="Full Name"
-              value={formData.name}
-              onChangeText={(value) => handleInputChange('name', value)}
-              placeholder="Enter driver's full name"
-              leftIcon="person"
-            />
+          <Animated.View
+            style={[
+              styles.formContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            {/* Driver Information */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Driver Information</Text>
 
-            <EnhancedCustomInput
-              label="License Number"
-              value={formData.licenseNumber}
-              onChangeText={(value) => handleInputChange('licenseNumber', value)}
-              placeholder="DL-1234567890"
-              leftIcon="card"
-            />
+              <CustomInput
+                label="Full Name"
+                value={formData.name}
+                onChangeText={(value) => handleInputChange('name', value)}
+                placeholder="Enter driver's full name"
+                leftIcon="person"
+              />
 
-            <EnhancedCustomInput
-              label="Phone Number"
-              value={formData.phone}
-              onChangeText={(value) => handleInputChange('phone', value)}
-              placeholder="Enter phone number"
-              leftIcon="call"
-              keyboardType="phone-pad"
-            />
+              <CustomInput
+                label="License Number"
+                value={formData.licenseNumber}
+                onChangeText={(value) => handleInputChange('licenseNumber', value)}
+                placeholder="DL-1234567890"
+                leftIcon="card"
+              />
 
-            <EnhancedCustomInput
-              label="Age"
-              value={formData.age}
-              onChangeText={(value) => handleInputChange('age', value)}
-              placeholder="Enter age"
-              leftIcon="calendar"
-              keyboardType="numeric"
-            />
-          </View>
+              <CustomInput
+                label="Phone Number"
+                value={formData.phone}
+                onChangeText={(value) => handleInputChange('phone', value)}
+                placeholder="Enter phone number"
+                leftIcon="call"
+                keyboardType="phone-pad"
+              />
 
-          {/* License Photo Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>License Photo</Text>
-            <Text style={styles.sectionSubtitle}>
-              Please upload a clear photo of the driver's license
-            </Text>
+              <CustomInput
+                label="Age"
+                value={formData.age}
+                onChangeText={(value) => handleInputChange('age', value)}
+                placeholder="Enter age"
+                leftIcon="calendar"
+                keyboardType="numeric"
+              />
+            </View>
 
-            <TouchableOpacity
-              style={styles.imagePicker}
-              onPress={showImagePickerOptions}
-              activeOpacity={0.7}
-            >
-              {licenseImage ? (
-                <View style={styles.imageContainer}>
-                  <Image source={{ uri: licenseImage }} style={styles.licenseImage} />
-                  <View style={styles.imageOverlay}>
-                    <Ionicons name="camera" size={24} color={COLORS.textInverse} />
-                    <Text style={styles.changePhotoText}>Change Photo</Text>
+            {/* License Photo Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>License Photo</Text>
+              <Text style={styles.sectionSubtitle}>
+                Please upload a clear photo of the driver's license
+              </Text>
+
+              <TouchableOpacity
+                style={styles.imagePicker}
+                onPress={showImagePickerOptions}
+                activeOpacity={0.7}
+              >
+                {licenseImage ? (
+                  <View style={styles.imageContainer}>
+                    <Image source={{ uri: licenseImage }} style={styles.licenseImage} />
+                    <View style={styles.imageOverlay}>
+                      <Ionicons name="camera" size={24} color={COLORS.textInverse} />
+                      <Text style={styles.changePhotoText}>Change Photo</Text>
+                    </View>
                   </View>
-                </View>
-              ) : (
-                <View style={styles.placeholderContainer}>
-                  <Ionicons name="camera" size={48} color={COLORS.textSecondary} />
-                  <Text style={styles.placeholderText}>Tap to add license photo</Text>
-                  <Text style={styles.placeholderSubtext}>Take a photo or select from gallery</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          </View>
+                ) : (
+                  <View style={styles.placeholderContainer}>
+                    <Ionicons name="camera" size={48} color={COLORS.textSecondary} />
+                    <Text style={styles.placeholderText}>Tap to add license photo</Text>
+                    <Text style={styles.placeholderSubtext}>Take a photo or select from gallery</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
 
-          {/* Submit Button */}
-          <View style={styles.submitContainer}>
-            <EnhancedCustomButton
-              title={isEditMode ? "Edit Driver" : "Add Driver"}
-              onPress={handleSubmit}
-              icon="person-add"
-              variant="success"
-              size="large"
-              fullWidth
-              loading={loading}
-              disabled={loading}
-            />
-          </View>
-        </Animated.View>
+            {/* Submit Button */}
+            <View style={styles.submitContainer}>
+              <CustomButton
+                title={isEditMode ? "Edit Driver" : "Add Driver"}
+                onPress={handleSubmit}
+                icon="person-add"
+                variant="success"
+                size="large"
+                fullWidth
+                loading={loading}
+                disabled={loading}
+              />
+            </View>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -513,4 +513,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedAddDriverScreen;
+export default AddDriverScreen;

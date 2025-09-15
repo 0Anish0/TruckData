@@ -8,25 +8,27 @@ import {
   Animated,
   TouchableOpacity,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { mockTruckService, mockTripService } from '../services/mockService';
+import { tripService, truckService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedTruckCard from '../components/EnhancedTruckCard';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
-import { Truck, Trip, TrucksScreenNavigationProp } from '../types';
+import TripCard from '../components/TripCard';
+import CustomButton from '../components/CustomButton';
+import { Trip, Truck, TripsScreenNavigationProp, TripWithRelations } from '../types';
 const { width } = Dimensions.get('window');
 
-interface EnhancedTrucksScreenProps {
-  navigation: TrucksScreenNavigationProp;
+interface TripsScreenProps {
+  navigation: TripsScreenNavigationProp;
 }
 
-const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation }) => {
-  const [trucks, setTrucks] = useState<Truck[]>([]);
+const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [trucks, setTrucks] = useState<Truck[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedTruckId, setSelectedTruckId] = useState<string | null>(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -54,16 +56,16 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
   const loadData = async () => {
     try {
       setLoading(true);
-      
-      const [trucksData, tripsData] = await Promise.all([
-        mockTruckService.getTrucks(),
-        mockTripService.getTrips(),
+
+      const [tripsData, trucksData] = await Promise.all([
+        tripService.getTrips(),
+        truckService.getTrucks(),
       ]);
 
-      setTrucks(trucksData);
       setTrips(tripsData);
+      setTrucks(trucksData);
     } catch (error) {
-      console.error('Error loading trucks data:', error);
+      console.error('Error loading trips data:', error);
     } finally {
       setLoading(false);
     }
@@ -75,21 +77,16 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
     setRefreshing(false);
   };
 
-  const getTruckStats = (truckId: string) => {
-    const truckTrips = trips.filter(trip => trip.truck_id === truckId);
-    const totalTrips = truckTrips.length;
-    const totalCost = truckTrips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
-    
-    return { totalTrips, totalCost };
+  const getTruckName = (truckId: string) => {
+    const truck = trucks.find(t => t.id === truckId);
+    return truck?.name || 'Unknown Truck';
   };
 
-  const getSortedTrucks = () => {
-    const trucksWithStats = trucks.map(truck => ({
-      ...truck,
-      ...getTruckStats(truck.id),
-    }));
-    // Default sort by name
-    return trucksWithStats.sort((a, b) => a.name.localeCompare(b.name));
+  const getFilteredTrips = () => {
+    if (!selectedTruckId) {
+      return trips;
+    }
+    return trips.filter(trip => trip.truck_id === selectedTruckId);
   };
 
   const formatCurrency = (amount: number) => {
@@ -97,37 +94,36 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
   };
 
   const getTotalStats = () => {
-    const totalTrucks = trucks.length;
     const totalTrips = trips.length;
     const totalCost = trips.reduce((sum, trip) => sum + (trip.total_cost || 0), 0);
-    const avgCostPerTruck = totalTrucks > 0 ? totalCost / totalTrucks : 0;
+    const avgCost = totalTrips > 0 ? totalCost / totalTrips : 0;
 
-    return { totalTrucks, totalTrips, totalCost, avgCostPerTruck };
+    return { totalTrips, totalCost, avgCost };
   };
 
-  const SortButton: React.FC<{
-    title: string;
+  const TruckFilterButton: React.FC<{
+    truck: Truck;
     isActive: boolean;
     onPress: () => void;
-    icon: keyof typeof Ionicons.glyphMap;
-  }> = ({ title, isActive, onPress, icon }) => (
+  }> = ({ truck, isActive, onPress }) => (
     <TouchableOpacity
-      style={[styles.sortButton, isActive && styles.sortButtonActive]}
+      style={[styles.truckFilterButton, isActive && styles.truckFilterButtonActive]}
       onPress={onPress}
       activeOpacity={0.7}
     >
       <Ionicons
-        name={icon}
+        name="car-sport"
         size={16}
-        color={isActive ? COLORS.textInverse : COLORS.secondary}
+        color={isActive ? COLORS.textInverse : COLORS.primary}
       />
       <Text
         style={[
-          styles.sortButtonText,
-          isActive && styles.sortButtonTextActive,
+          styles.truckFilterButtonText,
+          isActive && styles.truckFilterButtonTextActive,
         ]}
+        numberOfLines={1}
       >
-        {title}
+        {truck.name}
       </Text>
     </TouchableOpacity>
   );
@@ -155,26 +151,25 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
     </Animated.View>
   );
 
-  const renderTruckItem = ({ item, index }: { item: Truck & { totalTrips: number; totalCost: number }; index: number }) => (
-    <EnhancedTruckCard
-      truck={item}
-      onPress={() => {}}
-      onEdit={() => navigation.navigate('AddTruck', { truck: item })}
-      onDelete={() => {}}
+  const renderTripItem = ({ item, index }: { item: Trip; index: number }) => (
+    <TripCard
+      trip={item}
+      truckName={getTruckName(item.truck_id)}
+      onPress={() => { }}
+      onEdit={() => navigation.navigate('AddTrip', { trip: item as TripWithRelations })}
+      onDelete={() => { }}
       index={index}
-      tripCount={item.totalTrips}
-      totalCost={item.totalCost}
     />
   );
 
   const stats = getTotalStats();
-  const sortedTrucks = getSortedTrucks();
+  const filteredTrips = getFilteredTrips();
 
   if (loading) {
     return (
       <View style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading Trucks...</Text>
+          <Text style={styles.loadingText}>Loading Trips...</Text>
         </View>
       </View>
     );
@@ -182,30 +177,31 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       {/* Sticky Header */}
       <LinearGradient
-        colors={COLORS.secondaryGradient}
+        colors={COLORS.primaryGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
       >
         <View style={styles.headerContent}>
           <View style={styles.headerText}>
-            <Text style={styles.headerTitle}>Fleet Management</Text>
+            <Text style={styles.headerTitle}>Trip Management</Text>
             <Text style={styles.headerSubtitle}>
-              Manage your truck fleet efficiently
+              Track and manage all your trips
             </Text>
           </View>
           <View style={styles.headerIcon}>
-            <Ionicons name="car-sport" size={28} color={COLORS.textInverse} />
+            <Ionicons name="list" size={28} color={COLORS.textInverse} />
           </View>
         </View>
       </LinearGradient>
 
       {/* Make entire screen scrollable using FlatList as root */}
       <FlatList
-        data={sortedTrucks}
-        renderItem={renderTruckItem}
+        data={filteredTrips}
+        renderItem={renderTripItem}
         keyExtractor={(item) => item.id}
         style={styles.content}
         contentContainerStyle={styles.listContainer}
@@ -214,8 +210,8 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={[COLORS.secondary]}
-            tintColor={COLORS.secondary}
+            colors={[COLORS.primary]}
+            tintColor={COLORS.primary}
           />
         }
         ListHeaderComponent={
@@ -223,28 +219,65 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
             {/* Stats Cards */}
             <View style={styles.statsContainer}>
               <StatCard
-                title="Total Trucks"
-                value={stats.totalTrucks.toString()}
-                icon="car-sport"
-                color={COLORS.secondary}
-              />
-              <StatCard
                 title="Total Trips"
                 value={stats.totalTrips.toString()}
                 icon="trending-up"
                 color={COLORS.info}
               />
+              <StatCard
+                title="Total Cost"
+                value={formatCurrency(stats.totalCost)}
+                icon="wallet"
+                color={COLORS.success}
+              />
             </View>
 
-            {/* Sort controls removed as requested */}
+            {/* Truck Filter */}
+            <View style={styles.filterContainer}>
+              <Text style={styles.filterTitle}>Filter by Truck</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.truckFilterScrollContent}
+              >
+                <TouchableOpacity
+                  style={[styles.truckFilterButton, !selectedTruckId && styles.truckFilterButtonActive]}
+                  onPress={() => setSelectedTruckId(null)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons
+                    name="list"
+                    size={16}
+                    color={!selectedTruckId ? COLORS.textInverse : COLORS.primary}
+                  />
+                  <Text
+                    style={[
+                      styles.truckFilterButtonText,
+                      !selectedTruckId && styles.truckFilterButtonTextActive,
+                    ]}
+                  >
+                    All Trips
+                  </Text>
+                </TouchableOpacity>
 
-            {/* Add Truck Button */}
+                {trucks.map((truck) => (
+                  <TruckFilterButton
+                    key={truck.id}
+                    truck={truck}
+                    isActive={selectedTruckId === truck.id}
+                    onPress={() => setSelectedTruckId(truck.id)}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* Add Trip Button */}
             <View style={styles.addButtonContainer}>
-              <EnhancedCustomButton
-                title="Add New Truck"
-                onPress={() => navigation.navigate('AddTruck')}
+              <CustomButton
+                title="Add New Trip"
+                onPress={() => navigation.navigate('AddTrip')}
                 icon="add-circle"
-                variant="secondary"
+                variant="primary"
                 size="large"
                 fullWidth
               />
@@ -254,13 +287,15 @@ const EnhancedTrucksScreen: React.FC<EnhancedTrucksScreenProps> = ({ navigation 
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="car-outline" size={64} color={COLORS.textTertiary} />
-            <Text style={styles.emptyTitle}>No Trucks Found</Text>
+            <Text style={styles.emptyTitle}>No Trips Found</Text>
             <Text style={styles.emptySubtitle}>
-              Start by adding your first truck to the fleet
+              {!selectedTruckId
+                ? 'Start by adding your first trip'
+                : `No trips found for ${getTruckName(selectedTruckId)}`}
             </Text>
-            <EnhancedCustomButton
-              title="Add Truck"
-              onPress={() => navigation.navigate('AddTruck')}
+            <CustomButton
+              title="Add Trip"
+              onPress={() => navigation.navigate('AddTrip')}
               icon="add-circle"
               variant="outline"
               size="medium"
@@ -335,9 +370,9 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-between',
     marginTop: SIZES.spacingLg,
     marginBottom: SIZES.spacingXl,
-    justifyContent: 'space-between',
     gap: SIZES.spacingMd,
   },
   statCard: {
@@ -348,7 +383,6 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacingMd,
     alignItems: 'center',
     ...SIZES.shadow,
-    minHeight: 120,
   },
   statIcon: {
     width: 40,
@@ -370,13 +404,20 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     textAlign: 'center',
   },
-  sortContainer: {
-    flexDirection: 'row',
+  filterContainer: {
     marginBottom: SIZES.spacingLg,
+  },
+  filterTitle: {
+    fontSize: SIZES.fontSizeMd,
+    fontWeight: '600' as const,
+    color: COLORS.textPrimary,
+    marginBottom: SIZES.spacingMd,
+  },
+  truckFilterScrollContent: {
+    paddingHorizontal: SIZES.spacingXs,
     gap: SIZES.spacingSm,
   },
-  sortButton: {
-    flex: 1,
+  truckFilterButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -384,26 +425,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.spacingLg,
     borderRadius: SIZES.radiusMd,
     borderWidth: 2,
-    borderColor: COLORS.secondary,
+    borderColor: COLORS.primary,
     backgroundColor: COLORS.surface,
+    minWidth: 120,
   },
-  sortButtonActive: {
-    backgroundColor: COLORS.secondary,
+  truckFilterButtonActive: {
+    backgroundColor: COLORS.primary,
   },
-  sortButtonText: {
+  truckFilterButtonText: {
     fontSize: SIZES.fontSizeSm,
     fontWeight: '600' as const,
-    color: COLORS.secondary,
+    color: COLORS.primary,
     marginLeft: SIZES.spacingXs,
+    flexShrink: 1,
   },
-  sortButtonTextActive: {
+  truckFilterButtonTextActive: {
     color: COLORS.textInverse,
   },
   addButtonContainer: {
     marginBottom: SIZES.spacingLg,
   },
+  tripsList: {
+    flex: 1,
+  },
   listContainer: {
     paddingBottom: SIZES.spacingXl,
+    flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
@@ -430,4 +477,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedTrucksScreen;
+export default TripsScreen;

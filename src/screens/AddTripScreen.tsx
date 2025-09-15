@@ -15,13 +15,13 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { mockTripService, mockTruckService, mockDriverService } from '../services/mockService';
+import { tripService, truckService, driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomInput from '../components/EnhancedCustomInput';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import CustomInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
 import { Truck, Driver, TripFormData, AddTripScreenNavigationProp, FastTagEventFormData, McdEventFormData, GreenTaxEventFormData, TripWithRelations } from '../types';
 
-interface EnhancedAddTripScreenProps {
+interface AddTripScreenProps {
   route?: {
     params?: {
       trip?: TripWithRelations;
@@ -29,7 +29,7 @@ interface EnhancedAddTripScreenProps {
   };
 }
 
-const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) => {
+const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
   const navigation = useNavigation<AddTripScreenNavigationProp>();
   const tripToEdit = route?.params?.trip;
   const isEditMode = !!tripToEdit;
@@ -81,7 +81,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
       };
     }
   });
-  
+
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(false);
@@ -93,7 +93,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
 
   useEffect(() => {
     loadInitialData();
-    
+
     // Entrance animation
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -112,8 +112,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
   const loadInitialData = async () => {
     try {
       const [trucksData, driversData] = await Promise.all([
-        mockTruckService.getTrucks(),
-        mockDriverService.getDrivers(),
+        truckService.getTrucks(),
+        driverService.getDrivers(),
       ]);
       setTrucks(trucksData);
       setDrivers(driversData);
@@ -193,15 +193,15 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
           border_cost: formData.border_costs.reduce((sum, cost) => sum + cost.amount, 0),
           repair_cost: formData.repair_items.reduce((sum, item) => sum + item.amount, 0),
         };
-        
-        await mockTripService.updateTrip(tripToEdit.id, tripUpdateData);
+
+        await tripService.updateTrip(tripToEdit.id, tripUpdateData);
         Alert.alert(
           'Success',
           'Trip updated successfully!',
           [{ text: 'OK', onPress: () => navigation.goBack() }]
         );
       } else {
-        await mockTripService.createTrip(formData);
+        await tripService.createTrip(formData);
         Alert.alert(
           'Success',
           'Trip created successfully!',
@@ -272,9 +272,9 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
         </View>
         <Text style={styles.costSectionTitle}>{title}</Text>
       </View>
-      
+
       {costs.map((cost, index) => (
-        <EnhancedCustomInput
+        <CustomInput
           key={index}
           label={`${title} ${index + 1}`}
           value={cost.toString()}
@@ -288,8 +288,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
           placeholder="Enter amount"
         />
       ))}
-      
-      <EnhancedCustomButton
+
+      <CustomButton
         title={`Add ${title}`}
         onPress={() => onUpdate([...costs, 0])}
         variant="outline"
@@ -314,7 +314,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
         </View>
         <Text style={styles.costSectionTitle}>{title} Costs</Text>
       </View>
-      
+
       {costs.map((cost, index) => (
         <View key={index} style={styles.complexCostCard}>
           <View style={styles.complexCostHeader}>
@@ -329,8 +329,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
               <Ionicons name="close-circle" size={20} color={COLORS.error} />
             </TouchableOpacity>
           </View>
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="State"
             value={cost.state}
             onChangeText={(text) => {
@@ -341,8 +341,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             leftIcon="location"
             placeholder="Enter state"
           />
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="Checkpoint (Optional)"
             value={cost.checkpoint || ''}
             onChangeText={(text) => {
@@ -353,8 +353,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             leftIcon="flag"
             placeholder="Enter checkpoint"
           />
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="Part/Defect"
             value={cost.part_or_defect}
             onChangeText={(text) => {
@@ -365,8 +365,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             leftIcon="construct"
             placeholder="Enter part or defect description"
           />
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="Amount"
             value={cost.amount.toString()}
             onChangeText={(text) => {
@@ -378,8 +378,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             keyboardType="numeric"
             placeholder="Enter amount"
           />
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="Notes (Optional)"
             value={cost.notes || ''}
             onChangeText={(text) => {
@@ -393,8 +393,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
           />
         </View>
       ))}
-      
-      <EnhancedCustomButton
+
+      <CustomButton
         title={`Add ${title}`}
         onPress={() => onUpdate([...costs, { state: '', checkpoint: '', part_or_defect: '', amount: 0, notes: '' }])}
         variant="outline"
@@ -419,7 +419,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
         </View>
         <Text style={styles.costSectionTitle}>{title} Costs</Text>
       </View>
-      
+
       {costs.map((cost, index) => (
         <View key={index} style={styles.complexCostCard}>
           <View style={styles.complexCostHeader}>
@@ -434,8 +434,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
               <Ionicons name="close-circle" size={20} color={COLORS.error} />
             </TouchableOpacity>
           </View>
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="State"
             value={cost.state}
             onChangeText={(text) => {
@@ -446,8 +446,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             leftIcon="location"
             placeholder="Enter state"
           />
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="Checkpoint (Optional)"
             value={cost.checkpoint || ''}
             onChangeText={(text) => {
@@ -458,8 +458,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             leftIcon="flag"
             placeholder="Enter checkpoint"
           />
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="Amount"
             value={cost.amount.toString()}
             onChangeText={(text) => {
@@ -471,8 +471,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             keyboardType="numeric"
             placeholder="Enter amount"
           />
-          
-          <EnhancedCustomInput
+
+          <CustomInput
             label="Notes (Optional)"
             value={cost.notes || ''}
             onChangeText={(text) => {
@@ -486,8 +486,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
           />
         </View>
       ))}
-      
-      <EnhancedCustomButton
+
+      <CustomButton
         title={`Add ${title}`}
         onPress={() => onUpdate([...costs, { state: '', checkpoint: '', amount: 0, notes: '' }])}
         variant="outline"
@@ -548,8 +548,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             {/* Basic Information */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Basic Information</Text>
-              
-              <EnhancedCustomInput
+
+              <CustomInput
                 label="Source"
                 value={formData.source}
                 onChangeText={(text) => setFormData(prev => ({ ...prev, source: text }))}
@@ -558,7 +558,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                 placeholder="Enter source location"
               />
 
-              <EnhancedCustomInput
+              <CustomInput
                 label="Destination"
                 value={formData.destination}
                 onChangeText={(text) => setFormData(prev => ({ ...prev, destination: text }))}
@@ -616,7 +616,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             {/* Vehicle & Driver Selection */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Vehicle & Driver</Text>
-              
+
               <View style={styles.pickerContainer}>
                 <Text style={styles.pickerLabel}>Select Truck</Text>
                 <View style={styles.picker}>
@@ -674,7 +674,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                 </View>
                 <Text style={styles.costSectionTitle}>Diesel Purchases</Text>
               </View>
-              
+
               {formData.diesel_purchases.map((purchase, index) => (
                 <View key={index} style={styles.complexCostCard}>
                   <View style={styles.complexCostHeader}>
@@ -686,8 +686,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                       <Ionicons name="close-circle" size={20} color={COLORS.error} />
                     </TouchableOpacity>
                   </View>
-                  
-                  <EnhancedCustomInput
+
+                  <CustomInput
                     label="State"
                     value={purchase.state}
                     onChangeText={(text) => updateDieselPurchase(index, 'state', text)}
@@ -695,8 +695,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     leftIcon="location"
                     error={errors[`diesel_state_${index}`]}
                   />
-                  
-                  <EnhancedCustomInput
+
+                  <CustomInput
                     label="City"
                     value={purchase.city}
                     onChangeText={(text) => updateDieselPurchase(index, 'city', text)}
@@ -704,8 +704,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     leftIcon="business"
                     error={errors[`diesel_city_${index}`]}
                   />
-                  
-                  <EnhancedCustomInput
+
+                  <CustomInput
                     label="Quantity (L)"
                     value={purchase.diesel_quantity > 0 ? purchase.diesel_quantity.toString() : ''}
                     onChangeText={(text) => {
@@ -717,8 +717,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     leftIcon="water"
                     error={errors[`diesel_quantity_${index}`]}
                   />
-                  
-                  <EnhancedCustomInput
+
+                  <CustomInput
                     label="Price/Liter (₹)"
                     value={purchase.diesel_price_per_liter > 0 ? purchase.diesel_price_per_liter.toString() : ''}
                     onChangeText={(text) => {
@@ -730,7 +730,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     leftIcon="cash"
                     error={errors[`diesel_price_${index}`]}
                   />
-                  
+
                   <TouchableOpacity
                     style={[
                       styles.datePickerButton,
@@ -739,11 +739,11 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                     onPress={() => setShowDatePicker(prev => ({ ...prev, [`purchase_${index}`]: true }))}
                   >
                     <View style={styles.datePickerContent}>
-                      <Ionicons 
-                        name="calendar" 
-                        size={20} 
-                        color={errors[`diesel_date_${index}`] ? COLORS.error : COLORS.primary} 
-                        style={styles.datePickerIcon} 
+                      <Ionicons
+                        name="calendar"
+                        size={20}
+                        color={errors[`diesel_date_${index}`] ? COLORS.error : COLORS.primary}
+                        style={styles.datePickerIcon}
                       />
                       <View style={styles.datePickerText}>
                         <Text style={[
@@ -764,7 +764,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                   {errors[`diesel_date_${index}`] && (
                     <Text style={styles.datePickerErrorText}>{errors[`diesel_date_${index}`]}</Text>
                   )}
-                  
+
                   {/* Total Calculation Display */}
                   {purchase.diesel_quantity > 0 && purchase.diesel_price_per_liter > 0 && (
                     <View style={styles.totalCalculationContainer}>
@@ -783,8 +783,8 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
                   )}
                 </View>
               ))}
-              
-              <EnhancedCustomButton
+
+              <CustomButton
                 title="Add Purchase"
                 onPress={addDieselPurchase}
                 variant="outline"
@@ -861,7 +861,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             />
 
             {/* Submit Button */}
-            <EnhancedCustomButton
+            <CustomButton
               title={isEditMode ? "Edit Trip" : "Create Trip"}
               onPress={handleSubmit}
               loading={loading}
@@ -874,11 +874,11 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
-      
+
       {/* Date Picker Modal */}
       {Object.entries(showDatePicker).map(([key, show]) => {
         if (!show) return null;
-        
+
         // Handle trip start/end date pickers
         if (key === 'start_date') {
           return (
@@ -896,7 +896,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             />
           );
         }
-        
+
         if (key === 'end_date') {
           return (
             <DateTimePicker
@@ -913,7 +913,7 @@ const EnhancedAddTripScreen: React.FC<EnhancedAddTripScreenProps> = ({ route }) 
             />
           );
         }
-        
+
         // Handle diesel purchase date pickers (existing logic)
         const index = parseInt(key.split('_')[1]);
         return (
@@ -1264,4 +1264,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedAddTripScreen;
+export default AddTripScreen;

@@ -10,16 +10,16 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { mockDriverService } from '../services/mockService';
+import { driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import EnhancedCustomButton from '../components/EnhancedCustomButton';
+import CustomButton from '../components/CustomButton';
 import { Driver, DriversScreenNavigationProp } from '../types';
 
-interface EnhancedDriversScreenProps {
+interface DriversScreenProps {
   navigation: DriversScreenNavigationProp;
 }
 
-const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigation }) => {
+const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,7 +50,7 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
   const loadData = async () => {
     try {
       setLoading(true);
-      const driversData = await mockDriverService.getDrivers();
+      const driversData = await driverService.getDrivers();
       setDrivers(driversData);
     } catch (error) {
       console.error('Error loading drivers data:', error);
@@ -73,7 +73,7 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
 
   const getTotalStats = () => {
     const totalDrivers = drivers.length;
-    const avgAge = drivers.length > 0 
+    const avgAge = drivers.length > 0
       ? Math.round(drivers.reduce((sum, driver) => sum + (driver.age || 0), 0) / drivers.length)
       : 0;
     const activeDrivers = drivers.length; // All drivers are active in mock data
@@ -190,8 +190,8 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
             </View>
           </View>
           <View style={styles.driverActions}>
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.editButton]} 
+            <TouchableOpacity
+              style={[styles.actionButton, styles.editButton]}
               onPress={() => navigation.navigate('AddDriver', { driver: driver })}
               activeOpacity={0.7}
             >
@@ -210,13 +210,13 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
               <Text style={styles.detailLabel}>Age</Text>
               <Text style={styles.detailValue}>{driver.age} years</Text>
             </View>
-            
+
             <View style={styles.detailItem}>
               <Ionicons name="time" size={16} color={COLORS.textSecondary} />
               <Text style={styles.detailLabel}>Experience</Text>
               <Text style={styles.detailValue}>{experience} years</Text>
             </View>
-            
+
             <View style={styles.detailItem}>
               <Ionicons name="call" size={16} color={COLORS.textSecondary} />
               <Text style={styles.detailLabel}>Phone</Text>
@@ -305,7 +305,7 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
 
             {/* Add Driver Button */}
             <View style={styles.addButtonContainer}>
-              <EnhancedCustomButton
+              <CustomButton
                 title="Add New Driver"
                 onPress={() => navigation.navigate('AddDriver')}
                 icon="person-add"
@@ -323,7 +323,7 @@ const EnhancedDriversScreen: React.FC<EnhancedDriversScreenProps> = ({ navigatio
             <Text style={styles.emptySubtitle}>
               Start by adding your first driver to the team
             </Text>
-            <EnhancedCustomButton
+            <CustomButton
               title="Add Driver"
               onPress={() => navigation.navigate('AddDriver')}
               icon="person-add"
@@ -599,4 +599,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedDriversScreen;
+export default DriversScreen;

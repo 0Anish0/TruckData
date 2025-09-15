@@ -6,15 +6,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  TextInputProps,
   TextInputFocusEventData,
   NativeSyntheticEvent,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
-import { ContainerStyle, LabelStyle, EnhancedCustomInputProps } from '../types';
+import { ContainerStyle, LabelStyle, CustomInputProps } from '../types';
 
-const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
+const CustomInput: React.FC<CustomInputProps> = ({
   label,
   error,
   leftIcon,
@@ -33,7 +32,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(!!value);
-  
+
   const labelAnim = useRef(new Animated.Value(isFilled ? 1 : 0)).current;
   const borderAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -41,7 +40,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
   useEffect(() => {
     const hasValue = !!value && value.toString().length > 0;
     setIsFilled(hasValue);
-    
+
     Animated.timing(labelAnim, {
       toValue: hasValue || isFocused ? 1 : 0,
       duration: ANIMATIONS.fast,
@@ -51,7 +50,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
 
   const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(true);
-    
+
     Animated.parallel([
       Animated.timing(borderAnim, {
         toValue: 1,
@@ -64,13 +63,13 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
         ...ANIMATIONS.springGentle,
       }),
     ]).start();
-    
+
     if (onFocus) onFocus(e);
   };
 
   const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(false);
-    
+
     Animated.parallel([
       Animated.timing(borderAnim, {
         toValue: 0,
@@ -83,7 +82,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
         ...ANIMATIONS.springGentle,
       }),
     ]).start();
-    
+
     if (onBlur) onBlur(e);
   };
 
@@ -183,7 +182,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
     top: -8,
     fontSize: SIZES.fontSizeSm,
     color: error ? COLORS.error : COLORS.primary,
-    backgroundColor: COLORS.surface,
+    backgroundColor: 'transparent',
     paddingHorizontal: SIZES.spacingXs,
     zIndex: 1,
   };
@@ -210,7 +209,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
           {label}
         </Text>
       )}
-      
+
       <Animated.View
         style={[
           getContainerStyle(),
@@ -227,16 +226,16 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
               />
             </View>
           )}
-          
+
           <TextInput
             style={[getInputStyle(), inputStyle]}
             value={value}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
+            onFocus={(e) => handleFocus(e as unknown as NativeSyntheticEvent<TextInputFocusEventData>)}
+            onBlur={(e) => handleBlur(e as unknown as NativeSyntheticEvent<TextInputFocusEventData>)}
             placeholderTextColor={COLORS.textTertiary}
             {...props}
           />
-          
+
           {rightIcon && (
             <TouchableOpacity
               style={styles.rightIconContainer}
@@ -252,7 +251,7 @@ const EnhancedCustomInput: React.FC<EnhancedCustomInputProps> = ({
           )}
         </View>
       </Animated.View>
-      
+
       {error && (
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={16} color={COLORS.error} />
@@ -292,4 +291,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EnhancedCustomInput;
+export default CustomInput;

@@ -9,6 +9,8 @@ import {
   Animated,
   Dimensions,
   StatusBar,
+  Image,
+  TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +27,7 @@ const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -94,8 +97,15 @@ const AuthScreen: React.FC = () => {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (!isLogin && !name.trim()) {
-      newErrors.name = 'Name is required';
+    if (!isLogin) {
+      if (!name.trim()) {
+        newErrors.name = 'Name is required';
+      }
+      if (!confirmPassword.trim()) {
+        newErrors.confirmPassword = 'Confirm your password';
+      } else if (confirmPassword !== password) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
     }
 
     setErrors(newErrors);
@@ -111,13 +121,13 @@ const AuthScreen: React.FC = () => {
     try {
       if (isLogin) {
         await signIn(email, password);
-        // If sign in is successful, the auth state change will handle navigation
       } else {
         await signUp(email, password, name);
         // After signup, clear the form and show success message
         setEmail('');
         setPassword('');
         setName('');
+        setConfirmPassword('');
         // Don't switch to login mode automatically - let user choose
       }
     } catch (error: unknown) {
@@ -143,13 +153,14 @@ const AuthScreen: React.FC = () => {
     setEmail('');
     setPassword('');
     setName('');
+    setConfirmPassword('');
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       <LinearGradient
-        colors={COLORS.primaryGradient}
+        colors={COLORS.secondaryGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.background}
@@ -191,20 +202,18 @@ const AuthScreen: React.FC = () => {
                 ]}
               >
                 <LinearGradient
-                  colors={COLORS.secondaryGradient}
+                  colors={COLORS.primaryGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
-                  style={styles.logoGradient}
+                  style={styles.logoRing}
                 >
                   <Ionicons name="car" size={52} color={COLORS.textInverse} />
                 </LinearGradient>
                 {/* Logo glow effect */}
                 <View style={styles.logoGlow} />
               </Animated.View>
-              <Text style={styles.appTitle}>Trip Treker</Text>
-              <Text style={styles.appSubtitle}>
-                Manage your fleet with ease
-              </Text>
+              <Text style={styles.appTitle}>TRIP COST</Text>
+              <Text style={styles.appSubtitle}>Welcome! Please log in to continue.</Text>
             </Animated.View>
 
             {/* Form Section */}
@@ -219,12 +228,10 @@ const AuthScreen: React.FC = () => {
             >
               <View style={styles.formContainer}>
                 <Text style={styles.formTitle}>
-                  {isLogin ? 'Welcome Back' : 'Create Account'}
+                  {isLogin ? '' : ''}
                 </Text>
                 <Text style={styles.formSubtitle}>
-                  {isLogin
-                    ? 'Sign in to continue to your dashboard'
-                    : 'Sign up to start managing your fleet'}
+                  {''}
                 </Text>
                 {errors.general && (
                   <View style={styles.generalErrorContainer}>
@@ -236,50 +243,77 @@ const AuthScreen: React.FC = () => {
                 )}
 
                 <View style={styles.inputContainer}>
-                  {!isLogin && (
-                    <CustomInput
-                      label="Full Name"
-                      value={name}
-                      onChangeText={setName}
-                      leftIcon="person"
-                      error={errors.name}
-                      placeholder="Enter your full name"
-                      autoCapitalize="words"
-                      textContentType="name"
-                    />
-                  )}
-
+                  {/* Email */}
                   <CustomInput
                     label="Email"
                     value={email}
                     onChangeText={setEmail}
                     leftIcon="mail"
                     error={errors.email}
-                    placeholder="Enter your email"
+                    placeholder="Truck ID or Email"
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
-                    size="small"
+                    size="large"
+                    variant="filled"
+                    containerStyle={styles.inputPill}
                   />
 
+                  {/* Password */}
                   <CustomInput
                     label="Password"
                     value={password}
                     onChangeText={setPassword}
                     leftIcon="lock-closed"
                     error={errors.password}
-                    placeholder="Enter your password"
+                    placeholder="Password"
                     secureTextEntry
                     textContentType={isLogin ? 'password' : 'newPassword'}
-                    size="small"
+                    size="large"
+                    variant="filled"
+                    containerStyle={styles.inputPill}
                   />
 
+                  {/* Extra sign up fields */}
+                  {!isLogin && (
+                    <>
+                      <CustomInput
+                        label="Full Name"
+                        value={name}
+                        onChangeText={setName}
+                        leftIcon="person"
+                        error={errors.name}
+                        placeholder="Full Name"
+                        autoCapitalize="words"
+                        textContentType="name"
+                        size="large"
+                        variant="filled"
+                        containerStyle={styles.inputPill}
+                      />
+                      <CustomInput
+                        label="Confirm Password"
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                        leftIcon="lock-closed"
+                        error={errors.confirmPassword}
+                        placeholder="Confirm Password"
+                        secureTextEntry
+                        textContentType="password"
+                        size="large"
+                        variant="filled"
+                        containerStyle={styles.inputPill}
+                      />
+                    </>
+                  )}
+
+                  {/* Removed Remember Me / Forgot Password */}
+
                   <CustomButton
-                    title={isLogin ? 'Sign In' : 'Create Account'}
+                    title={isLogin ? 'LOG IN' : 'SIGN UP'}
                     onPress={handleSubmit}
                     loading={loading}
-                    variant="secondary"
-                    size="small"
+                    variant="primary"
+                    size="large"
                     fullWidth
                     icon={isLogin ? 'log-in' : 'person-add'}
                     shape="pill"
@@ -287,22 +321,23 @@ const AuthScreen: React.FC = () => {
                     style={styles.submitButton}
                   />
 
-                  <View style={styles.divider}>
-                    <View style={styles.dividerLine} />
-                    <Text style={styles.dividerText}>or</Text>
-                    <View style={styles.dividerLine} />
+                  <View style={styles.signUpRow}>
+                    {isLogin ? (
+                      <>
+                        <Text style={styles.signUpHint}>Don't have an account? </Text>
+                        <TouchableOpacity onPress={toggleMode}>
+                          <Text style={styles.signUpLink}>Sign Up</Text>
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <>
+                        <Text style={styles.signUpHint}>Already have an account? </Text>
+                        <TouchableOpacity onPress={toggleMode}>
+                          <Text style={styles.signUpLink}>Log In</Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
                   </View>
-
-                  <CustomButton
-                    title={isLogin ? 'Create Account' : 'Already have an account?'}
-                    onPress={toggleMode}
-                    variant="ghost"
-                    size="medium"
-                    fullWidth
-                    icon={isLogin ? 'person-add' : 'log-in'}
-                    iconPosition="right"
-                    style={styles.toggleButton}
-                  />
                 </View>
               </View>
             </Animated.View>
@@ -330,28 +365,28 @@ const styles = StyleSheet.create({
   decorationCircle: {
     position: 'absolute',
     borderRadius: 9999,
-    opacity: 0.1,
+    opacity: 0.08,
   },
   decorationCircle1: {
+    width: 300,
+    height: 300,
+    backgroundColor: COLORS.textInverse,
+    top: -150,
+    right: -100,
+  },
+  decorationCircle2: {
     width: 200,
     height: 200,
     backgroundColor: COLORS.textInverse,
-    top: -100,
-    right: -50,
+    bottom: -100,
+    left: -100,
   },
-  decorationCircle2: {
+  decorationCircle3: {
     width: 150,
     height: 150,
     backgroundColor: COLORS.textInverse,
-    bottom: -75,
-    left: -75,
-  },
-  decorationCircle3: {
-    width: 100,
-    height: 100,
-    backgroundColor: COLORS.textInverse,
-    top: '30%',
-    right: -25,
+    top: '25%',
+    right: -75,
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -359,7 +394,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    // Reduce horizontal padding so inputs and buttons are visually wider
     paddingHorizontal: SIZES.spacingMd,
     paddingVertical: SIZES.spacingXl,
   },
@@ -368,30 +402,43 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacingXxl,
   },
   logoContainer: {
-    marginBottom: SIZES.spacingLg,
+    marginBottom: SIZES.spacingXl,
     position: 'relative',
   },
-  logoGradient: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+  logoRing: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    padding: 4,
     alignItems: 'center',
     justifyContent: 'center',
     ...SIZES.shadowLarge,
   },
+  logoInnerCircle: {
+    backgroundColor: COLORS.surface,
+    width: 132,
+    height: 132,
+    borderRadius: 66,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoImage: {
+    width: 110,
+    height: 110,
+  },
   logoGlow: {
     position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: COLORS.textInverse,
-    opacity: 0.2,
-    top: -5,
-    left: -5,
+    opacity: 0.15,
+    top: -10,
+    left: -10,
     zIndex: -1,
   },
   appTitle: {
-    fontSize: SIZES.fontSizeDisplay,
+    fontSize: SIZES.fontSizeXxxl,
     fontWeight: '800' as const,
     color: COLORS.textInverse,
     marginBottom: SIZES.spacingXs,
@@ -432,18 +479,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.infoLight,
-    padding: SIZES.spacingSm,
-    borderRadius: SIZES.radiusMd,
+    backgroundColor: COLORS.glassVeryLight,
+    padding: SIZES.spacingMd,
+    borderRadius: SIZES.radiusLg,
     marginBottom: SIZES.spacingLg,
     borderWidth: 1,
-    borderColor: COLORS.info,
+    borderColor: COLORS.glassLight,
   },
   verificationText: {
     fontSize: SIZES.fontSizeSm,
-    color: COLORS.info,
+    color: COLORS.textInverse,
     marginLeft: SIZES.spacingXs,
     textAlign: 'center',
+    fontWeight: '500' as const,
   },
   generalErrorContainer: {
     flexDirection: 'row',
@@ -464,10 +512,11 @@ const styles = StyleSheet.create({
     fontWeight: '500' as const,
   },
   inputContainer: {
-    gap: SIZES.spacingXs,
+    gap: SIZES.spacingSm,
   },
   submitButton: {
-    marginTop: SIZES.spacingXs,
+    marginTop: SIZES.spacingLg,
+    ...SIZES.shadowStrong,
   },
   divider: {
     flexDirection: 'row',
@@ -487,6 +536,34 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     marginTop: SIZES.spacingSm,
+  },
+  pillCard: undefined as unknown as never,
+  rememberRow: undefined as unknown as never,
+  rememberToggle: undefined as unknown as never,
+  rememberLabel: undefined as unknown as never,
+  forgotLink: undefined as unknown as never,
+  signUpRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: SIZES.spacingMd,
+  },
+  signUpHint: {
+    color: COLORS.textInverse,
+    opacity: 0.9,
+  },
+  signUpLink: {
+    color: COLORS.textInverse,
+    fontWeight: '700' as const,
+    textDecorationLine: 'underline',
+  },
+  footerBrand: undefined as unknown as never,
+  inputPill: {
+    borderRadius: SIZES.radiusRound,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.surface,
+    ...SIZES.shadowSubtle,
   },
   demoInfo: {
     alignItems: 'center',
@@ -508,6 +585,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1,
   },
+  glassInput: undefined as unknown as never,
 });
 
 export default AuthScreen;

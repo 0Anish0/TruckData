@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
   Animated,
   Dimensions,
   StatusBar,
@@ -202,7 +201,7 @@ const AuthScreen: React.FC = () => {
                 {/* Logo glow effect */}
                 <View style={styles.logoGlow} />
               </Animated.View>
-              <Text style={styles.appTitle}>Truck Fleet</Text>
+              <Text style={styles.appTitle}>Trip Treker</Text>
               <Text style={styles.appSubtitle}>
                 Manage your fleet with ease
               </Text>
@@ -227,16 +226,6 @@ const AuthScreen: React.FC = () => {
                     ? 'Sign in to continue to your dashboard'
                     : 'Sign up to start managing your fleet'}
                 </Text>
-
-                {!isLogin && (
-                  <View style={styles.verificationHint}>
-                    <Ionicons name="mail" size={16} color={COLORS.info} />
-                    <Text style={styles.verificationText}>
-                      You'll receive a verification email after signing up
-                    </Text>
-                  </View>
-                )}
-
                 {errors.general && (
                   <View style={styles.generalErrorContainer}>
                     <Ionicons name="alert-circle" size={16} color={COLORS.error} />
@@ -270,6 +259,7 @@ const AuthScreen: React.FC = () => {
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
+                    size="small"
                   />
 
                   <CustomInput
@@ -281,16 +271,19 @@ const AuthScreen: React.FC = () => {
                     placeholder="Enter your password"
                     secureTextEntry
                     textContentType={isLogin ? 'password' : 'newPassword'}
+                    size="small"
                   />
 
                   <CustomButton
                     title={isLogin ? 'Sign In' : 'Create Account'}
                     onPress={handleSubmit}
                     loading={loading}
-                    variant="primary"
-                    size="large"
+                    variant="secondary"
+                    size="small"
                     fullWidth
                     icon={isLogin ? 'log-in' : 'person-add'}
+                    shape="pill"
+                    uppercase
                     style={styles.submitButton}
                   />
 
@@ -366,7 +359,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: SIZES.spacingLg,
+    // Reduce horizontal padding so inputs and buttons are visually wider
+    paddingHorizontal: SIZES.spacingMd,
     paddingVertical: SIZES.spacingXl,
   },
   logoSection: {
@@ -414,23 +408,22 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacingXl,
   },
   formContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: 'transparent',
     borderRadius: SIZES.radiusXl,
     padding: SIZES.spacingXl,
-    ...SIZES.shadowLarge,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    borderWidth: 0,
   },
   formTitle: {
     fontSize: SIZES.fontSizeXxl,
     fontWeight: '700' as const,
-    color: COLORS.textPrimary,
+    color: COLORS.textInverse,
     textAlign: 'center',
     marginBottom: SIZES.spacingXs,
   },
   formSubtitle: {
     fontSize: SIZES.fontSizeMd,
-    color: COLORS.textSecondary,
+    color: COLORS.textInverse,
+    opacity: 0.9,
     textAlign: 'center',
     marginBottom: SIZES.spacingMd,
     lineHeight: 22,
@@ -484,11 +477,11 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.glassLight,
   },
   dividerText: {
     fontSize: SIZES.fontSizeSm,
-    color: COLORS.textTertiary,
+    color: COLORS.textInverse,
     fontWeight: '600' as const,
     marginHorizontal: SIZES.spacingLg,
   },

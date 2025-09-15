@@ -434,6 +434,8 @@ export interface CustomButtonProps {
   fullWidth?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  shape?: 'rounded' | 'pill';
+  uppercase?: boolean;
 }
 
 // Screen Prop Interfaces

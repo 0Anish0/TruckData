@@ -26,6 +26,8 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   fullWidth = false,
   style,
   textStyle,
+  shape = 'rounded',
+  uppercase = false,
 }) => {
   const scaleValue = new Animated.Value(1);
   const opacityValue = new Animated.Value(1);
@@ -62,7 +64,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 
   const getButtonStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
-      borderRadius: SIZES.radiusMd,
+      borderRadius: shape === 'pill' ? SIZES.radiusRound : SIZES.radiusMd,
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'row',
@@ -102,7 +104,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 
   const getTextStyle = (): TextStyle => {
     const baseStyle: TextStyle = {
-      fontWeight: '600',
+      fontWeight: '700',
       textAlign: 'center',
     };
 
@@ -135,6 +137,12 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       case 'danger':
         baseStyle.color = COLORS.textInverse;
         break;
+    }
+
+    if (uppercase) {
+      baseStyle.textTransform = 'uppercase';
+      // Slightly increase letter spacing for uppercase for better readability
+      baseStyle.letterSpacing = 0.5;
     }
 
     return baseStyle;
@@ -173,27 +181,27 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     return (
       <View style={styles.content}>
         {loading ? (
-          <ActivityIndicator 
-            size="small" 
-            color={getIconColor()} 
+          <ActivityIndicator
+            size="small"
+            color={getIconColor()}
             style={styles.loader}
           />
         ) : (
           <>
             {icon && iconPosition === 'left' && (
-              <Ionicons 
-                name={icon} 
-                size={iconSize} 
-                color={iconColor} 
+              <Ionicons
+                name={icon}
+                size={iconSize}
+                color={iconColor}
                 style={styles.iconLeft}
               />
             )}
             <Text style={[getTextStyle(), textStyle]}>{title}</Text>
             {icon && iconPosition === 'right' && (
-              <Ionicons 
-                name={icon} 
-                size={iconSize} 
-                color={iconColor} 
+              <Ionicons
+                name={icon}
+                size={iconSize}
+                color={iconColor}
                 style={styles.iconRight}
               />
             )}
@@ -207,11 +215,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     const buttonStyle = getButtonStyle();
 
     if (variant === 'primary' || variant === 'secondary' || variant === 'danger' || variant === 'success') {
-      const gradientColors = 
+      const gradientColors =
         variant === 'primary' ? COLORS.primaryGradient :
-        variant === 'secondary' ? COLORS.secondaryGradient :
-        variant === 'success' ? COLORS.successGradient :
-        COLORS.errorGradient;
+          variant === 'secondary' ? COLORS.secondaryGradient :
+            variant === 'success' ? COLORS.successGradient :
+              COLORS.errorGradient;
 
       return (
         <LinearGradient
@@ -226,9 +234,9 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     }
 
     // For outline and ghost variants
-    const backgroundColor = 
+    const backgroundColor =
       variant === 'outline' ? 'transparent' :
-      variant === 'ghost' ? COLORS.primaryLight : 'transparent';
+        variant === 'ghost' ? COLORS.primaryLight : 'transparent';
 
     const borderWidth = variant === 'outline' ? 2 : 0;
     const borderColor = variant === 'outline' ? COLORS.primary : 'transparent';

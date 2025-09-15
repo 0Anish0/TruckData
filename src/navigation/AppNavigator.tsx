@@ -3,62 +3,60 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SIZES } from '../constants/theme';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/MockAuthContext';
 import { 
   RootStackParamList
 } from '../types/navigation';
 
-// Screens
-import AuthScreen from '../screens/AuthScreen';
-import DashboardScreen from '../screens/DashboardScreen';
-import AddTripScreen from '../screens/AddTripScreen';
-import AddTruckScreen from '../screens/AddTruckScreen';
-import TripsScreen from '../screens/TripsScreen';
-import TrucksScreen from '../screens/TrucksScreen';
-import TruckTripsScreen from '../screens/TruckTripsScreen';
-import EditTripScreen from '../screens/EditTripScreen';
-import EditTruckScreen from '../screens/EditTruckScreen';
-import DriversScreen from '../screens/DriversScreen';
-import AddDriverScreen from '../screens/AddDriverScreen';
+// Enhanced Screens
+import EnhancedAuthScreen from '../screens/EnhancedAuthScreen';
+import EnhancedDashboardScreen from '../screens/EnhancedDashboardScreen';
+import EnhancedTripsScreen from '../screens/EnhancedTripsScreen';
+import EnhancedTrucksScreen from '../screens/EnhancedTrucksScreen';
+import EnhancedDriversScreen from '../screens/EnhancedDriversScreen';
+import EnhancedAddTripScreen from '../screens/EnhancedAddTripScreen';
+import EnhancedAddTruckScreen from '../screens/EnhancedAddTruckScreen';
+import EnhancedAddDriverScreen from '../screens/EnhancedAddDriverScreen';
+import EnhancedTruckTripsScreen from '../screens/EnhancedTruckTripsScreen';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createStackNavigator();
 
 const DashboardStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="DashboardMain" component={DashboardScreen} />
-    <Stack.Screen name="AddTrip" component={AddTripScreen} />
-    <Stack.Screen name="AddTruck" component={AddTruckScreen} />
-    <Stack.Screen name="TruckTrips" component={TruckTripsScreen as React.ComponentType} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen as React.ComponentType} />
-    <Stack.Screen name="EditTruck" component={EditTruckScreen as React.ComponentType} />
+    <Stack.Screen name="DashboardMain" component={EnhancedDashboardScreen} />
+    <Stack.Screen name="AddTrip" component={EnhancedAddTripScreen} />
+    <Stack.Screen name="AddTruck" component={EnhancedAddTruckScreen} />
+    <Stack.Screen name="TruckTrips" component={EnhancedTruckTripsScreen as React.ComponentType} />
+    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
+    <Stack.Screen name="EditTruck" component={EnhancedAddTruckScreen} />
   </Stack.Navigator>
 );
 
 const TripsStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="TripsMain" component={TripsScreen} />
-    <Stack.Screen name="AddTrip" component={AddTripScreen} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen as React.ComponentType} />
+    <Stack.Screen name="TripsMain" component={EnhancedTripsScreen} />
+    <Stack.Screen name="AddTrip" component={EnhancedAddTripScreen} />
+    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
   </Stack.Navigator>
 );
 
 const TrucksStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="TrucksMain" component={TrucksScreen} />
-    <Stack.Screen name="AddTruck" component={AddTruckScreen} />
-    <Stack.Screen name="EditTrip" component={EditTripScreen as React.ComponentType} />
-    <Stack.Screen name="EditTruck" component={EditTruckScreen as React.ComponentType} />
+    <Stack.Screen name="TrucksMain" component={EnhancedTrucksScreen} />
+    <Stack.Screen name="AddTruck" component={EnhancedAddTruckScreen} />
+    <Stack.Screen name="EditTrip" component={EnhancedAddTripScreen} />
+    <Stack.Screen name="EditTruck" component={EnhancedAddTruckScreen} />
   </Stack.Navigator>
 );
 
 const DriversStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="DriversMain" component={DriversScreen} />
-    <Stack.Screen name="AddDriver" component={AddDriverScreen} />
+    <Stack.Screen name="DriversMain" component={EnhancedDriversScreen} />
+    <Stack.Screen name="AddDriver" component={EnhancedAddDriverScreen} />
   </Stack.Navigator>
 );
 
@@ -78,7 +76,7 @@ const AppNavigator = () => {
     return (
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Auth" component={AuthScreen} />
+          <Stack.Screen name="Auth" component={EnhancedAuthScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -87,8 +85,7 @@ const AppNavigator = () => {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <Tab.Navigator
+        <Tab.Navigator
             screenOptions={({ route }) => ({
               tabBarIcon: ({ focused, color, size }) => {
                 let iconName: keyof typeof Ionicons.glyphMap;
@@ -115,13 +112,17 @@ const AppNavigator = () => {
                 borderTopColor: COLORS.border,
                 paddingTop: SIZES.spacingSm,
                 paddingBottom: insets.bottom,
-                height: 60 + insets.bottom,
+                height: 70 + insets.bottom,
                 ...SIZES.shadowStrong,
               },
               tabBarLabelStyle: {
                 fontSize: SIZES.fontSizeXs,
                 fontWeight: '600',
                 marginTop: SIZES.spacingXs,
+                marginBottom: SIZES.spacingXs,
+              },
+              tabBarItemStyle: {
+                paddingVertical: SIZES.spacingXs,
               },
               headerShown: false,
             })}
@@ -131,7 +132,6 @@ const AppNavigator = () => {
             <Tab.Screen name="Trucks" component={TrucksStack} />
             <Tab.Screen name="Drivers" component={DriversStack} />
           </Tab.Navigator>
-        </SafeAreaView>
       </NavigationContainer>
     </SafeAreaProvider>
   );

@@ -1,7 +1,7 @@
 import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { Truck, TripWithRelations } from './index';
+import { Truck, TripWithRelations, Driver } from './index';
 
 // Root tab navigator parameter types
 export type RootStackParamList = {
@@ -14,8 +14,8 @@ export type RootStackParamList = {
 // Dashboard stack navigator parameter types
 export type DashboardStackParamList = {
   DashboardMain: undefined;
-  AddTrip: undefined;
-  AddTruck: undefined;
+  AddTrip: { trip?: TripWithRelations };
+  AddTruck: { truck?: Truck };
   TruckTrips: { truck: Truck };
   EditTrip: { trip: TripWithRelations };
   EditTruck: { truck: Truck };
@@ -24,14 +24,14 @@ export type DashboardStackParamList = {
 // Trips stack navigator parameter types
 export type TripsStackParamList = {
   TripsMain: undefined;
-  AddTrip: undefined;
+  AddTrip: { trip?: TripWithRelations };
   EditTrip: { trip: TripWithRelations };
 };
 
 // Trucks stack navigator parameter types
 export type TrucksStackParamList = {
   TrucksMain: undefined;
-  AddTruck: undefined;
+  AddTruck: { truck?: Truck };
   EditTrip: { trip: TripWithRelations };
   EditTruck: { truck: Truck };
 };
@@ -39,7 +39,7 @@ export type TrucksStackParamList = {
 // Drivers stack navigator parameter types
 export type DriversStackParamList = {
   DriversMain: undefined;
-  AddDriver: undefined;
+  AddDriver: { driver?: Driver };
 };
 
 // Auth stack navigator parameter types

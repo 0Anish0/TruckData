@@ -72,6 +72,78 @@ export class TripService extends SupabaseService {
     }
   }
 
+  async getTripWithDetails(id: string): Promise<TripWithRelations | null> {
+    try {
+      // Fetch the basic trip data
+      const { data: tripData, error: tripError } = await supabase
+        .from('trips')
+        .select(`
+          *,
+          trucks: truck_id (
+            id,
+            name,
+            truck_number,
+            model
+          ),
+          drivers: driver_id (
+            id,
+            name
+          )
+        `)
+        .eq('id', id)
+        .eq('user_id', await this.getUserId())
+        .single();
+
+      if (tripError) {
+        if (tripError.code === 'PGRST116') {
+          return null;
+        }
+        throw tripError;
+      }
+
+      // Fetch all related data in parallel
+      const [
+        dieselData,
+        fastTagData,
+        mcdData,
+        greenTaxData,
+        rtoData,
+        dtoData,
+        municipalitiesData,
+        borderData,
+        repairData
+      ] = await Promise.all([
+        supabase.from('diesel_purchases').select('*').eq('trip_id', id),
+        supabase.from('fast_tag_events').select('*').eq('trip_id', id),
+        supabase.from('mcd_events').select('*').eq('trip_id', id),
+        supabase.from('green_tax_events').select('*').eq('trip_id', id),
+        supabase.from('rto_events').select('*').eq('trip_id', id),
+        supabase.from('dto_events').select('*').eq('trip_id', id),
+        supabase.from('municipalities_events').select('*').eq('trip_id', id),
+        supabase.from('border_events').select('*').eq('trip_id', id),
+        supabase.from('repair_items').select('*').eq('trip_id', id)
+      ]);
+
+      // Combine all data
+      const tripWithDetails: TripWithRelations = {
+        ...tripData,
+        diesel_purchases: dieselData.data || [],
+        fast_tag_events: fastTagData.data || [],
+        mcd_events: mcdData.data || [],
+        green_tax_events: greenTaxData.data || [],
+        rto_events: rtoData.data || [],
+        dto_events: dtoData.data || [],
+        municipalities_events: municipalitiesData.data || [],
+        border_events: borderData.data || [],
+        repair_items: repairData.data || []
+      };
+
+      return tripWithDetails;
+    } catch (error) {
+      return this.handleError(error, 'Get trip with details');
+    }
+  }
+
   async getTripsByTruck(truckId: string): Promise<TripWithRelations[]> {
     try {
       const { data, error } = await supabase
@@ -178,6 +250,66 @@ export class TripService extends SupabaseService {
       return data;
     } catch (error) {
       return this.handleError(error, 'Update trip');
+    }
+  }
+
+  async updateTripWithDetails(id: string, tripFormData: TripFormData): Promise<Trip> {
+    try {
+      // Calculate costs locally
+      const calculatedCosts = this.calculateTripCosts(tripFormData);
+
+      // Update the main trip record
+      const { data: trip, error: tripError } = await supabase
+        .from('trips')
+        .update({
+          truck_id: tripFormData.truck_id,
+          driver_id: tripFormData.driver_id || null,
+          source: tripFormData.source,
+          destination: tripFormData.destination,
+          start_date: tripFormData.start_date,
+          end_date: tripFormData.end_date,
+          trip_date: tripFormData.start_date, // Use start_date as trip_date
+          ...calculatedCosts,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('user_id', await this.getUserId())
+        .select()
+        .single();
+
+      if (tripError) {
+        throw tripError;
+      }
+
+      // Delete all existing related data first
+      await this.deleteTripRelatedData(id);
+
+      // Insert new diesel purchases
+      if (tripFormData.diesel_purchases.length > 0) {
+        const dieselData = tripFormData.diesel_purchases.map(purchase => ({
+          trip_id: id,
+          state: purchase.state,
+          city: purchase.city || null,
+          diesel_quantity: purchase.diesel_quantity,
+          diesel_price_per_liter: purchase.diesel_price_per_liter,
+          purchase_date: purchase.purchase_date,
+        }));
+
+        const { error: dieselError } = await supabase
+          .from('diesel_purchases')
+          .insert(dieselData);
+
+        if (dieselError) {
+          console.error('Error updating diesel purchases:', dieselError);
+        }
+      }
+
+      // Insert all new event types
+      await this.insertEventData(id, tripFormData);
+
+      return trip;
+    } catch (error) {
+      return this.handleError(error, 'Update trip with details');
     }
   }
 

@@ -151,12 +151,23 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
     </Animated.View>
   );
 
+  const handleEditTrip = async (tripId: string) => {
+    try {
+      const tripWithDetails = await tripService.getTripWithDetails(tripId);
+      if (tripWithDetails) {
+        navigation.navigate('AddTrip', { trip: tripWithDetails });
+      }
+    } catch (error) {
+      console.error('Error fetching trip details for edit:', error);
+    }
+  };
+
   const renderTripItem = ({ item, index }: { item: Trip; index: number }) => (
     <TripCard
       trip={item}
       truckName={getTruckName(item.truck_id)}
       onPress={() => { }}
-      onEdit={() => navigation.navigate('AddTrip', { trip: item as TripWithRelations })}
+      onEdit={() => handleEditTrip(item.id)}
       onDelete={() => { }}
       index={index}
     />

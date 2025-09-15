@@ -194,11 +194,89 @@ export interface TripWithRelations {
     name: string;
   };
   diesel_purchases?: {
+    id?: string;
     state: string;
     city: string | null;
     diesel_quantity: number;
     diesel_price_per_liter: number;
     purchase_date: string;
+    created_at?: string;
+    updated_at?: string;
+  }[];
+  fast_tag_events?: {
+    id: string;
+    amount: number;
+    event_time: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  mcd_events?: {
+    id: string;
+    amount: number;
+    event_time: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  green_tax_events?: {
+    id: string;
+    amount: number;
+    event_time: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  rto_events?: {
+    id: string;
+    state: string;
+    checkpoint?: string;
+    amount: number;
+    event_time: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  dto_events?: {
+    id: string;
+    state: string;
+    checkpoint?: string;
+    amount: number;
+    event_time: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  municipalities_events?: {
+    id: string;
+    state: string;
+    checkpoint?: string;
+    amount: number;
+    event_time: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  border_events?: {
+    id: string;
+    state: string;
+    checkpoint?: string;
+    amount: number;
+    event_time: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  repair_items?: {
+    id: string;
+    state: string;
+    checkpoint?: string;
+    part_or_defect: string;
+    amount: number;
+    notes?: string;
+    event_time: string;
+    created_at: string;
+    updated_at: string;
   }[];
 }
 

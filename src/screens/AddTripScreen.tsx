@@ -35,7 +35,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
   const isEditMode = !!tripToEdit;
   const [formData, setFormData] = useState<TripFormData>(() => {
     if (isEditMode && tripToEdit) {
-      // Pre-fill form data for edit mode
+      // Pre-fill form data for edit mode with detailed event data
       return {
         truck_id: tripToEdit.truck_id,
         source: tripToEdit.source,
@@ -50,14 +50,79 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
           diesel_price_per_liter: purchase.diesel_price_per_liter,
           purchase_date: purchase.purchase_date,
         })),
-        fast_tag_costs: [{ state: '', checkpoint: '', amount: tripToEdit.fast_tag_cost || 0, notes: '' }],
-        mcd_costs: [{ state: '', checkpoint: '', amount: tripToEdit.mcd_cost || 0, notes: '' }],
-        green_tax_costs: [{ state: '', checkpoint: '', amount: tripToEdit.green_tax_cost || 0, notes: '' }],
-        rto_costs: [{ state: '', checkpoint: '', amount: tripToEdit.rto_cost || 0, notes: '' }],
-        dto_costs: [{ state: '', checkpoint: '', amount: tripToEdit.dto_cost || 0, notes: '' }],
-        municipalities_costs: [{ state: '', checkpoint: '', amount: tripToEdit.municipalities_cost || 0, notes: '' }],
-        border_costs: [{ state: '', checkpoint: '', amount: tripToEdit.border_cost || 0, notes: '' }],
-        repair_items: [{ state: '', checkpoint: '', part_or_defect: '', amount: tripToEdit.repair_cost || 0, notes: '' }],
+        fast_tag_costs: (tripToEdit.fast_tag_events && tripToEdit.fast_tag_events.length > 0)
+          ? tripToEdit.fast_tag_events.map(event => ({
+            state: '', // Events don't have state, using empty string
+            checkpoint: '',
+            amount: event.amount,
+            notes: event.notes || '',
+            event_time: event.event_time,
+          }))
+          : [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        mcd_costs: (tripToEdit.mcd_events && tripToEdit.mcd_events.length > 0)
+          ? tripToEdit.mcd_events.map(event => ({
+            state: '', // Events don't have state, using empty string
+            checkpoint: '',
+            amount: event.amount,
+            notes: event.notes || '',
+            event_time: event.event_time,
+          }))
+          : [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        green_tax_costs: (tripToEdit.green_tax_events && tripToEdit.green_tax_events.length > 0)
+          ? tripToEdit.green_tax_events.map(event => ({
+            state: '', // Events don't have state, using empty string
+            checkpoint: '',
+            amount: event.amount,
+            notes: event.notes || '',
+            event_time: event.event_time,
+          }))
+          : [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        rto_costs: (tripToEdit.rto_events && tripToEdit.rto_events.length > 0)
+          ? tripToEdit.rto_events.map(event => ({
+            state: event.state,
+            checkpoint: event.checkpoint || '',
+            amount: event.amount,
+            notes: event.notes || '',
+            event_time: event.event_time,
+          }))
+          : [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        dto_costs: (tripToEdit.dto_events && tripToEdit.dto_events.length > 0)
+          ? tripToEdit.dto_events.map(event => ({
+            state: event.state,
+            checkpoint: event.checkpoint || '',
+            amount: event.amount,
+            notes: event.notes || '',
+            event_time: event.event_time,
+          }))
+          : [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        municipalities_costs: (tripToEdit.municipalities_events && tripToEdit.municipalities_events.length > 0)
+          ? tripToEdit.municipalities_events.map(event => ({
+            state: event.state,
+            checkpoint: event.checkpoint || '',
+            amount: event.amount,
+            notes: event.notes || '',
+            event_time: event.event_time,
+          }))
+          : [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        border_costs: (tripToEdit.border_events && tripToEdit.border_events.length > 0)
+          ? tripToEdit.border_events.map(event => ({
+            state: event.state,
+            checkpoint: event.checkpoint || '',
+            amount: event.amount,
+            notes: event.notes || '',
+            event_time: event.event_time,
+          }))
+          : [{ state: '', checkpoint: '', amount: 0, notes: '' }],
+        repair_items: (tripToEdit.repair_items && tripToEdit.repair_items.length > 0)
+          ? tripToEdit.repair_items.map(item => ({
+            state: item.state,
+            checkpoint: item.checkpoint || '',
+            part_or_defect: item.part_or_defect,
+            amount: item.amount,
+            notes: item.notes || '',
+            event_time: item.event_time,
+          }))
+          : [{ state: '', checkpoint: '', part_or_defect: '', amount: 0, notes: '' }],
       };
     } else {
       // Default empty form for add mode
@@ -176,25 +241,8 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
     setLoading(true);
     try {
       if (isEditMode && tripToEdit) {
-        // Convert form data to trip data for update
-        const tripUpdateData = {
-          truck_id: formData.truck_id,
-          source: formData.source,
-          destination: formData.destination,
-          driver_id: formData.driver_id || null,
-          start_date: formData.start_date,
-          end_date: formData.end_date,
-          fast_tag_cost: formData.fast_tag_costs.reduce((sum, cost) => sum + cost.amount, 0),
-          mcd_cost: formData.mcd_costs.reduce((sum, cost) => sum + cost.amount, 0),
-          green_tax_cost: formData.green_tax_costs.reduce((sum, cost) => sum + cost.amount, 0),
-          rto_cost: formData.rto_costs.reduce((sum, cost) => sum + cost.amount, 0),
-          dto_cost: formData.dto_costs.reduce((sum, cost) => sum + cost.amount, 0),
-          municipalities_cost: formData.municipalities_costs.reduce((sum, cost) => sum + cost.amount, 0),
-          border_cost: formData.border_costs.reduce((sum, cost) => sum + cost.amount, 0),
-          repair_cost: formData.repair_items.reduce((sum, item) => sum + item.amount, 0),
-        };
-
-        await tripService.updateTrip(tripToEdit.id, tripUpdateData);
+        // Use the comprehensive update method that handles all related data
+        await tripService.updateTripWithDetails(tripToEdit.id, formData);
         Alert.alert(
           'Success',
           'Trip updated successfully!',
@@ -516,9 +564,11 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
             <Ionicons name="arrow-back" size={24} color={COLORS.textInverse} />
           </TouchableOpacity>
           <View style={styles.headerText}>
-            <Text style={styles.headerTitle}>Add New Trip</Text>
+            <Text style={styles.headerTitle}>
+              {isEditMode ? 'Edit Trip' : 'Add New Trip'}
+            </Text>
             <Text style={styles.headerSubtitle}>
-              Create a new trip with all expenses
+              {isEditMode ? 'Update trip information and expenses' : 'Create a new trip with all expenses'}
             </Text>
           </View>
           <View style={styles.headerIcon}>
@@ -862,7 +912,7 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
 
             {/* Submit Button */}
             <CustomButton
-              title={isEditMode ? "Edit Trip" : "Create Trip"}
+              title={isEditMode ? "Update Trip" : "Create Trip"}
               onPress={handleSubmit}
               loading={loading}
               variant="primary"

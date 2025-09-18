@@ -19,6 +19,7 @@ import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import { driverService } from '../services';
+import { base64ToDataUri } from '../services/supabaseService';
 import { AddDriverScreenNavigationProp, Driver } from '../types';
 
 interface AddDriverScreenProps {
@@ -52,9 +53,12 @@ const AddDriverScreen: React.FC<AddDriverScreenProps> = ({ route, navigation }) 
       };
     }
   });
-  const [licenseImage, setLicenseImage] = useState<string | null>(
-    isEditMode && driverToEdit ? driverToEdit.license_image_url || null : null
-  );
+  const [licenseImage, setLicenseImage] = useState<string | null>(() => {
+    if (isEditMode && driverToEdit && driverToEdit.license_image_url) {
+      return base64ToDataUri(driverToEdit.license_image_url);
+    }
+    return null;
+  });
   const [loading, setLoading] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;

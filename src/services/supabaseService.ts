@@ -113,3 +113,16 @@ export const convertImageToBase64 = async (imageUri: string): Promise<string> =>
     throw new Error('Failed to convert image to base64');
   }
 };
+
+// Utility function to convert base64 string to data URI for display
+export const base64ToDataUri = (base64String: string, mimeType: string = 'image/jpeg'): string => {
+  if (!base64String) return '';
+  
+  // If it already has a data URI prefix, return as is
+  if (base64String.startsWith('data:')) {
+    return base64String;
+  }
+  
+  // Add the data URI prefix
+  return `data:${mimeType};base64,${base64String}`;
+};

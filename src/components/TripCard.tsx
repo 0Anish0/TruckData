@@ -120,6 +120,14 @@ const TripCard: React.FC<TripCardProps> = ({
     return trip.municipalities_cost || 0;
   };
 
+  const getBorderCost = () => {
+    return trip.border_cost || 0;
+  };
+
+  const getRepairCost = () => {
+    return trip.repair_cost || 0;
+  };
+
   const getTotalCost = () => {
     return trip.total_cost || 0;
   };
@@ -258,6 +266,22 @@ const TripCard: React.FC<TripCardProps> = ({
               </View>
               <Text style={styles.costLabel}>Municipalities</Text>
               <Text style={styles.costValue}>{formatCurrency(getMunicipalitiesCost())}</Text>
+            </View>
+
+            <View style={styles.costItem}>
+              <View style={[styles.costIcon, { backgroundColor: COLORS.warning + '20' }]}>
+                <Ionicons name="flag" size={16} color={COLORS.warning} />
+              </View>
+              <Text style={styles.costLabel}>Border</Text>
+              <Text style={styles.costValue}>{formatCurrency(getBorderCost())}</Text>
+            </View>
+
+            <View style={styles.costItem}>
+              <View style={[styles.costIcon, { backgroundColor: COLORS.warning + '20' }]}>
+                <Ionicons name="construct" size={16} color={COLORS.warning} />
+              </View>
+              <Text style={styles.costLabel}>Repair</Text>
+              <Text style={styles.costValue}>{formatCurrency(getRepairCost())}</Text>
             </View>
           </View>
         </View>
@@ -406,7 +430,7 @@ const styles = StyleSheet.create({
     marginBottom: SIZES.spacingLg,
   },
   costItem: {
-    width: '30%',
+    width: '22%',
     alignItems: 'center',
     paddingHorizontal: SIZES.spacingXs,
     marginBottom: SIZES.spacingSm,

@@ -269,72 +269,80 @@ export interface CommissionItemFormData {
   amount: number;
   checkpoint?: string;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string;
 }
 
 export interface RepairItemFormData {
+  id?: string;
   state: string;
   checkpoint?: string;
   part_or_defect: string;
   amount: number;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string; 
 }
 
 export interface FastTagEventFormData {
+  id?: string; 
   state: string;
   checkpoint?: string;
   amount: number;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string; 
 }
 
 export interface McdEventFormData {
+  id?: string; 
   state: string;
   checkpoint?: string;
   amount: number;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string; 
 }
 
 export interface GreenTaxEventFormData {
+  id?: string; 
   state: string;
   checkpoint?: string;
   amount: number;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string; 
 }
 
 export interface RtoEventFormData {
+  id?: string; 
   state: string;
   checkpoint?: string;
   amount: number;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string; 
 }
 
 export interface DtoEventFormData {
+  id?: string; 
   state: string;
   checkpoint?: string;
   amount: number;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string; 
 }
 
 export interface MunicipalitiesEventFormData {
+  id?: string; 
   state: string;
   checkpoint?: string;
   amount: number;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string; 
 }
 
 export interface BorderEventFormData {
+  id?: string; 
   state: string;
   checkpoint?: string;
   amount: number;
   notes?: string;
-  event_time?: string; // ISO
+  event_time?: string; 
 }
 
 export const INDIAN_STATES = [

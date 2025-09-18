@@ -245,6 +245,78 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
     }));
   };
 
+  const updateFastTagCost = (index: number, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      fast_tag_costs: prev.fast_tag_costs.map((cost, i) =>
+        i === index ? { ...cost, [field]: value } : cost
+      )
+    }));
+  };
+
+  const updateMcdCost = (index: number, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      mcd_costs: prev.mcd_costs.map((cost, i) =>
+        i === index ? { ...cost, [field]: value } : cost
+      )
+    }));
+  };
+
+  const updateGreenTaxCost = (index: number, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      green_tax_costs: prev.green_tax_costs.map((cost, i) =>
+        i === index ? { ...cost, [field]: value } : cost
+      )
+    }));
+  };
+
+  const updateRtoCost = (index: number, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      rto_costs: prev.rto_costs.map((cost, i) =>
+        i === index ? { ...cost, [field]: value } : cost
+      )
+    }));
+  };
+
+  const updateDtoCost = (index: number, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      dto_costs: prev.dto_costs.map((cost, i) =>
+        i === index ? { ...cost, [field]: value } : cost
+      )
+    }));
+  };
+
+  const updateBorderCost = (index: number, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      border_costs: prev.border_costs.map((cost, i) =>
+        i === index ? { ...cost, [field]: value } : cost
+      )
+    }));
+  };
+
+  const updateMunicipalitiesCost = (index: number, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      municipalities_costs: prev.municipalities_costs.map((cost, i) =>
+        i === index ? { ...cost, [field]: value } : cost
+      )
+    }));
+  };
+
+  const updateRepairItem = (index: number, field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      repair_items: prev.repair_items.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
   const handleDateChange = (event: unknown, selectedDate: Date | undefined, index: number) => {
     setShowDatePicker(prev => ({ ...prev, [`purchase_${index}`]: false }));
     if (selectedDate) {
@@ -795,70 +867,629 @@ const AddTripScreen: React.FC<AddTripScreenProps> = ({ route }) => {
             </View>
 
             {/* Cost Sections */}
-            <ComplexCostSection
-              title="Fast Tag"
-              icon="card"
-              color={COLORS.info}
-              costs={formData.fast_tag_costs}
-              onUpdate={(costs) => setFormData(prev => ({ ...prev, fast_tag_costs: costs }))}
-            />
+            {/* Fast Tag Costs */}
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.info + '20' }]}>
+                  <Ionicons name="card" size={20} color={COLORS.info} />
+                </View>
+                <Text style={styles.costSectionTitle}>Fast Tag Costs</Text>
+              </View>
 
-            <ComplexCostSection
-              title="MCD"
-              icon="business"
-              color={COLORS.warning}
-              costs={formData.mcd_costs}
-              onUpdate={(costs) => setFormData(prev => ({ ...prev, mcd_costs: costs }))}
-            />
+              {formData.fast_tag_costs.map((cost, index) => (
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>Fast Tag Cost {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          fast_tag_costs: prev.fast_tag_costs.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      style={styles.removeCostButton}
+                    >
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
 
-            <ComplexCostSection
-              title="Green Tax"
-              icon="leaf"
-              color={COLORS.success}
-              costs={formData.green_tax_costs}
-              onUpdate={(costs) => setFormData(prev => ({ ...prev, green_tax_costs: costs }))}
-            />
+                  <CustomInput
+                    label="State"
+                    value={cost.state}
+                    onChangeText={(text) => updateFastTagCost(index, 'state', text)}
+                    leftIcon="location"
+                    placeholder="Enter state"
+                  />
 
-            <ComplexCostSection
-              title="RTO"
-              icon="document-text"
-              color={COLORS.primary}
-              costs={formData.rto_costs}
-              onUpdate={(costs) => setFormData(prev => ({ ...prev, rto_costs: costs }))}
-            />
+                  <CustomInput
+                    label="Checkpoint (Optional)"
+                    value={cost.checkpoint || ''}
+                    onChangeText={(text) => updateFastTagCost(index, 'checkpoint', text)}
+                    leftIcon="flag"
+                    placeholder="Enter checkpoint"
+                  />
 
-            <ComplexCostSection
-              title="DTO"
-              icon="receipt"
-              color={COLORS.secondary}
-              costs={formData.dto_costs}
-              onUpdate={(costs) => setFormData(prev => ({ ...prev, dto_costs: costs }))}
-            />
+                  <CustomInput
+                    label="Amount"
+                    value={cost.amount.toString()}
+                    onChangeText={(text) => updateFastTagCost(index, 'amount', parseFloat(text) || 0)}
+                    leftIcon="cash"
+                    keyboardType="numeric"
+                    placeholder="Enter amount"
+                  />
 
-            <ComplexCostSection
-              title="Border"
-              icon="flag"
-              color={COLORS.warning}
-              costs={formData.border_costs}
-              onUpdate={(costs) => setFormData(prev => ({ ...prev, border_costs: costs }))}
-            />
+                  <CustomInput
+                    label="Notes (Optional)"
+                    value={cost.notes || ''}
+                    onChangeText={(text) => updateFastTagCost(index, 'notes', text)}
+                    leftIcon="document-text"
+                    placeholder="Enter notes"
+                    multiline
+                  />
+                </View>
+              ))}
 
-            <ComplexCostSection
-              title="Municipalities"
-              icon="business"
-              color={COLORS.accent}
-              costs={formData.municipalities_costs}
-              onUpdate={(costs) => setFormData(prev => ({ ...prev, municipalities_costs: costs }))}
-            />
+              <CustomButton
+                title="Add Fast Tag"
+                onPress={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    fast_tag_costs: [...prev.fast_tag_costs, { state: '', checkpoint: '', amount: 0, notes: '' }]
+                  }));
+                }}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
+            </View>
+
+            {/* MCD Costs */}
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.warning + '20' }]}>
+                  <Ionicons name="business" size={20} color={COLORS.warning} />
+                </View>
+                <Text style={styles.costSectionTitle}>MCD Costs</Text>
+              </View>
+
+              {formData.mcd_costs.map((cost, index) => (
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>MCD Cost {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          mcd_costs: prev.mcd_costs.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      style={styles.removeCostButton}
+                    >
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <CustomInput
+                    label="State"
+                    value={cost.state}
+                    onChangeText={(text) => updateMcdCost(index, 'state', text)}
+                    leftIcon="location"
+                    placeholder="Enter state"
+                  />
+
+                  <CustomInput
+                    label="Checkpoint (Optional)"
+                    value={cost.checkpoint || ''}
+                    onChangeText={(text) => updateMcdCost(index, 'checkpoint', text)}
+                    leftIcon="flag"
+                    placeholder="Enter checkpoint"
+                  />
+
+                  <CustomInput
+                    label="Amount"
+                    value={cost.amount.toString()}
+                    onChangeText={(text) => updateMcdCost(index, 'amount', parseFloat(text) || 0)}
+                    leftIcon="cash"
+                    keyboardType="numeric"
+                    placeholder="Enter amount"
+                  />
+
+                  <CustomInput
+                    label="Notes (Optional)"
+                    value={cost.notes || ''}
+                    onChangeText={(text) => updateMcdCost(index, 'notes', text)}
+                    leftIcon="document-text"
+                    placeholder="Enter notes"
+                    multiline
+                  />
+                </View>
+              ))}
+
+              <CustomButton
+                title="Add MCD"
+                onPress={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    mcd_costs: [...prev.mcd_costs, { state: '', checkpoint: '', amount: 0, notes: '' }]
+                  }));
+                }}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
+            </View>
+
+            {/* Green Tax Costs */}
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.success + '20' }]}>
+                  <Ionicons name="leaf" size={20} color={COLORS.success} />
+                </View>
+                <Text style={styles.costSectionTitle}>Green Tax Costs</Text>
+              </View>
+
+              {formData.green_tax_costs.map((cost, index) => (
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>Green Tax Cost {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          green_tax_costs: prev.green_tax_costs.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      style={styles.removeCostButton}
+                    >
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <CustomInput
+                    label="State"
+                    value={cost.state}
+                    onChangeText={(text) => updateGreenTaxCost(index, 'state', text)}
+                    leftIcon="location"
+                    placeholder="Enter state"
+                  />
+
+                  <CustomInput
+                    label="Checkpoint (Optional)"
+                    value={cost.checkpoint || ''}
+                    onChangeText={(text) => updateGreenTaxCost(index, 'checkpoint', text)}
+                    leftIcon="flag"
+                    placeholder="Enter checkpoint"
+                  />
+
+                  <CustomInput
+                    label="Amount"
+                    value={cost.amount.toString()}
+                    onChangeText={(text) => updateGreenTaxCost(index, 'amount', parseFloat(text) || 0)}
+                    leftIcon="cash"
+                    keyboardType="numeric"
+                    placeholder="Enter amount"
+                  />
+
+                  <CustomInput
+                    label="Notes (Optional)"
+                    value={cost.notes || ''}
+                    onChangeText={(text) => updateGreenTaxCost(index, 'notes', text)}
+                    leftIcon="document-text"
+                    placeholder="Enter notes"
+                    multiline
+                  />
+                </View>
+              ))}
+
+              <CustomButton
+                title="Add Green Tax"
+                onPress={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    green_tax_costs: [...prev.green_tax_costs, { state: '', checkpoint: '', amount: 0, notes: '' }]
+                  }));
+                }}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
+            </View>
+
+            {/* RTO Costs */}
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.primary + '20' }]}>
+                  <Ionicons name="document-text" size={20} color={COLORS.primary} />
+                </View>
+                <Text style={styles.costSectionTitle}>RTO Costs</Text>
+              </View>
+
+              {formData.rto_costs.map((cost, index) => (
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>RTO Cost {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          rto_costs: prev.rto_costs.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      style={styles.removeCostButton}
+                    >
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <CustomInput
+                    label="State"
+                    value={cost.state}
+                    onChangeText={(text) => updateRtoCost(index, 'state', text)}
+                    leftIcon="location"
+                    placeholder="Enter state"
+                  />
+
+                  <CustomInput
+                    label="Checkpoint (Optional)"
+                    value={cost.checkpoint || ''}
+                    onChangeText={(text) => updateRtoCost(index, 'checkpoint', text)}
+                    leftIcon="flag"
+                    placeholder="Enter checkpoint"
+                  />
+
+                  <CustomInput
+                    label="Amount"
+                    value={cost.amount.toString()}
+                    onChangeText={(text) => updateRtoCost(index, 'amount', parseFloat(text) || 0)}
+                    leftIcon="cash"
+                    keyboardType="numeric"
+                    placeholder="Enter amount"
+                  />
+
+                  <CustomInput
+                    label="Notes (Optional)"
+                    value={cost.notes || ''}
+                    onChangeText={(text) => updateRtoCost(index, 'notes', text)}
+                    leftIcon="document-text"
+                    placeholder="Enter notes"
+                    multiline
+                  />
+                </View>
+              ))}
+
+              <CustomButton
+                title="Add RTO"
+                onPress={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    rto_costs: [...prev.rto_costs, { state: '', checkpoint: '', amount: 0, notes: '' }]
+                  }));
+                }}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
+            </View>
+
+            {/* DTO Costs */}
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.secondary + '20' }]}>
+                  <Ionicons name="receipt" size={20} color={COLORS.secondary} />
+                </View>
+                <Text style={styles.costSectionTitle}>DTO Costs</Text>
+              </View>
+
+              {formData.dto_costs.map((cost, index) => (
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>DTO Cost {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          dto_costs: prev.dto_costs.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      style={styles.removeCostButton}
+                    >
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <CustomInput
+                    label="State"
+                    value={cost.state}
+                    onChangeText={(text) => updateDtoCost(index, 'state', text)}
+                    leftIcon="location"
+                    placeholder="Enter state"
+                  />
+
+                  <CustomInput
+                    label="Checkpoint (Optional)"
+                    value={cost.checkpoint || ''}
+                    onChangeText={(text) => updateDtoCost(index, 'checkpoint', text)}
+                    leftIcon="flag"
+                    placeholder="Enter checkpoint"
+                  />
+
+                  <CustomInput
+                    label="Amount"
+                    value={cost.amount.toString()}
+                    onChangeText={(text) => updateDtoCost(index, 'amount', parseFloat(text) || 0)}
+                    leftIcon="cash"
+                    keyboardType="numeric"
+                    placeholder="Enter amount"
+                  />
+
+                  <CustomInput
+                    label="Notes (Optional)"
+                    value={cost.notes || ''}
+                    onChangeText={(text) => updateDtoCost(index, 'notes', text)}
+                    leftIcon="document-text"
+                    placeholder="Enter notes"
+                    multiline
+                  />
+                </View>
+              ))}
+
+              <CustomButton
+                title="Add DTO"
+                onPress={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    dto_costs: [...prev.dto_costs, { state: '', checkpoint: '', amount: 0, notes: '' }]
+                  }));
+                }}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
+            </View>
+
+            {/* Border Costs */}
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.warning + '20' }]}>
+                  <Ionicons name="flag" size={20} color={COLORS.warning} />
+                </View>
+                <Text style={styles.costSectionTitle}>Border Costs</Text>
+              </View>
+
+              {formData.border_costs.map((cost, index) => (
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>Border Cost {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          border_costs: prev.border_costs.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      style={styles.removeCostButton}
+                    >
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <CustomInput
+                    label="State"
+                    value={cost.state}
+                    onChangeText={(text) => updateBorderCost(index, 'state', text)}
+                    leftIcon="location"
+                    placeholder="Enter state"
+                  />
+
+                  <CustomInput
+                    label="Checkpoint (Optional)"
+                    value={cost.checkpoint || ''}
+                    onChangeText={(text) => updateBorderCost(index, 'checkpoint', text)}
+                    leftIcon="flag"
+                    placeholder="Enter checkpoint"
+                  />
+
+                  <CustomInput
+                    label="Amount"
+                    value={cost.amount.toString()}
+                    onChangeText={(text) => updateBorderCost(index, 'amount', parseFloat(text) || 0)}
+                    leftIcon="cash"
+                    keyboardType="numeric"
+                    placeholder="Enter amount"
+                  />
+
+                  <CustomInput
+                    label="Notes (Optional)"
+                    value={cost.notes || ''}
+                    onChangeText={(text) => updateBorderCost(index, 'notes', text)}
+                    leftIcon="document-text"
+                    placeholder="Enter notes"
+                    multiline
+                  />
+                </View>
+              ))}
+
+              <CustomButton
+                title="Add Border"
+                onPress={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    border_costs: [...prev.border_costs, { state: '', checkpoint: '', amount: 0, notes: '' }]
+                  }));
+                }}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
+            </View>
+
+            {/* Municipalities Costs */}
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.accent + '20' }]}>
+                  <Ionicons name="business" size={20} color={COLORS.accent} />
+                </View>
+                <Text style={styles.costSectionTitle}>Municipalities Costs</Text>
+              </View>
+
+              {formData.municipalities_costs.map((cost, index) => (
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>Municipalities Cost {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          municipalities_costs: prev.municipalities_costs.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      style={styles.removeCostButton}
+                    >
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <CustomInput
+                    label="State"
+                    value={cost.state}
+                    onChangeText={(text) => updateMunicipalitiesCost(index, 'state', text)}
+                    leftIcon="location"
+                    placeholder="Enter state"
+                  />
+
+                  <CustomInput
+                    label="Checkpoint (Optional)"
+                    value={cost.checkpoint || ''}
+                    onChangeText={(text) => updateMunicipalitiesCost(index, 'checkpoint', text)}
+                    leftIcon="flag"
+                    placeholder="Enter checkpoint"
+                  />
+
+                  <CustomInput
+                    label="Amount"
+                    value={cost.amount.toString()}
+                    onChangeText={(text) => updateMunicipalitiesCost(index, 'amount', parseFloat(text) || 0)}
+                    leftIcon="cash"
+                    keyboardType="numeric"
+                    placeholder="Enter amount"
+                  />
+
+                  <CustomInput
+                    label="Notes (Optional)"
+                    value={cost.notes || ''}
+                    onChangeText={(text) => updateMunicipalitiesCost(index, 'notes', text)}
+                    leftIcon="document-text"
+                    placeholder="Enter notes"
+                    multiline
+                  />
+                </View>
+              ))}
+
+              <CustomButton
+                title="Add Municipalities"
+                onPress={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    municipalities_costs: [...prev.municipalities_costs, { state: '', checkpoint: '', amount: 0, notes: '' }]
+                  }));
+                }}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
+            </View>
 
             {/* Repair Costs */}
-            <RepairCostSection
-              title="Repair"
-              icon="construct"
-              color={COLORS.warning}
-              costs={formData.repair_items}
-              onUpdate={(costs) => setFormData(prev => ({ ...prev, repair_items: costs }))}
-            />
+            <View style={styles.costSection}>
+              <View style={styles.costSectionHeader}>
+                <View style={[styles.costIcon, { backgroundColor: COLORS.warning + '20' }]}>
+                  <Ionicons name="construct" size={20} color={COLORS.warning} />
+                </View>
+                <Text style={styles.costSectionTitle}>Repair Costs</Text>
+              </View>
+
+              {formData.repair_items.map((item, index) => (
+                <View key={index} style={styles.complexCostCard}>
+                  <View style={styles.complexCostHeader}>
+                    <Text style={styles.complexCostTitle}>Repair Cost {index + 1}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          repair_items: prev.repair_items.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      style={styles.removeCostButton}
+                    >
+                      <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <CustomInput
+                    label="State"
+                    value={item.state}
+                    onChangeText={(text) => updateRepairItem(index, 'state', text)}
+                    leftIcon="location"
+                    placeholder="Enter state"
+                  />
+
+                  <CustomInput
+                    label="Checkpoint (Optional)"
+                    value={item.checkpoint || ''}
+                    onChangeText={(text) => updateRepairItem(index, 'checkpoint', text)}
+                    leftIcon="flag"
+                    placeholder="Enter checkpoint"
+                  />
+
+                  <CustomInput
+                    label="Part/Defect"
+                    value={item.part_or_defect}
+                    onChangeText={(text) => updateRepairItem(index, 'part_or_defect', text)}
+                    leftIcon="construct"
+                    placeholder="Enter part or defect description"
+                  />
+
+                  <CustomInput
+                    label="Amount"
+                    value={item.amount.toString()}
+                    onChangeText={(text) => updateRepairItem(index, 'amount', parseFloat(text) || 0)}
+                    leftIcon="cash"
+                    keyboardType="numeric"
+                    placeholder="Enter amount"
+                  />
+
+                  <CustomInput
+                    label="Notes (Optional)"
+                    value={item.notes || ''}
+                    onChangeText={(text) => updateRepairItem(index, 'notes', text)}
+                    leftIcon="document-text"
+                    placeholder="Enter notes"
+                    multiline
+                  />
+                </View>
+              ))}
+
+              <CustomButton
+                title="Add Repair"
+                onPress={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    repair_items: [...prev.repair_items, { state: '', checkpoint: '', part_or_defect: '', amount: 0, notes: '' }]
+                  }));
+                }}
+                variant="outline"
+                size="small"
+                icon="add"
+                style={styles.addCostButton}
+              />
+            </View>
 
             {/* Submit Button */}
             <CustomButton

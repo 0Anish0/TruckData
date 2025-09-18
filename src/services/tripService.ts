@@ -23,6 +23,14 @@ export class TripService extends SupabaseService {
           drivers: driver_id (
             id,
             name
+          ),
+          diesel_purchases (
+            id,
+            state,
+            city,
+            diesel_quantity,
+            diesel_price_per_liter,
+            purchase_date
           )
         `)
         .eq('user_id', await this.getUserId())
@@ -53,6 +61,14 @@ export class TripService extends SupabaseService {
           drivers: driver_id (
             id,
             name
+          ),
+          diesel_purchases (
+            id,
+            state,
+            city,
+            diesel_quantity,
+            diesel_price_per_liter,
+            purchase_date
           )
         `)
         .eq('id', id)
@@ -87,6 +103,14 @@ export class TripService extends SupabaseService {
           drivers: driver_id (
             id,
             name
+          ),
+          diesel_purchases (
+            id,
+            state,
+            city,
+            diesel_quantity,
+            diesel_price_per_liter,
+            purchase_date
           )
         `)
         .eq('truck_id', truckId)

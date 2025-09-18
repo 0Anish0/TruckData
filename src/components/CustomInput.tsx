@@ -88,7 +88,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
 
   const getContainerStyle = (): ContainerStyle => {
     const baseStyle: ContainerStyle = {
-      borderRadius: SIZES.radiusMd,
+      borderRadius: SIZES.radiusXxl,
       borderWidth: 1,
       borderColor: error ? COLORS.error : isFocused ? COLORS.primary : COLORS.border,
       backgroundColor: COLORS.surface,
@@ -109,8 +109,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
         break;
       default: // medium
         baseStyle.paddingHorizontal = SIZES.spacingLg;
-        baseStyle.paddingVertical = SIZES.spacingMd;
-        baseStyle.minHeight = 48;
+        baseStyle.paddingVertical = SIZES.spacingSm;
+        baseStyle.minHeight = 45
     }
 
     // Variant styles
@@ -144,6 +144,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
       case 'large':
         baseStyle.fontSize = SIZES.fontSizeLg;
         break;
+      default:
+        baseStyle.fontSize = SIZES.fontSizeMd;
     }
 
     return baseStyle;
@@ -159,7 +161,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
     if (error) {
       baseStyle.color = COLORS.error;
     } else {
-      baseStyle.color = COLORS.primary;
+      baseStyle.color = COLORS.accent;
     }
 
     return baseStyle;
@@ -179,12 +181,14 @@ const CustomInput: React.FC<CustomInputProps> = ({
   const animatedLabelStyle = {
     position: 'absolute' as const,
     left: leftIcon ? SIZES.spacingXl + SIZES.spacingMd : SIZES.spacingLg,
-    top: -8,
-    fontSize: SIZES.fontSizeSm,
+    top: -10,
+    fontSize: SIZES.fontSizeMd,
     color: error ? COLORS.error : COLORS.primary,
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.background,
     paddingHorizontal: SIZES.spacingXs,
+    borderRadius: SIZES.radius,
     zIndex: 1,
+    opacity: (isFilled || isFocused) ? 1 : 0,
   };
 
   const animatedBorderStyle = {

@@ -76,7 +76,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       case 'small':
         baseStyle.paddingHorizontal = SIZES.spacingMd;
         baseStyle.paddingVertical = SIZES.spacingSm;
-        baseStyle.minHeight = 36;
+        baseStyle.minHeight = 40;
         break;
       case 'large':
         baseStyle.paddingHorizontal = SIZES.spacingXl;
@@ -86,7 +86,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       default: // medium
         baseStyle.paddingHorizontal = SIZES.spacingLg;
         baseStyle.paddingVertical = SIZES.spacingMd;
-        baseStyle.minHeight = 48;
+        baseStyle.minHeight = 45;
     }
 
     // Width

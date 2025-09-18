@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -12,6 +12,7 @@ import {
 } from '../types/navigation';
 
 // Screens
+import SplashScreen from '../screens/SplashScreen';
 import AuthScreen from '../screens/AuthScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import TripsScreen from '../screens/TripsScreen';
@@ -63,7 +64,25 @@ const DriversStack = () => (
 const AppNavigator = () => {
   const { user, loading } = useAuth();
   const insets = useSafeAreaInsets();
+  const [showSplash, setShowSplash] = useState(true);
 
+  useEffect(() => {
+    // Show splash screen for initial app load
+    if (!loading) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+      }, 4500); // Match splash screen duration
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
+  // Show splash screen on initial load
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
+
+  // Show loading while checking auth state
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -72,6 +91,7 @@ const AppNavigator = () => {
     );
   }
 
+  // Show auth screen if not logged in
   if (!user) {
     return (
       <NavigationContainer>

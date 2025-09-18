@@ -1,14 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Animated,
-  Dimensions,
-  StatusBar,
+    View,
+    Text,
+    StyleSheet,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Animated,
+    Dimensions,
+    StatusBar,
+    TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,497 +18,440 @@ import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
+interface FormData {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    fullName: string;
+}
+
+interface FormErrors {
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+    fullName?: string;
+    general?: string;
+}
 
 const AuthScreen: React.FC = () => {
-  const { signIn, signUp } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const { signIn, signUp } = useAuth();
+    const [isLogin, setIsLogin] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState<FormData>({
+        email: '',
+        password: '',
+        confirmPassword: '',
+        fullName: '',
+    });
+    const [errors, setErrors] = useState<FormErrors>({});
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
-  const logoScaleAnim = useRef(new Animated.Value(0.8)).current;
-  const formSlideAnim = useRef(new Animated.Value(30)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+    // Animation values
+    const formOpacityAnim = useRef(new Animated.Value(0)).current;
+    const formTranslateAnim = useRef(new Animated.Value(30)).current;
 
-  useEffect(() => {
-    // Entrance animation
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: ANIMATIONS.slow,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        ...ANIMATIONS.springGentle,
-      }),
-      Animated.spring(logoScaleAnim, {
-        toValue: 1,
-        useNativeDriver: true,
-        ...ANIMATIONS.springBouncy,
-      }),
-      Animated.timing(formSlideAnim, {
-        toValue: 0,
-        duration: ANIMATIONS.slow + 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    useEffect(() => {
+        // Form entrance animations
+        const entranceAnimation = Animated.parallel([
+            Animated.timing(formOpacityAnim, {
+                toValue: 1,
+                duration: ANIMATIONS.slow,
+                useNativeDriver: true,
+            }),
+            Animated.timing(formTranslateAnim, {
+                toValue: 0,
+                duration: ANIMATIONS.slow,
+                useNativeDriver: true,
+            }),
+        ]);
 
-    // Subtle pulse animation for logo
-    const pulseAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.05,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    pulseAnimation.start();
+        entranceAnimation.start();
+    }, []);
 
-    return () => pulseAnimation.stop();
-  }, []);
+    const updateFormData = (field: keyof FormData, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        // Clear error when user starts typing
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: undefined }));
+        }
+    };
 
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {};
 
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
+        // Email validation
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Please enter a valid email address';
+        }
 
-    if (!password.trim()) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
+        // Password validation
+        if (!formData.password.trim()) {
+            newErrors.password = 'Password is required';
+        } else if (formData.password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters';
+        }
 
-    if (!isLogin && !name.trim()) {
-      newErrors.name = 'Name is required';
-    }
+        // Signup specific validations
+        if (!isLogin) {
+            if (!formData.fullName.trim()) {
+                newErrors.fullName = 'Full name is required';
+            } else if (formData.fullName.trim().length < 2) {
+                newErrors.fullName = 'Name must be at least 2 characters';
+            }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+            if (!formData.confirmPassword.trim()) {
+                newErrors.confirmPassword = 'Please confirm your password';
+            } else if (formData.password !== formData.confirmPassword) {
+                newErrors.confirmPassword = 'Passwords do not match';
+            }
+        }
 
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
-    setLoading(true);
-    setErrors({}); // Clear previous errors
+    const handleSubmit = async () => {
+        if (!validateForm()) return;
 
-    try {
-      if (isLogin) {
-        await signIn(email, password);
-        // If sign in is successful, the auth state change will handle navigation
-      } else {
-        await signUp(email, password, name);
-        // After signup, clear the form and show success message
-        setEmail('');
-        setPassword('');
-        setName('');
-        // Don't switch to login mode automatically - let user choose
-      }
-    } catch (error: unknown) {
-      console.error('Auth error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred. Please try again.';
+        setLoading(true);
+        setErrors({});
 
-      // Set specific field errors if possible
-      if (errorMessage.includes('email')) {
-        setErrors({ email: errorMessage });
-      } else if (errorMessage.includes('password')) {
-        setErrors({ password: errorMessage });
-      } else {
-        setErrors({ general: errorMessage });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+        try {
+            if (isLogin) {
+                await signIn(formData.email, formData.password);
+            } else {
+                await signUp(formData.email, formData.password, formData.fullName);
+                // Clear form after successful signup
+                setFormData({
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    fullName: '',
+                });
+            }
+        } catch (error: unknown) {
+            console.error('Auth error:', error);
+            const errorMessage = error instanceof Error ? error.message : 'An error occurred. Please try again.';
 
-  const toggleMode = () => {
-    setIsLogin(!isLogin);
-    setErrors({});
-    setEmail('');
-    setPassword('');
-    setName('');
-  };
+            // Set specific field errors if possible
+            if (errorMessage.toLowerCase().includes('email')) {
+                setErrors({ email: errorMessage });
+            } else if (errorMessage.toLowerCase().includes('password')) {
+                setErrors({ password: errorMessage });
+            } else {
+                setErrors({ general: errorMessage });
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-      <LinearGradient
-        colors={COLORS.primaryGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.background}
-      >
-        {/* Background decorative elements */}
-        <View style={styles.backgroundDecorations}>
-          <View style={[styles.decorationCircle, styles.decorationCircle1]} />
-          <View style={[styles.decorationCircle, styles.decorationCircle2]} />
-          <View style={[styles.decorationCircle, styles.decorationCircle3]} />
-        </View>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardAvoidingView}
-        >
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            {/* Logo Section */}
-            <Animated.View
-              style={[
-                styles.logoSection,
-                {
-                  opacity: fadeAnim,
-                  transform: [
-                    { translateY: slideAnim },
-                    { scale: logoScaleAnim },
-                  ],
-                },
-              ]}
+    const toggleAuthMode = () => {
+        setIsLogin(!isLogin);
+        setErrors({});
+        setFormData({
+            email: '',
+            password: '',
+            confirmPassword: '',
+            fullName: '',
+        });
+
+        // Animate form transition
+        Animated.sequence([
+            Animated.timing(formOpacityAnim, {
+                toValue: 0.3,
+                duration: ANIMATIONS.fast,
+                useNativeDriver: true,
+            }),
+            Animated.timing(formOpacityAnim, {
+                toValue: 1,
+                duration: ANIMATIONS.fast,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    };
+
+    return (
+        <View style={styles.container}>
+            <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+
+            <LinearGradient
+                colors={COLORS.primaryGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.background}
             >
-              <Animated.View
-                style={[
-                  styles.logoContainer,
-                  {
-                    transform: [{ scale: pulseAnim }],
-                  },
-                ]}
-              >
-                <LinearGradient
-                  colors={COLORS.secondaryGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.logoGradient}
-                >
-                  <Ionicons name="car" size={52} color={COLORS.textInverse} />
-                </LinearGradient>
-                {/* Logo glow effect */}
-                <View style={styles.logoGlow} />
-              </Animated.View>
-              <Text style={styles.appTitle}>Trip Treker</Text>
-              <Text style={styles.appSubtitle}>
-                Manage your fleet with ease
-              </Text>
-            </Animated.View>
-
-            {/* Form Section */}
-            <Animated.View
-              style={[
-                styles.formSection,
-                {
-                  opacity: fadeAnim,
-                  transform: [{ translateY: formSlideAnim }],
-                },
-              ]}
-            >
-              <View style={styles.formContainer}>
-                <Text style={styles.formTitle}>
-                  {isLogin ? 'Welcome Back' : 'Create Account'}
-                </Text>
-                <Text style={styles.formSubtitle}>
-                  {isLogin
-                    ? 'Sign in to continue to your dashboard'
-                    : 'Sign up to start managing your fleet'}
-                </Text>
-                {errors.general && (
-                  <View style={styles.generalErrorContainer}>
-                    <Ionicons name="alert-circle" size={16} color={COLORS.error} />
-                    <Text style={styles.generalErrorText}>
-                      {errors.general}
-                    </Text>
-                  </View>
-                )}
-
-                <View style={styles.inputContainer}>
-                  {!isLogin && (
-                    <CustomInput
-                      label="Full Name"
-                      value={name}
-                      onChangeText={setName}
-                      leftIcon="person"
-                      error={errors.name}
-                      placeholder="Enter your full name"
-                      autoCapitalize="words"
-                      textContentType="name"
-                    />
-                  )}
-
-                  <CustomInput
-                    label="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    leftIcon="mail"
-                    error={errors.email}
-                    placeholder="Enter your email"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    textContentType="emailAddress"
-                    size="small"
-                  />
-
-                  <CustomInput
-                    label="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    leftIcon="lock-closed"
-                    error={errors.password}
-                    placeholder="Enter your password"
-                    secureTextEntry
-                    textContentType={isLogin ? 'password' : 'newPassword'}
-                    size="small"
-                  />
-
-                  <CustomButton
-                    title={isLogin ? 'Sign In' : 'Create Account'}
-                    onPress={handleSubmit}
-                    loading={loading}
-                    variant="secondary"
-                    size="small"
-                    fullWidth
-                    icon={isLogin ? 'log-in' : 'person-add'}
-                    shape="pill"
-                    uppercase
-                    style={styles.submitButton}
-                  />
-
-                  <View style={styles.divider}>
-                    <View style={styles.dividerLine} />
-                    <Text style={styles.dividerText}>or</Text>
-                    <View style={styles.dividerLine} />
-                  </View>
-
-                  <CustomButton
-                    title={isLogin ? 'Create Account' : 'Already have an account?'}
-                    onPress={toggleMode}
-                    variant="ghost"
-                    size="medium"
-                    fullWidth
-                    icon={isLogin ? 'person-add' : 'log-in'}
-                    iconPosition="right"
-                    style={styles.toggleButton}
-                  />
+                {/* Background decorative elements */}
+                <View style={styles.backgroundDecorations}>
+                    <View style={[styles.decorationCircle, styles.circle1]} />
+                    <View style={[styles.decorationCircle, styles.circle2]} />
+                    <View style={[styles.decorationCircle, styles.circle3]} />
                 </View>
-              </View>
-            </Animated.View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </LinearGradient>
-    </View>
-  );
+
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={styles.keyboardAvoidingView}
+                >
+                    <ScrollView
+                        contentContainerStyle={styles.scrollContent}
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                    >
+
+                        {/* Form Section */}
+                        <Animated.View
+                            style={[
+                                styles.formSection,
+                                {
+                                    opacity: formOpacityAnim,
+                                    transform: [{ translateY: formTranslateAnim }],
+                                },
+                            ]}
+                        >
+                            <View style={styles.formHeader}>
+                                <Text style={styles.formTitle}>
+                                    {isLogin ? 'Welcome Back' : 'Create Account'}
+                                </Text>
+                                <Text style={styles.formSubtitle}>
+                                    {isLogin
+                                        ? 'Sign in to continue to your dashboard'
+                                        : 'Join us to start managing your fleet'}
+                                </Text>
+                            </View>
+
+                            {/* General Error Display */}
+                            {errors.general && (
+                                <View style={styles.errorContainer}>
+                                    <Ionicons name="alert-circle" size={20} color={COLORS.error} />
+                                    <Text style={styles.errorText}>{errors.general}</Text>
+                                </View>
+                            )}
+
+                            {/* Form Fields */}
+                            <View style={styles.formFields}>
+                                {!isLogin && (
+                                    <CustomInput
+                                        label="Full Name"
+                                        value={formData.fullName}
+                                        onChangeText={(value) => updateFormData('fullName', value)}
+                                        leftIcon="person"
+                                        error={errors.fullName}
+                                        placeholder="Enter your full name"
+                                        autoCapitalize="words"
+                                        textContentType="name"
+                                        containerStyle={styles.inputContainer}
+                                    />
+                                )}
+
+                                <CustomInput
+                                    label="Email"
+                                    value={formData.email}
+                                    onChangeText={(value) => updateFormData('email', value)}
+                                    leftIcon="mail"
+                                    error={errors.email}
+                                    placeholder="Enter your email"
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    textContentType="emailAddress"
+                                    containerStyle={styles.inputContainer}
+                                />
+
+                                <CustomInput
+                                    label="Password"
+                                    value={formData.password}
+                                    onChangeText={(value) => updateFormData('password', value)}
+                                    leftIcon="lock-closed"
+                                    error={errors.password}
+                                    placeholder="Enter your password"
+                                    secureTextEntry
+                                    textContentType={isLogin ? 'password' : 'newPassword'}
+                                    containerStyle={styles.inputContainer}
+                                />
+
+                                {!isLogin && (
+                                    <CustomInput
+                                        label="Confirm Password"
+                                        value={formData.confirmPassword}
+                                        onChangeText={(value) => updateFormData('confirmPassword', value)}
+                                        leftIcon="lock-closed"
+                                        error={errors.confirmPassword}
+                                        placeholder="Confirm your password"
+                                        secureTextEntry
+                                        textContentType="newPassword"
+                                        containerStyle={styles.inputContainer}
+                                    />
+                                )}
+                            </View>
+
+                            {/* Submit Button */}
+                            <CustomButton
+                                title={isLogin ? 'Sign In' : 'Create Account'}
+                                onPress={handleSubmit}
+                                loading={loading}
+                                variant="secondary"
+                                size="medium"
+                                fullWidth
+                                icon={isLogin ? 'log-in' : 'person-add'}
+                                shape="pill"
+                                uppercase
+                                style={styles.submitButton}
+                            />
+
+                            {/* Divider */}
+                            <View style={styles.divider}>
+                                <View style={styles.dividerLine} />
+                                <Text style={styles.dividerText}>or</Text>
+                                <View style={styles.dividerLine} />
+                            </View>
+
+                            {/* Toggle Text */}
+                            <TouchableOpacity onPress={toggleAuthMode} style={styles.toggleTextContainer}>
+                                <Text style={styles.toggleText}>
+                                    {isLogin ? "Don't have an account? " : "Already have an account? "}
+                                    <Text style={styles.toggleTextAction}>
+                                        {isLogin ? 'Sign up' : 'Log in'}
+                                    </Text>
+                                </Text>
+                            </TouchableOpacity>
+                        </Animated.View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </LinearGradient>
+        </View>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  background: {
-    flex: 1,
-  },
-  backgroundDecorations: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  decorationCircle: {
-    position: 'absolute',
-    borderRadius: 9999,
-    opacity: 0.1,
-  },
-  decorationCircle1: {
-    width: 200,
-    height: 200,
-    backgroundColor: COLORS.textInverse,
-    top: -100,
-    right: -50,
-  },
-  decorationCircle2: {
-    width: 150,
-    height: 150,
-    backgroundColor: COLORS.textInverse,
-    bottom: -75,
-    left: -75,
-  },
-  decorationCircle3: {
-    width: 100,
-    height: 100,
-    backgroundColor: COLORS.textInverse,
-    top: '30%',
-    right: -25,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    // Reduce horizontal padding so inputs and buttons are visually wider
-    paddingHorizontal: SIZES.spacingMd,
-    paddingVertical: SIZES.spacingXl,
-  },
-  logoSection: {
-    alignItems: 'center',
-    marginBottom: SIZES.spacingXxl,
-  },
-  logoContainer: {
-    marginBottom: SIZES.spacingLg,
-    position: 'relative',
-  },
-  logoGradient: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...SIZES.shadowLarge,
-  },
-  logoGlow: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: COLORS.textInverse,
-    opacity: 0.2,
-    top: -5,
-    left: -5,
-    zIndex: -1,
-  },
-  appTitle: {
-    fontSize: SIZES.fontSizeDisplay,
-    fontWeight: '800' as const,
-    color: COLORS.textInverse,
-    marginBottom: SIZES.spacingXs,
-    textAlign: 'center',
-  },
-  appSubtitle: {
-    fontSize: SIZES.fontSizeLg,
-    color: COLORS.textInverse,
-    opacity: 0.9,
-    fontWeight: '500' as const,
-    textAlign: 'center',
-  },
-  formSection: {
-    marginBottom: SIZES.spacingXl,
-  },
-  formContainer: {
-    backgroundColor: 'transparent',
-    borderRadius: SIZES.radiusXl,
-    padding: SIZES.spacingXl,
-    borderWidth: 0,
-  },
-  formTitle: {
-    fontSize: SIZES.fontSizeXxl,
-    fontWeight: '700' as const,
-    color: COLORS.textInverse,
-    textAlign: 'center',
-    marginBottom: SIZES.spacingXs,
-  },
-  formSubtitle: {
-    fontSize: SIZES.fontSizeMd,
-    color: COLORS.textInverse,
-    opacity: 0.9,
-    textAlign: 'center',
-    marginBottom: SIZES.spacingMd,
-    lineHeight: 22,
-  },
-  verificationHint: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.infoLight,
-    padding: SIZES.spacingSm,
-    borderRadius: SIZES.radiusMd,
-    marginBottom: SIZES.spacingLg,
-    borderWidth: 1,
-    borderColor: COLORS.info,
-  },
-  verificationText: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.info,
-    marginLeft: SIZES.spacingXs,
-    textAlign: 'center',
-  },
-  generalErrorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FEF2F2',
-    padding: SIZES.spacingSm,
-    borderRadius: SIZES.radiusMd,
-    marginBottom: SIZES.spacingLg,
-    borderWidth: 1,
-    borderColor: COLORS.error,
-  },
-  generalErrorText: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.error,
-    marginLeft: SIZES.spacingXs,
-    textAlign: 'center',
-    fontWeight: '500' as const,
-  },
-  inputContainer: {
-    gap: SIZES.spacingXs,
-  },
-  submitButton: {
-    marginTop: SIZES.spacingXs,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: SIZES.spacingXs,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.glassLight,
-  },
-  dividerText: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textInverse,
-    fontWeight: '600' as const,
-    marginHorizontal: SIZES.spacingLg,
-  },
-  toggleButton: {
-    marginTop: SIZES.spacingSm,
-  },
-  demoInfo: {
-    alignItems: 'center',
-  },
-  demoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.glassVeryLight,
-    paddingHorizontal: SIZES.spacingLg,
-    paddingVertical: SIZES.spacingMd,
-    borderRadius: SIZES.radiusLg,
-    maxWidth: width * 0.8,
-  },
-  demoText: {
-    fontSize: SIZES.fontSizeSm,
-    color: COLORS.textInverse,
-    marginLeft: SIZES.spacingSm,
-    fontWeight: '500' as const,
-    textAlign: 'center',
-    flex: 1,
-  },
+    container: {
+        flex: 1,
+    },
+    background: {
+        flex: 1,
+    },
+    backgroundDecorations: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    decorationCircle: {
+        position: 'absolute',
+        borderRadius: 9999,
+        opacity: 0.08,
+    },
+    circle1: {
+        width: 200,
+        height: 200,
+        backgroundColor: COLORS.textInverse,
+        top: -100,
+        right: -50,
+    },
+    circle2: {
+        width: 150,
+        height: 150,
+        backgroundColor: COLORS.textInverse,
+        bottom: -75,
+        left: -75,
+    },
+    circle3: {
+        width: 100,
+        height: 100,
+        backgroundColor: COLORS.textInverse,
+        top: '35%',
+        right: -25,
+    },
+    keyboardAvoidingView: {
+        flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingHorizontal: SIZES.spacingLg,
+        paddingVertical: SIZES.spacingXl,
+    },
+    formSection: {
+        marginBottom: SIZES.spacingLg,
+    },
+    formHeader: {
+        marginBottom: SIZES.spacingXl,
+    },
+    formTitle: {
+        fontSize: SIZES.fontSizeXxl,
+        fontWeight: '700' as const,
+        color: COLORS.textInverse,
+        textAlign: 'center',
+        marginBottom: SIZES.spacingXs,
+    },
+    formSubtitle: {
+        fontSize: SIZES.fontSizeMd,
+        color: COLORS.textInverse,
+        opacity: 0.9,
+        textAlign: 'center',
+        lineHeight: 22,
+    },
+    errorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: COLORS.glassVeryLight,
+        padding: SIZES.spacingMd,
+        borderRadius: SIZES.radiusMd,
+        marginBottom: SIZES.spacingLg,
+        borderWidth: 1,
+        borderColor: COLORS.error,
+    },
+    errorText: {
+        fontSize: SIZES.fontSizeSm,
+        color: COLORS.error,
+        marginLeft: SIZES.spacingSm,
+        fontWeight: '500' as const,
+        textAlign: 'center',
+        flex: 1,
+    },
+    formFields: {
+        marginBottom: SIZES.spacingLg,
+    },
+    inputContainer: {
+        marginBottom: SIZES.spacingMd,
+    },
+    submitButton: {
+        marginBottom: SIZES.spacingLg,
+    },
+    divider: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: SIZES.spacingLg,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: COLORS.glassLight,
+    },
+    dividerText: {
+        fontSize: SIZES.fontSizeSm,
+        color: COLORS.textInverse,
+        fontWeight: '600' as const,
+        marginHorizontal: SIZES.spacingLg,
+        opacity: 0.8,
+    },
+    toggleTextContainer: {
+        alignItems: 'center',
+        marginTop: SIZES.spacingLg,
+    },
+    toggleText: {
+        fontSize: SIZES.fontSizeMd,
+        color: COLORS.textInverse,
+        opacity: 0.9,
+        textAlign: 'center',
+    },
+    toggleTextAction: {
+        color: COLORS.accent,
+        fontWeight: '600' as const,
+    },
 });
 
 export default AuthScreen;

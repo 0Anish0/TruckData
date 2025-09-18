@@ -264,7 +264,7 @@ const TripCard: React.FC<TripCardProps> = ({
               <View style={[styles.costIcon, { backgroundColor: COLORS.accent + '20' }]}>
                 <Ionicons name="business" size={16} color={COLORS.accent} />
               </View>
-              <Text style={styles.costLabel}>Municipalities</Text>
+              <Text style={styles.costLabel}>Municipal</Text>
               <Text style={styles.costValue}>{formatCurrency(getMunicipalitiesCost())}</Text>
             </View>
 

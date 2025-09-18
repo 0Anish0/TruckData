@@ -20,7 +20,7 @@ const TripCard: React.FC<TripCardProps> = ({
   useEffect(() => {
     // Staggered animation for multiple cards
     const delay = index * 100;
-    
+
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -91,7 +91,7 @@ const TripCard: React.FC<TripCardProps> = ({
 
   const getTotalDieselCost = () => {
     const purchases = getDieselPurchases();
-    return purchases.reduce((total, purchase) => 
+    return purchases.reduce((total, purchase) =>
       total + ((purchase.diesel_quantity || 0) * (purchase.diesel_price_per_liter || 0)), 0
     );
   };
@@ -106,6 +106,18 @@ const TripCard: React.FC<TripCardProps> = ({
 
   const getGreenTaxCost = () => {
     return trip.green_tax_cost || 0;
+  };
+
+  const getRtoCost = () => {
+    return trip.rto_cost || 0;
+  };
+
+  const getDtoCost = () => {
+    return trip.dto_cost || 0;
+  };
+
+  const getMunicipalitiesCost = () => {
+    return trip.municipalities_cost || 0;
   };
 
   const getTotalCost = () => {
@@ -182,7 +194,7 @@ const TripCard: React.FC<TripCardProps> = ({
             <Text style={styles.dieselInfo}>
               {getTotalDieselQuantity()}L - {formatCurrency(getTotalDieselCost())}
             </Text>
-            
+
             {/* Diesel Purchases Breakdown */}
             {getDieselPurchases().length > 0 && (
               <View style={styles.dieselPurchasesContainer}>
@@ -207,7 +219,7 @@ const TripCard: React.FC<TripCardProps> = ({
               <Text style={styles.costLabel}>Fast Tag</Text>
               <Text style={styles.costValue}>{formatCurrency(getFastTagCost())}</Text>
             </View>
-            
+
             <View style={styles.costItem}>
               <View style={[styles.costIcon, { backgroundColor: COLORS.warning + '20' }]}>
                 <Ionicons name="business" size={16} color={COLORS.warning} />
@@ -215,13 +227,37 @@ const TripCard: React.FC<TripCardProps> = ({
               <Text style={styles.costLabel}>MCD</Text>
               <Text style={styles.costValue}>{formatCurrency(getMcdCost())}</Text>
             </View>
-            
+
             <View style={styles.costItem}>
               <View style={[styles.costIcon, { backgroundColor: COLORS.success + '20' }]}>
                 <Ionicons name="leaf" size={16} color={COLORS.success} />
               </View>
               <Text style={styles.costLabel}>Green Tax</Text>
               <Text style={styles.costValue}>{formatCurrency(getGreenTaxCost())}</Text>
+            </View>
+
+            <View style={styles.costItem}>
+              <View style={[styles.costIcon, { backgroundColor: COLORS.primary + '20' }]}>
+                <Ionicons name="document-text" size={16} color={COLORS.primary} />
+              </View>
+              <Text style={styles.costLabel}>RTO</Text>
+              <Text style={styles.costValue}>{formatCurrency(getRtoCost())}</Text>
+            </View>
+
+            <View style={styles.costItem}>
+              <View style={[styles.costIcon, { backgroundColor: COLORS.secondary + '20' }]}>
+                <Ionicons name="receipt" size={16} color={COLORS.secondary} />
+              </View>
+              <Text style={styles.costLabel}>DTO</Text>
+              <Text style={styles.costValue}>{formatCurrency(getDtoCost())}</Text>
+            </View>
+
+            <View style={styles.costItem}>
+              <View style={[styles.costIcon, { backgroundColor: COLORS.accent + '20' }]}>
+                <Ionicons name="business" size={16} color={COLORS.accent} />
+              </View>
+              <Text style={styles.costLabel}>Municipalities</Text>
+              <Text style={styles.costValue}>{formatCurrency(getMunicipalitiesCost())}</Text>
             </View>
           </View>
         </View>
@@ -245,8 +281,8 @@ const TripCard: React.FC<TripCardProps> = ({
       {(onEdit || onDelete) && (
         <View style={styles.actions}>
           {onEdit && (
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.editButton]} 
+            <TouchableOpacity
+              style={[styles.actionButton, styles.editButton]}
               onPress={handleEditPress}
               activeOpacity={0.7}
             >
@@ -254,8 +290,8 @@ const TripCard: React.FC<TripCardProps> = ({
             </TouchableOpacity>
           )}
           {onDelete && (
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.deleteButton]} 
+            <TouchableOpacity
+              style={[styles.actionButton, styles.deleteButton]}
               onPress={handleDeletePress}
               activeOpacity={0.7}
             >
@@ -365,13 +401,15 @@ const styles = StyleSheet.create({
   },
   costsGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: SIZES.spacingLg,
   },
   costItem: {
-    flex: 1,
+    width: '30%',
     alignItems: 'center',
     paddingHorizontal: SIZES.spacingXs,
+    marginBottom: SIZES.spacingSm,
   },
   costIcon: {
     width: 32,

@@ -28,19 +28,22 @@ const ExportButton: React.FC<ExportButtonProps> = ({
 
     const sizeConfig = {
         small: {
-            padding: SIZES.spacingSm,
+            paddingHorizontal: SIZES.spacingSm,
+            paddingVertical: SIZES.spacingXs,
             fontSize: SIZES.fontSizeXs,
-            iconSize: 16,
+            iconSize: 14,
         },
         medium: {
-            padding: SIZES.spacingMd,
+            paddingHorizontal: SIZES.spacingMd,
+            paddingVertical: SIZES.spacingSm,
             fontSize: SIZES.fontSizeSm,
-            iconSize: 20,
+            iconSize: 18,
         },
         large: {
-            padding: SIZES.spacingLg,
+            paddingHorizontal: SIZES.spacingLg,
+            paddingVertical: SIZES.spacingMd,
             fontSize: SIZES.fontSizeMd,
-            iconSize: 24,
+            iconSize: 20,
         },
     };
 
@@ -49,16 +52,19 @@ const ExportButton: React.FC<ExportButtonProps> = ({
             backgroundColor: COLORS.primary,
             textColor: COLORS.textInverse,
             borderColor: COLORS.primary,
+            shadow: false,
         },
         secondary: {
             backgroundColor: COLORS.secondary,
             textColor: COLORS.textInverse,
             borderColor: COLORS.secondary,
+            shadow: false,
         },
         outline: {
-            backgroundColor: 'transparent',
+            backgroundColor: COLORS.surface,
             textColor: COLORS.primary,
             borderColor: COLORS.primary,
+            shadow: true,
         },
     };
 
@@ -97,11 +103,13 @@ const ExportButton: React.FC<ExportButtonProps> = ({
             style={[
                 styles.button,
                 {
-                    padding: config.padding,
+                    paddingHorizontal: config.paddingHorizontal,
+                    paddingVertical: config.paddingVertical,
                     backgroundColor: variantStyle.backgroundColor,
                     borderColor: variantStyle.borderColor,
                     borderWidth: variant === 'outline' ? 1 : 0,
                 },
+                variantStyle.shadow && SIZES.shadow,
             ]}
             onPress={handleExport}
             disabled={isExporting}
@@ -143,13 +151,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: SIZES.radius,
-        ...SIZES.shadow,
+        minHeight: 32,
     },
     icon: {
         marginRight: SIZES.spacingXs,
     },
     text: {
         fontWeight: '600' as const,
+        fontSize: SIZES.fontSizeXs,
+        letterSpacing: 0.5,
     },
 });
 

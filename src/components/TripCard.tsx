@@ -335,7 +335,7 @@ const TripCard: React.FC<TripCardProps> = ({
             <ExportButton
               trip={trip as any}
               size="small"
-              variant="outline"
+              variant="primary"
               onExportComplete={onExport}
             />
           </View>

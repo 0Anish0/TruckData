@@ -156,6 +156,7 @@ const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route }) => {
       onPress={() => { }}
       onEdit={() => navigation.navigate('AddTrip', { trip: item as TripWithRelations })}
       onDelete={() => { }}
+      onExport={() => { }} // Export functionality will be handled by the ExportButton component
       index={index}
     />
   );

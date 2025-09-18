@@ -417,6 +417,7 @@ export interface TripCardProps {
   onPress: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onExport?: () => void;
   index?: number;
 }
 

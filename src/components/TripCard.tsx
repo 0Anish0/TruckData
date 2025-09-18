@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import { TripCardProps } from '../types';
+import ExportButton from './ExportButton';
 
 const TripCard: React.FC<TripCardProps> = ({
   trip,
@@ -11,6 +12,7 @@ const TripCard: React.FC<TripCardProps> = ({
   onPress,
   onEdit,
   onDelete,
+  onExport,
   index = 0,
 }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -301,29 +303,44 @@ const TripCard: React.FC<TripCardProps> = ({
         </LinearGradient>
       </TouchableOpacity>
 
-      {/* Action buttons */}
-      {(onEdit || onDelete) && (
-        <View style={styles.actions}>
-          {onEdit && (
-            <TouchableOpacity
-              style={[styles.actionButton, styles.editButton]}
-              onPress={handleEditPress}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="pencil" size={18} color={COLORS.primary} />
-            </TouchableOpacity>
-          )}
-          {onDelete && (
-            <TouchableOpacity
-              style={[styles.actionButton, styles.deleteButton]}
-              onPress={handleDeletePress}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="trash" size={18} color={COLORS.error} />
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
+      {/* Action buttons container */}
+      <View style={styles.actionsContainer}>
+        {/* Edit and Delete buttons */}
+        {(onEdit || onDelete) && (
+          <View style={styles.actions}>
+            {onEdit && (
+              <TouchableOpacity
+                style={[styles.actionButton, styles.editButton]}
+                onPress={handleEditPress}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="pencil" size={18} color={COLORS.primary} />
+              </TouchableOpacity>
+            )}
+            {onDelete && (
+              <TouchableOpacity
+                style={[styles.actionButton, styles.deleteButton]}
+                onPress={handleDeletePress}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="trash" size={18} color={COLORS.error} />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        {/* Export button - positioned below edit/delete buttons */}
+        {onExport && (
+          <View style={styles.exportButtonWrapper}>
+            <ExportButton
+              trip={trip as any}
+              size="small"
+              variant="outline"
+              onExportComplete={onExport}
+            />
+          </View>
+        )}
+      </View>
     </Animated.View>
   );
 };
@@ -349,7 +366,7 @@ const styles = StyleSheet.create({
   },
   routeInfo: {
     flex: 1,
-    paddingRight: 80, // Add padding to prevent overlap with action buttons
+    paddingRight: 80,
   },
   route: {
     fontSize: SIZES.fontSizeLg,
@@ -477,13 +494,16 @@ const styles = StyleSheet.create({
     color: COLORS.textInverse,
     fontWeight: '800' as const,
   },
-  actions: {
+  actionsContainer: {
     position: 'absolute',
     top: SIZES.spacingLg,
     right: SIZES.spacingLg,
+    alignItems: 'flex-end',
+    zIndex: 10,
+  },
+  actions: {
     flexDirection: 'row',
     gap: SIZES.spacingSm,
-    zIndex: 10,
   },
   actionButton: {
     width: 32,
@@ -498,6 +518,10 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     backgroundColor: COLORS.surface,
+  },
+  exportButtonWrapper: {
+    marginTop: SIZES.spacingSm,
+    alignItems: 'flex-end',
   },
   durationContainer: {
     flexDirection: 'row',

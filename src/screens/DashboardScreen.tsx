@@ -289,6 +289,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
                 // TODO: Implement delete functionality
                 console.log('Delete trip:', trip.id);
               }}
+              onExport={() => { }} // Export functionality will be handled by the ExportButton component
               index={index}
             />
           ))}

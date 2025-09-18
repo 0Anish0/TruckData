@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import CustomButton from '../components/CustomButton';
+import Loader from '../components/Loader';
 import { Driver, DriversScreenNavigationProp } from '../types';
 
 interface DriversScreenProps {
@@ -236,13 +237,7 @@ const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
   const sortedDrivers = getSortedDrivers();
 
   if (loading) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading Drivers...</Text>
-        </View>
-      </View>
-    );
+    return <Loader message="Loading Drivers..." size="large" />;
   }
 
   return (
@@ -342,16 +337,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: SIZES.fontSizeLg,
-    color: COLORS.textSecondary,
-    fontWeight: '600' as const,
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,

@@ -18,6 +18,7 @@ import { tripService, truckService, driverService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import TripCard from '../components/TripCard';
 import CustomButton from '../components/CustomButton';
+import Loader from '../components/Loader';
 import { Trip, Truck, Driver, DashboardStats, DashboardScreenNavigationProp, TripWithRelations } from '../types';
 
 const { width } = Dimensions.get('window');
@@ -172,13 +173,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   );
 
   if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading Dashboard...</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <Loader message="Loading Dashboard..." size="large" />;
   }
 
   return (
@@ -324,16 +319,6 @@ const styles = StyleSheet.create({
     paddingBottom: SIZES.spacingXl,
     paddingTop: SIZES.spacingSm,
     paddingHorizontal: SIZES.spacingLg,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: SIZES.fontSizeLg,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,

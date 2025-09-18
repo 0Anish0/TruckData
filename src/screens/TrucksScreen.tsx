@@ -15,6 +15,7 @@ import { truckService, tripService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import TruckCard from '../components/TruckCard';
 import CustomButton from '../components/CustomButton';
+import Loader from '../components/Loader';
 import { Truck, Trip, TrucksScreenNavigationProp } from '../types';
 const { width } = Dimensions.get('window');
 
@@ -171,13 +172,7 @@ const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
   const sortedTrucks = getSortedTrucks();
 
   if (loading) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading Trucks...</Text>
-        </View>
-      </View>
-    );
+    return <Loader message="Loading Trucks..." size="large" />;
   }
 
   return (
@@ -277,16 +272,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: SIZES.fontSizeLg,
-    color: COLORS.textSecondary,
-    fontWeight: '600' as const,
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,

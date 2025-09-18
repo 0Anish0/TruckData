@@ -16,6 +16,7 @@ import { tripService, truckService } from '../services';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 import TripCard from '../components/TripCard';
 import CustomButton from '../components/CustomButton';
+import Loader from '../components/Loader';
 import { Trip, Truck, TripsScreenNavigationProp, TripWithRelations } from '../types';
 const { width } = Dimensions.get('window');
 
@@ -166,13 +167,7 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const filteredTrips = getFilteredTrips();
 
   if (loading) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading Trips...</Text>
-        </View>
-      </View>
-    );
+    return <Loader message="Loading Trips..." size="large" />;
   }
 
   return (
@@ -312,16 +307,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: SIZES.fontSizeLg,
-    color: COLORS.textSecondary,
-    fontWeight: '600' as const,
   },
   header: {
     paddingHorizontal: SIZES.spacingLg,

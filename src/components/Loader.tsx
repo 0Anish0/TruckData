@@ -16,12 +16,14 @@ interface LoaderProps {
     message?: string;
     size?: 'small' | 'medium' | 'large';
     showProgress?: boolean;
+    iconName?: keyof typeof Ionicons.glyphMap;
 }
 
 const Loader: React.FC<LoaderProps> = ({
     message = 'Loading...',
     size = 'medium',
-    showProgress = true
+    showProgress = true,
+    iconName = 'car'
 }) => {
     // Animation values
     const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -178,7 +180,7 @@ const Loader: React.FC<LoaderProps> = ({
                                 ]}
                             >
                                 <Ionicons
-                                    name="car"
+                                    name={iconName}
                                     size={config.iconSize}
                                     color={COLORS.textInverse}
                                 />

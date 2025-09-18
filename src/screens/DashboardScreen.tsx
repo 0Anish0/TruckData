@@ -173,7 +173,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   );
 
   if (loading) {
-    return <Loader message="Loading Dashboard..." size="large" />;
+    return <Loader message="Loading Dashboard..." size="large" iconName="car-sport" />;
   }
 
   return (
@@ -196,10 +196,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
               onPress={handleLogout}
               activeOpacity={0.7}
             >
-              <Ionicons name="log-out-outline" size={24} color={COLORS.textInverse} />
+              <Ionicons name="log-out-outline" size={30} color={COLORS.textInverse} />
             </TouchableOpacity>
             <View style={styles.headerIcon}>
-              <Ionicons name="car" size={32} color={COLORS.textInverse} />
+              <Ionicons name="car-sport" size={30} color={COLORS.textInverse} />
             </View>
           </View>
         </View>

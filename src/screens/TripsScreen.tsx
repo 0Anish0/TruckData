@@ -167,7 +167,7 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const filteredTrips = getFilteredTrips();
 
   if (loading) {
-    return <Loader message="Loading Trips..." size="large" />;
+    return <Loader message="Loading Trips..." size="large" iconName="list" />;
   }
 
   return (

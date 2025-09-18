@@ -237,7 +237,7 @@ const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
   const sortedDrivers = getSortedDrivers();
 
   if (loading) {
-    return <Loader message="Loading Drivers..." size="large" />;
+    return <Loader message="Loading Drivers..." size="large" iconName="people" />;
   }
 
   return (

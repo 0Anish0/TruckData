@@ -172,7 +172,7 @@ const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
   const sortedTrucks = getSortedTrucks();
 
   if (loading) {
-    return <Loader message="Loading Trucks..." size="large" />;
+    return <Loader message="Loading Trucks..." size="large" iconName="car-sport" />;
   }
 
   return (

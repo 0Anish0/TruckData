@@ -173,7 +173,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   );
 
   if (loading) {
-    return <Loader message="Loading Dashboard..." size="large" iconName="car-sport" />;
+    return <Loader message="Loading Dashboard..." size="large" iconName="analytics" />;
   }
 
   return (

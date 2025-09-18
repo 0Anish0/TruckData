@@ -164,7 +164,7 @@ const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route }) => {
   const filteredTrips = getFilteredTrips();
 
   if (loading) {
-    return <Loader message="Loading Trips..." size="large" />;
+    return <Loader message="Loading Trips..." size="large" iconName="car-sport" />;
   }
 
   return (

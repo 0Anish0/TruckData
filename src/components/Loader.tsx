@@ -5,7 +5,10 @@ import {
     StyleSheet,
     Animated,
     Dimensions,
+    StatusBar,
+    Modal,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
@@ -25,6 +28,7 @@ const Loader: React.FC<LoaderProps> = ({
     showProgress = true,
     iconName = 'car'
 }) => {
+    const insets = useSafeAreaInsets();
     // Animation values
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const logoScaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -136,124 +140,132 @@ const Loader: React.FC<LoaderProps> = ({
     });
 
     return (
-        <View style={styles.container}>
-            <Animated.View
-                style={[
-                    styles.content,
-                    {
-                        opacity: fadeAnim,
-                    },
-                ]}
-            >
-                {/* Logo Section */}
-                <View style={styles.logoSection}>
-                    <Animated.View
-                        style={[
-                            styles.logoContainer,
-                            {
-                                transform: [
-                                    { scale: logoScaleAnim },
-                                    { rotate: logoRotation },
-                                ],
-                            },
-                        ]}
-                    >
+        <Modal
+            visible={true}
+            transparent={true}
+            animationType="fade"
+            statusBarTranslucent={true}
+        >
+            <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+                <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+                <Animated.View
+                    style={[
+                        styles.content,
+                        {
+                            opacity: fadeAnim,
+                        },
+                    ]}
+                >
+                    {/* Logo Section */}
+                    <View style={styles.logoSection}>
                         <Animated.View
                             style={[
-                                styles.logoInner,
+                                styles.logoContainer,
                                 {
-                                    transform: [{ scale: pulseAnim }],
+                                    transform: [
+                                        { scale: logoScaleAnim },
+                                        { rotate: logoRotation },
+                                    ],
                                 },
                             ]}
                         >
-                            <LinearGradient
-                                colors={COLORS.primaryGradient}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 1 }}
+                            <Animated.View
                                 style={[
-                                    styles.logoGradient,
+                                    styles.logoInner,
                                     {
-                                        width: config.logoSize,
-                                        height: config.logoSize,
-                                        borderRadius: config.logoSize / 2,
+                                        transform: [{ scale: pulseAnim }],
                                     },
                                 ]}
                             >
-                                <Ionicons
-                                    name={iconName}
-                                    size={config.iconSize}
-                                    color={COLORS.textInverse}
+                                <LinearGradient
+                                    colors={COLORS.primaryGradient}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 1 }}
+                                    style={[
+                                        styles.logoGradient,
+                                        {
+                                            width: config.logoSize,
+                                            height: config.logoSize,
+                                            borderRadius: config.logoSize / 2,
+                                        },
+                                    ]}
+                                >
+                                    <Ionicons
+                                        name={iconName}
+                                        size={config.iconSize}
+                                        color={COLORS.textInverse}
+                                    />
+                                </LinearGradient>
+
+                                {/* Logo glow effects */}
+                                <View
+                                    style={[
+                                        styles.logoGlow1,
+                                        {
+                                            width: config.logoSize + 20,
+                                            height: config.logoSize + 20,
+                                            borderRadius: (config.logoSize + 20) / 2,
+                                            top: -10,
+                                            left: -10,
+                                        },
+                                    ]}
                                 />
-                            </LinearGradient>
-
-                            {/* Logo glow effects */}
-                            <View
-                                style={[
-                                    styles.logoGlow1,
-                                    {
-                                        width: config.logoSize + 20,
-                                        height: config.logoSize + 20,
-                                        borderRadius: (config.logoSize + 20) / 2,
-                                        top: -10,
-                                        left: -10,
-                                    },
-                                ]}
-                            />
-                            <View
-                                style={[
-                                    styles.logoGlow2,
-                                    {
-                                        width: config.logoSize + 40,
-                                        height: config.logoSize + 40,
-                                        borderRadius: (config.logoSize + 40) / 2,
-                                        top: -20,
-                                        left: -20,
-                                    },
-                                ]}
-                            />
+                                <View
+                                    style={[
+                                        styles.logoGlow2,
+                                        {
+                                            width: config.logoSize + 40,
+                                            height: config.logoSize + 40,
+                                            borderRadius: (config.logoSize + 40) / 2,
+                                            top: -20,
+                                            left: -20,
+                                        },
+                                    ]}
+                                />
+                            </Animated.View>
                         </Animated.View>
-                    </Animated.View>
 
-                    {/* Loading Text */}
-                    <Animated.View
-                        style={[
-                            styles.textContainer,
-                            {
-                                transform: [{ translateY: textSlideAnim }],
-                                marginTop: config.spacing,
-                            },
-                        ]}
-                    >
-                        <Text
+                        {/* Loading Text */}
+                        <Animated.View
                             style={[
-                                styles.loadingText,
+                                styles.textContainer,
                                 {
-                                    fontSize: config.fontSize,
+                                    transform: [{ translateY: textSlideAnim }],
+                                    marginTop: config.spacing,
                                 },
                             ]}
                         >
-                            {message}
-                        </Text>
-                    </Animated.View>
-                </View>
-
-                {/* Progress Section */}
-                {showProgress && (
-                    <View style={styles.progressSection}>
-                        <View style={styles.progressBarContainer}>
-                            <Animated.View
+                            <Text
                                 style={[
-                                    styles.progressBar,
+                                    styles.loadingText,
                                     {
-                                        width: progressWidth,
+                                        fontSize: config.fontSize,
                                     },
                                 ]}
-                            />
-                        </View>
+                            >
+                                {message}
+                            </Text>
+                        </Animated.View>
                     </View>
-                )}
-            </Animated.View>
-        </View>
+
+                    {/* Progress Section */}
+                    {showProgress && (
+                        <View style={styles.progressSection}>
+                            <View style={styles.progressBarContainer}>
+                                <Animated.View
+                                    style={[
+                                        styles.progressBar,
+                                        {
+                                            width: progressWidth,
+                                        },
+                                    ]}
+                                />
+                            </View>
+                        </View>
+                    )}
+                </Animated.View>
+            </View>
+        </Modal>
     );
 };
 

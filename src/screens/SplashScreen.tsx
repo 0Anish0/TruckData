@@ -11,7 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES, ANIMATIONS } from '../constants/theme';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface SplashScreenProps {
     onFinish: () => void;
@@ -159,7 +159,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
                                     end={{ x: 1, y: 1 }}
                                     style={styles.logoGradient}
                                 >
-                                    <Ionicons name="car" size={60} color={COLORS.textInverse} />
+                                    <Ionicons name="car-sport" size={60} color={COLORS.textInverse} />
                                 </LinearGradient>
 
                                 {/* Logo glow effects */}

@@ -166,12 +166,9 @@ const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const stats = getTotalStats();
   const filteredTrips = getFilteredTrips();
 
-  if (loading) {
-    return <Loader message="Loading Trips..." size="large" iconName="list" />;
-  }
-
   return (
     <View style={styles.container}>
+      {loading && <Loader message="Loading Trips..." size="large" iconName="list" />}
       {/* Header */}
       {/* Sticky Header */}
       <LinearGradient

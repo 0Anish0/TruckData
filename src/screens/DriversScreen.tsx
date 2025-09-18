@@ -236,12 +236,9 @@ const DriversScreen: React.FC<DriversScreenProps> = ({ navigation }) => {
   const stats = getTotalStats();
   const sortedDrivers = getSortedDrivers();
 
-  if (loading) {
-    return <Loader message="Loading Drivers..." size="large" iconName="people" />;
-  }
-
   return (
     <View style={styles.container}>
+      {loading && <Loader message="Loading Drivers..." size="large" iconName="people" />}
       {/* Sticky Header */}
       <LinearGradient
         colors={COLORS.accentGradient}

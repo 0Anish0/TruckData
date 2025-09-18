@@ -171,12 +171,9 @@ const TrucksScreen: React.FC<TrucksScreenProps> = ({ navigation }) => {
   const stats = getTotalStats();
   const sortedTrucks = getSortedTrucks();
 
-  if (loading) {
-    return <Loader message="Loading Trucks..." size="large" iconName="car-sport" />;
-  }
-
   return (
     <View style={styles.container}>
+      {loading && <Loader message="Loading Trucks..." size="large" iconName="car-sport" />}
       {/* Sticky Header */}
       <LinearGradient
         colors={COLORS.secondaryGradient}

@@ -163,12 +163,9 @@ const TruckTripsScreen: React.FC<TruckTripsScreenProps> = ({ route }) => {
   const stats = getTruckStats();
   const filteredTrips = getFilteredTrips();
 
-  if (loading) {
-    return <Loader message="Loading Trips..." size="large" iconName="car-sport" />;
-  }
-
   return (
     <View style={styles.container}>
+      {loading && <Loader message="Loading Trips..." size="large" iconName="car-sport" />}
       {/* Header */}
       <LinearGradient
         colors={COLORS.secondaryGradient}

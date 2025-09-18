@@ -172,12 +172,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     </Animated.View>
   );
 
-  if (loading) {
-    return <Loader message="Loading Dashboard..." size="large" iconName="analytics" />;
-  }
-
   return (
     <View style={styles.container}>
+      {loading && <Loader message="Loading Dashboard..." size="large" iconName="analytics" />}
       {/* Sticky Header */}
       <LinearGradient
         colors={COLORS.primaryGradient}

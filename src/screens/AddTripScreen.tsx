@@ -1844,7 +1844,7 @@ const styles = StyleSheet.create({
     marginTop: SIZES.spacingLg,
   },
   dateRow: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: SIZES.spacingMd,
     marginTop: SIZES.spacingMd,
   },
